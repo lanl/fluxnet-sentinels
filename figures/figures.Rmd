@@ -1,0 +1,28 @@
+---
+title: "Figures"
+output:
+  pdf_document:
+    fig_caption: yes
+    keep_tex: yes
+header-includes: 
+- \usepackage{colortbl}
+- \usepackage{float}
+- \usepackage{caption}
+- \pagenumbering{gobble}
+---
+
+\arrayrulecolor{white}
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.path = "../figures/", dev = c("pdf"))
+knitr::opts_chunk$set(fig.pos = "H")
+```
+
+\pagebreak
+
+```{r}
+source("../scripts/99_utils.R")
+```
+
+```{r map}
+print(2)
+```
