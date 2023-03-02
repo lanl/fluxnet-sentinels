@@ -19,18 +19,22 @@ knitr::opts_chunk$set(fig.pos = "H")
 
 \pagebreak
 
-```{r}
+```{r, echo=FALSE}
 if(dir.exists("../scripts")){
+    shim <- "../"
     source("../scripts/99_utils.R")
 }else{
+    shim <- ""
     source("scripts/99_utils.R")
 }
 
+```
 
+```{r}
 dt <- read.csv(
-    "../../Data/Euroflux/BE-Lon/L2-L4_2004-2012/EFDC_L2_Flx_BELon_2008_v017_30m.txt",
+    paste0(shim, "../../Data/Euroflux/BE-Lon/L2-L4_2004-2012/EFDC_L2_Flx_BELon_2008_v017_30m.txt"),
     header = TRUE,
-    colClasses = c("TIMESTAMP_START" = "character", "TIMESTAMP_END" = "character"), 
+    colClasses = c("TIMESTAMP_START" = "character", "TIMESTAMP_END" = "character"),
     na.strings = "-9999") %>%
     clean_names()
 
@@ -38,5 +42,21 @@ head(dt)
 ```
 
 ```{r map}
-print(2)
+
+coords_ire <- sf::st_as_sf(
+    data.frame(lat = 50.45055, lon = 4.5350415),
+    coords = c("lon", "lat"), crs = 4326)
+
+dt_sites <- read.csv(
+    system.file("extdata", "Site_metadata.csv", package = "FluxnetLSM")) %>%
+    clean_names() %>%
+    dplyr::mutate_all(na_if, "") %>%
+    st_as_sf(coords = c("site_longitude", "site_latitude"), crs = 4326)
+
+dt_dist <- unlist(st_distance(coords_ire, dt_sites))
+dt_sites_close <- dt_sites[dt_dist < units::as_units(100, "mi"),]
+
+rmarkdown::render_delayed({
+    mapview(dt_sites_close) + mapview(coords_ire, color = "red")
+    })
 ```
