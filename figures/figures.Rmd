@@ -27,7 +27,6 @@ if(dir.exists("../scripts")){
     shim <- ""
     source("scripts/99_utils.R")
 }
-
 ```
 
 ```{r}
