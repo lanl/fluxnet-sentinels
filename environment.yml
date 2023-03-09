@@ -1,0 +1,14 @@
+name: fluxnet
+channels:
+- conda-forge
+dependencies:
+        - python>3
+        - pandas        
+        - pytest
+        - black
+        - geopy
+        - geopandas
+        - scipy
+        - pip
+        - pip:
+                - pyffp
