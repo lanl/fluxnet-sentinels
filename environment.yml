@@ -9,6 +9,8 @@ dependencies:
         - geopy
         - geopandas
         - scipy
+        - pyjanitor
+        - seaborn
         - pip
         - pip:
                 - pyffp
