@@ -4,12 +4,14 @@ import os
 import janitor # clean_names
 import numpy as np
 import pandas as pd
-import geopandas as gpd
 import seaborn as sns
+import geopandas as gpd
+import cartopy.crs as ccrs
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
-from pyffp import calc_footprint_FFP_climatology as myfootprint
+import cartopy.feature as cfeature
 
+from pyffp import calc_footprint_FFP_climatology as myfootprint
 from pyffp import utils as ffputils
 get_dd = ffputils.get_dd
 
@@ -87,11 +89,17 @@ cc = [c]*len(levs)
 # generate GeoDataFrame of contours
 fig, ax = plt.subplots(figsize=(10, 8))
 cp = ax.contour(x_2d_dd, y_2d_dd, fs, levs, colors = cc, linewidths=0.5)
-gdf = ffputils.contour_to_gdf(cp, "test.gpkg")
-gdf["timestamp_start"] = list(dt["timestamp_start"].values[0:10])
+gdf = ffputils.contour_to_gdf(cp)
 # plt.show()
 plt.close()
 
-gpd.GeoDataFrame(geometry=gpd.points_from_xy(x=[origin_lon], y=[origin_lat])).to_file("BELon.gpkg", driver="GPKG")
-gdf.to_file("test.gpkg", driver="GPKG")
+be_lon = gpd.GeoDataFrame(geometry=gpd.points_from_xy(x=[origin_lon], y=[origin_lat]))
 
+fig = plt.figure(figsize=[6, 6])
+ax1 = fig.add_subplot(1, 1, 1, projection=ccrs.PlateCarree())
+ax1.add_feature(cfeature.LAND)
+gdf.plot(ax=ax1, legend=True, legend_kwds={"shrink": 0.6})
+be_lon.plot(ax=ax1, color="black", markersize=2)
+plt.tight_layout()
+# plt.show()
+plt.savefig("figures/footprint.pdf", bbox_inches="tight")

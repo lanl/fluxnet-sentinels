@@ -11,6 +11,7 @@ dependencies:
         - scipy
         - pyjanitor
         - seaborn        
+        - cartopy
         - pip
         - pip:
                 - pyffp
