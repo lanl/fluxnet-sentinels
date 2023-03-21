@@ -1,1 +1,4 @@
 .vscode
+*.pdf
+*.gpkg
+figures/*.tex
