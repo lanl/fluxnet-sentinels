@@ -53,8 +53,10 @@ dt_sites <- read.csv(
     st_as_sf(coords = c("site_longitude", "site_latitude"), crs = 4326)
 
 dt_sites$dist <- unlist(list(unlist(st_distance(coords_ire, dt_sites)))) / 1609.34
-dt_sites_close <- dt_sites[dt_sites$dist < 100,]
-head(dplyr::arrange(dt_sites_close, dist)$dist)
+dt_sites_close <- dt_sites[dt_sites$dist < 100,] %>%
+    dplyr::arrange(dist)
+head(dt_sites_close$dist)
+st_coordinates(dt_sites_close[1,])
 
 rmarkdown::render_delayed({
     mapview(dt_sites_close) + mapview(coords_ire, color = "red")
