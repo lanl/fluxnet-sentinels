@@ -41,10 +41,10 @@ head(dt)
 ```
 
 ```{r map}
-
 coords_ire <- sf::st_as_sf(
     data.frame(lat = 50.45055, lon = 4.5350415),
     coords = c("lon", "lat"), crs = 4326)
+coords_ire$site_code <- "Fleurus"
 
 dt_sites <- read.csv(
     system.file("extdata", "Site_metadata.csv", package = "FluxnetLSM")) %>%
@@ -59,7 +59,7 @@ head(dplyr::select(dt_sites_close, site_code, dist))
     
 st_coordinates(dt_sites_close[1,])
 
-rmarkdown::render_delayed({
-    mapview(dt_sites_close) + mapview(coords_ire, color = "red")
-    })
+m1_data <- dplyr::bind_rows(dt_sites_close, coords_ire)
+m1 <- mapview(m1_data)
+addStaticLabels(m1, label = m1_data$site_code)
 ```
