@@ -34,10 +34,16 @@ dt = dt[dt["ppfd_in"] > 100]  # daytime
 
 # dt.columns
 dep_cols = ["co2", "fc", "le", "h"]
-indep_cols = ["ws", "p", "pa", "netrad", "rh", "ppfd_in", "ta"]
+indep_cols = ["ws", "p", "pa", "rh", "ppfd_in", "ta"]
 # dt[dep_cols].head()
 # dt[indep_cols].describe()
+dt[dep_cols[1]] = dt[dep_cols[1]] + abs(min(dt[dep_cols[1]])) + 0.01
+dt[dep_cols[2]] = dt[dep_cols[2]] + abs(min(dt[dep_cols[2]])) + 0.01
+dt[dep_cols[3]] = dt[dep_cols[3]] + abs(min(dt[dep_cols[3]])) + 0.01
+
 dt_select = dt[["timestamp_start", "timestamp_end"] + dep_cols + indep_cols]
+
+min(dt[dep_cols[3]])
 
 grid = pd.DataFrame(
     list(itertools.product(dep_cols, indep_cols)), columns=["dep", "indep"]
@@ -70,13 +76,13 @@ sns.pairplot(dt_select, x_vars=indep_cols, y_vars=dep_cols)
 plt.close()
 
 sns.lineplot(data=dt, x="timestamp_start", y="wd")
-plt.show()
+# plt.show()
 
 sns.lineplot(data=dt, x="timestamp_start", y="netrad")
-plt.show()
+# plt.show()
 
 sns.regplot(data=dt, x="hour", y="netrad")
-plt.show()
+# plt.show()
 
 # --- define before, during, and after periods
 # 10 days before and after
@@ -99,21 +105,38 @@ dt_select.loc[
     & (dt_select["timestamp_start"] < pd.to_datetime("2008-09-04")),
     "period",
 ] = "after"
-dt_event = dt_select[[x is not None for x in dt_select["period"]]]
+dt_event = dt_select[[x is not None for x in dt_select["period"]]].copy()
 
 # ---
 
-
-def p_quantile(dep, indep):    
+def p_quantile(dep, indep):
+    # dep = "fc"
+    # indep = "ws"
+    print((dep, indep))    
     model = smf.ols("np.log(" + dep + ") ~ " + indep + " * period", data=dt_event).fit()
-    p_fl = sm.stats.anova_lm(model, typ=1).to_dict()["PR(>F)"]["ta:period"]
+    p_fl = sm.stats.anova_lm(model, typ=1).to_dict()["PR(>F)"][indep + ":period"]
 
     # dt_event["period"].value_counts()
-    test = rolling_apply_ext(p_interact, 566, dt.ta.values, dt.co2.values)
+    test = rolling_apply_ext(p_interact, 566, dt[indep].values, dt[dep].values)
     test = test[~np.isnan(test)]
     return stats.percentileofscore(test, p_fl) / 100
 
-p_quantile("co2", "ta") # ~ 0.14
+# p_quantile("co2", "ta") # ~ 0.14
+# p_quantile("fc", "ws")
+
+grid["pquant"] = [
+    round(
+        abs(
+            p_quantile(
+                grid.iloc[[i]]["dep"].values[0],
+                grid.iloc[[i]]["indep"].values[0]
+        )),
+        2,
+    )
+    for i in range(grid.shape[0])
+]
+
+# ---
 
 # dep = grid["dep"][0]
 # indep = grid["indep"][0]
