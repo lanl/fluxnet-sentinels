@@ -136,6 +136,10 @@ grid["pquant"] = [
     for i in range(grid.shape[0])
 ]
 
+grid = grid.sort_values("pquant")
+test = grid[grid["r2"] > 0.05]
+grid.to_csv("data/grid.csv", index=False)
+
 # ---
 
 # dep = grid["dep"][0]
