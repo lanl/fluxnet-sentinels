@@ -1,7 +1,9 @@
 import janitor
 import itertools
+import numpy as np
 import pandas as pd
 import seaborn as sns
+import statsmodels.api as sm
 import matplotlib.pyplot as plt
 import statsmodels.formula.api as smf
 
@@ -14,7 +16,7 @@ dt["timestamp_start"] = pd.to_datetime(dt["timestamp_start"], format="%Y%m%d%H%M
 dt["timestamp_end"] = pd.to_datetime(dt["timestamp_end"], format="%Y%m%d%H%M")
 dt["hour"] = [int(x.strftime("%H")) for x in dt["timestamp_start"]]
 
-dt = dt[dt["netrad"] > 0 ] # daytime
+dt = dt[dt["ppfd_in"] > 100]  # daytime
 
 dt.columns
 
@@ -51,7 +53,7 @@ ax.xaxis.tick_top()
 plt.close()
 
 dt_select = dt[dep_cols + indep_cols]
-sns.pairplot(dt_select, x_vars = indep_cols, y_vars = dep_cols)
+sns.pairplot(dt_select, x_vars=indep_cols, y_vars=dep_cols)
 # plt.show()
 plt.close()
 
@@ -84,5 +86,14 @@ dt.loc[
     dt["timestamp_start"] > pd.to_datetime("2008-08-24"),
     "period",
 ] = "after"
+dt_event = dt[[x is not None for x in dt["period"]]]
 
-dt[["timestamp_start", "timestamp_end", "period"]].tail(20)
+# ---
+model = smf.ols("np.log(co2) ~ ppfd_in * period", data=dt_event).fit()
+sm.stats.anova_lm(model, typ=1).to_dict()["PR(>F)"]["ppfd_in:period"]
+
+
+sns.lmplot(x="ppfd_in", y="co2", hue="period", data=dt_event, scatter_kws={"s": 1})
+plt.yscale('log')
+plt.show()
+min(dt_event["ppfd_in"])
