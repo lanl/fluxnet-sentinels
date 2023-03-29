@@ -16,3 +16,4 @@ dependencies:
         - pip:
                 - pyffp
                 - geojsoncontour
+                - numpy-ext
