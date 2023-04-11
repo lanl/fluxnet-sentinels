@@ -1,4 +1,6 @@
+import os
 import janitor
+import tabulate
 import itertools
 import numpy as np
 import pandas as pd
@@ -68,7 +70,8 @@ grid["r2"] = [
 ax = sns.heatmap(grid.pivot("dep", "indep", values="r2"), annot=True)
 ax.set(xlabel="", ylabel="")
 ax.xaxis.tick_top()
-# plt.show()
+plt.suptitle("Regression R2")
+plt.savefig("figures/__rolling_heatmap.pdf")
 plt.close()
 
 sns.pairplot(dt_select, x_vars=indep_cols, y_vars=dep_cols)
@@ -124,32 +127,33 @@ def p_quantile(dep, indep):
 # p_quantile("co2", "ta") # ~ 0.14
 # p_quantile("fc", "ws")
 
-grid["pquant"] = [
-    round(
-        abs(
-            p_quantile(
-                grid.iloc[[i]]["dep"].values[0],
-                grid.iloc[[i]]["indep"].values[0]
-        )),
-        2,
-    )
-    for i in range(grid.shape[0])
-]
+if not os.path.exists("data/grid.csv"):
+    grid["pquant"] = [
+        round(
+            abs(
+                p_quantile(
+                    grid.iloc[[i]]["dep"].values[0],
+                    grid.iloc[[i]]["indep"].values[0]
+            )),
+            2,
+        )
+        for i in range(grid.shape[0])
+    ]
 
-grid = grid.sort_values("pquant")
+    grid = grid.sort_values("pquant")
+    grid.to_csv("data/grid.csv", index=False)
+
+grid = pd.read_csv("data/grid.csv")
 test = grid[grid["r2"] > 0.05]
-grid.to_csv("data/grid.csv", index=False)
+
+mdtable = tabulate.tabulate(test, tablefmt="github")
+with open('mdtable.md', 'w') as f:
+    f.write(mdtable)
 
 # ---
 
 # dep = grid["dep"][0]
 # indep = grid["indep"][0]
-
-d = pd.DataFrame({"ta": test})
-g = sns.histplot(x="ta", data=d, bins=50)
-g = g.set(xlim=(0, 0.2))
-plt.axvline(p_fl, 0, 5000)
-plt.show()
 
 sns.lmplot(x="ta", y="co2", hue="period", data=dt_event, scatter_kws={"s": 1})
 # plt.yscale("log")

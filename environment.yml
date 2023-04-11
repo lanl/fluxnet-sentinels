@@ -12,6 +12,7 @@ dependencies:
         - pyjanitor
         - seaborn        
         - cartopy
+        - tabulate
         - pip
         - pip:
                 - pyffp
