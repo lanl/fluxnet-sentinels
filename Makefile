@@ -6,10 +6,10 @@ figures/figures.pdf: figures/figures.Rmd
 	-pdftk $@ cat 2-end output figures2.pdf
 	-mv figures2.pdf $@
 
-figures/__rolling_heatmap.pdf: scripts/kelsey.py
+figures/__rolling_heatmap.pdf: figures/rolling.py
 	python $<
 
-figures/__rolling_grid.pdf: scripts/kelsey.py
+figures/__rolling_grid.pdf: figures/rolling.py
 	python $<
 	echo \\\\pagenumbering{gobble}| cat - mdtable.md > temp && mv temp mdtable.md
 	pandoc mdtable.md -V fontsize=14pt -o $@
