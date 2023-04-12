@@ -15,8 +15,14 @@ figures/__rolling_grid.pdf: scripts/kelsey.py
 	pandoc mdtable.md -V fontsize=14pt -o $@
 	pdfcrop $@ $@
 
-figures/all.pdf: figures/figures.pdf figures/__rolling_grid.pdf
-	pdftk $< $(wildcard figures/__*.pdf) output $@
+figures/__map.pdf: figures/maps.R
+	Rscript $<
+
+figures/__footprint.pdf: figures/footprint.py
+	python $<
+
+figures/all.pdf: figures/__rolling_grid.pdf figures/__map.pdf figures/__footprint.pdf
+	pdftk $(wildcard figures/__*.pdf) output $@
 
 clean:
 	rm figures/figures.pdf
