@@ -2,6 +2,7 @@ import os
 import janitor
 import tabulate
 import itertools
+import subprocess
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -156,7 +157,7 @@ grid = make_grid(dt, dep_cols, indep_cols)
 ax = sns.heatmap(grid.pivot("dep", "indep", values="r2"), annot=True)
 ax.set(xlabel="", ylabel="")
 ax.xaxis.tick_top()
-plt.suptitle("Regression R2")
+plt.suptitle(site + ": Regression R2")
 plt.savefig("figures/__rolling_heatmap_" + site + ".pdf")
 plt.close()
 
@@ -173,6 +174,26 @@ mdtable = tabulate.tabulate(
 )
 with open("mdtable.md", "w") as f:
     f.write(mdtable)
+
+subprocess.call(
+    "echo ## " + site + "| cat - mdtable.md > temp && mv temp mdtable.md",
+    shell=True,
+)
+subprocess.call(
+    "echo \\pagenumbering{gobble}| cat - mdtable.md > temp && mv temp mdtable.md",
+    shell=True,
+)
+subprocess.call(
+    "pandoc mdtable.md -V fontsize=14pt -o figures/__rolling_grid_" + site + ".pdf"
+)
+subprocess.call(
+    "pdfcrop figures/__rolling_grid_"
+    + site
+    + ".pdf figures/__rolling_grid_"
+    + site
+    + ".pdf"
+)
+
 
 # ---
 site = "be-lon"
@@ -186,7 +207,7 @@ grid = make_grid(dt, dep_cols, indep_cols)
 ax = sns.heatmap(grid.pivot("dep", "indep", values="r2"), annot=True)
 ax.set(xlabel="", ylabel="")
 ax.xaxis.tick_top()
-plt.suptitle("Regression R2")
+plt.suptitle(site + ": Regression R2")
 plt.savefig("figures/__rolling_heatmap_" + site + ".pdf")
 plt.close()
 
@@ -204,8 +225,26 @@ mdtable = tabulate.tabulate(
 with open("mdtable.md", "w") as f:
     f.write(mdtable)
 
-# ---
+subprocess.call(
+    "echo ## " + site + "| cat - mdtable.md > temp && mv temp mdtable.md",
+    shell=True,
+)
+subprocess.call(
+    "echo \\pagenumbering{gobble}| cat - mdtable.md > temp && mv temp mdtable.md",
+    shell=True,
+)
+subprocess.call(
+    "pandoc mdtable.md -V fontsize=14pt -o figures/__rolling_grid_" + site + ".pdf"
+)
+subprocess.call(
+    "pdfcrop figures/__rolling_grid_"
+    + site
+    + ".pdf figures/__rolling_grid_"
+    + site
+    + ".pdf"
+)
 
+# ---
 # dep = grid["dep"][0]
 # indep = grid["indep"][0]
 
