@@ -48,8 +48,16 @@ def preprocess_dt(file_in, dep_cols, indep_cols):
     dt["timestamp_end"] = pd.to_datetime(dt["timestamp_end"], format="%Y%m%d%H%M")
     dt["hour"] = [int(x.strftime("%H")) for x in dt["timestamp_start"]]
 
-    breakpoint()
-    dt = dt[dt["ppfd_in"] > 100]  # daytime
+    # breakpoint()
+    # ax = sns.lineplot(data=dt, x="timestamp_start", y="netrad")
+    # ax.set_xlim(pd.to_datetime("2008-01-01"), pd.to_datetime("2008-03-01"))
+    # plt.show()
+
+    if "ppfd_in" in dt.columns:
+        dt = dt[dt["ppfd_in"] > 100]  # daytime
+    else:
+        indep_cols = [x for x in indep_cols if x != "ppfd_in"]
+        dt = dt[dt["netrad"] > 0]  # daytime
 
     # dt[dep_cols].head()
     # dt[indep_cols].describe()
@@ -62,6 +70,9 @@ def preprocess_dt(file_in, dep_cols, indep_cols):
 
 
 def make_grid(dt, dep_cols, indep_cols):
+    if not "ppfd_in" in dt.columns:
+        indep_cols = [x for x in indep_cols if x != "ppfd_in"]
+
     grid = pd.DataFrame(
         list(itertools.product(dep_cols, indep_cols)), columns=["dep", "indep"]
     )
@@ -85,10 +96,60 @@ def make_grid(dt, dep_cols, indep_cols):
     return grid
 
 
-dep_cols = ["co2", "fc", "le", "h"]
-indep_cols = ["ws", "p", "pa", "rh", "ppfd_in", "ta"]
+def define_period(dt_select):
+    # 10 days before and after
+    # Before: Aug 12, 13, 14, 15, 16, 17, 18, 19, 20, 21
+    # During: Aug 22, 23, 24
+    # After: Aug 25, 26, 27, 28, 29, 30, 31, 1,2,3
+    dt_select = dt_select.copy()
+    dt_select["period"] = None
+    dt_select.loc[
+        (dt_select["timestamp_end"] < pd.to_datetime("2008-08-22"))
+        & (dt_select["timestamp_start"] > pd.to_datetime("2008-08-11")),
+        "period",
+    ] = "before"
+    dt_select.loc[
+        (dt_select["timestamp_end"] < pd.to_datetime("2008-08-25"))
+        & (dt_select["timestamp_start"] > pd.to_datetime("2008-08-21")),
+        "period",
+    ] = "during"
+    dt_select.loc[
+        (dt_select["timestamp_start"] > pd.to_datetime("2008-08-24"))
+        & (dt_select["timestamp_start"] < pd.to_datetime("2008-09-04")),
+        "period",
+    ] = "after"
+    dt_event = dt_select[[x is not None for x in dt_select["period"]]].copy()
+    return dt_event
 
+
+def grid_define_pquant(grid, out_path="data/grid.csv"):
+    if not os.path.exists(out_path):
+        grid["pquant"] = [
+            round(
+                abs(
+                    p_quantile(
+                        dt,
+                        grid.iloc[[i]]["dep"].values[0],
+                        grid.iloc[[i]]["indep"].values[0],
+                    )
+                ),
+                2,
+            )
+            for i in range(grid.shape[0])
+        ]
+
+        grid = grid.sort_values("pquant")
+        grid.to_csv(out_path, index=False)
+
+
+# ---
+dep_cols = ["co2", "fc", "le", "h"]
+indep_cols = ["ws", "p", "pa", "rh", "ppfd_in", "ta", "netrad"]
+
+# ---
+site = "be-bra"
 file_in = "../../Data/Euroflux/BE-Bra/EFDC_L2_Flx_BEBra_2008_v016_30m.txt"
+
 dt, dt_select = preprocess_dt(file_in, dep_cols, indep_cols)
 grid = make_grid(dt, dep_cols, indep_cols)
 
@@ -96,12 +157,29 @@ ax = sns.heatmap(grid.pivot("dep", "indep", values="r2"), annot=True)
 ax.set(xlabel="", ylabel="")
 ax.xaxis.tick_top()
 plt.suptitle("Regression R2")
-plt.savefig("figures/__rolling_heatmap_be-bra.pdf")
+plt.savefig("figures/__rolling_heatmap_" + site + ".pdf")
 plt.close()
 
+dt_event = define_period(dt_select)
+grid_define_pquant(grid, "data/grid_" + site + ".csv")
+grid = pd.read_csv("data/grid_" + site + ".csv")
+test = grid[grid["r2"] > 0.05].reset_index(drop=True)
+
+mdtable = tabulate.tabulate(
+    test,
+    headers=["Explanatory", "Regressor", "R2", r"Event Percentile"],
+    tablefmt="simple",
+    showindex=False,
+)
+with open("mdtable.md", "w") as f:
+    f.write(mdtable)
+
+# ---
+site = "be-lon"
 file_in = (
     "../../Data/Euroflux/BE-Lon/L2-L4_2004-2012/EFDC_L2_Flx_BELon_2008_v017_30m.txt"
 )
+
 dt, dt_select = preprocess_dt(file_in, dep_cols, indep_cols)
 grid = make_grid(dt, dep_cols, indep_cols)
 
@@ -109,53 +187,12 @@ ax = sns.heatmap(grid.pivot("dep", "indep", values="r2"), annot=True)
 ax.set(xlabel="", ylabel="")
 ax.xaxis.tick_top()
 plt.suptitle("Regression R2")
-plt.savefig("figures/__rolling_heatmap_be-lon.pdf")
+plt.savefig("figures/__rolling_heatmap_" + site + ".pdf")
 plt.close()
 
-# --- define before, during, and after periods
-# 10 days before and after
-# Before: Aug 12, 13, 14, 15, 16, 17, 18, 19, 20, 21
-# During: Aug 22, 23, 24
-# After: Aug 25, 26, 27, 28, 29, 30, 31, 1,2,3
-dt_select["period"] = None
-dt_select.loc[
-    (dt_select["timestamp_end"] < pd.to_datetime("2008-08-22"))
-    & (dt_select["timestamp_start"] > pd.to_datetime("2008-08-11")),
-    "period",
-] = "before"
-dt_select.loc[
-    (dt_select["timestamp_end"] < pd.to_datetime("2008-08-25"))
-    & (dt_select["timestamp_start"] > pd.to_datetime("2008-08-21")),
-    "period",
-] = "during"
-dt_select.loc[
-    (dt_select["timestamp_start"] > pd.to_datetime("2008-08-24"))
-    & (dt_select["timestamp_start"] < pd.to_datetime("2008-09-04")),
-    "period",
-] = "after"
-dt_event = dt_select[[x is not None for x in dt_select["period"]]].copy()
-
-# ---
-
-if not os.path.exists("data/grid.csv"):
-    grid["pquant"] = [
-        round(
-            abs(
-                p_quantile(
-                    dt,
-                    grid.iloc[[i]]["dep"].values[0],
-                    grid.iloc[[i]]["indep"].values[0],
-                )
-            ),
-            2,
-        )
-        for i in range(grid.shape[0])
-    ]
-
-    grid = grid.sort_values("pquant")
-    grid.to_csv("data/grid.csv", index=False)
-
-grid = pd.read_csv("data/grid.csv")
+dt_event = define_period(dt_select)
+grid_define_pquant(grid, "data/grid_" + site + ".csv")
+grid = pd.read_csv("data/grid_" + site + ".csv")
 test = grid[grid["r2"] > 0.05].reset_index(drop=True)
 
 mdtable = tabulate.tabulate(
@@ -176,3 +213,4 @@ sns.lmplot(x="ta", y="co2", hue="period", data=dt_event, scatter_kws={"s": 1})
 # plt.yscale("log")
 # plt.show()
 # min(dt_event["ppfd_in"])
+plt.close()
