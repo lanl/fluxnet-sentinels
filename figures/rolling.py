@@ -24,7 +24,7 @@ def p_interact(x, y):
     return sm.stats.anova_lm(model, typ=1).to_dict()["PR(>F)"]["x:period"]
 
 
-def p_quantile(dt, dep, indep):
+def p_quantile(dt, dt_event, dep, indep):
     # p_quantile("co2", "ta") # ~ 0.14
     # p_quantile("fc", "ws")
     # dep = "fc"
@@ -60,6 +60,9 @@ def preprocess_dt(file_in, dep_cols, indep_cols):
         indep_cols = [x for x in indep_cols if x != "ppfd_in"]
         dt = dt[dt["netrad"] > 0]  # daytime
 
+    dt = janitor.remove_empty(dt)
+    dep_cols = [x for x in dep_cols if x in dt.columns]
+
     # dt[dep_cols].head()
     # dt[indep_cols].describe()
     dt[dep_cols[1]] = dt[dep_cols[1]] + abs(min(dt[dep_cols[1]])) + 0.01
@@ -70,30 +73,37 @@ def preprocess_dt(file_in, dep_cols, indep_cols):
     return (dt, dt_select)
 
 
-def make_grid(dt, dep_cols, indep_cols):
+def make_grid(dt, dep_cols, indep_cols):    
     if not "ppfd_in" in dt.columns:
         indep_cols = [x for x in indep_cols if x != "ppfd_in"]
+    dep_cols = [x for x in dep_cols if x in dt.columns]
+    indep_cols = [x for x in indep_cols if x in dt.columns]
 
     grid = pd.DataFrame(
         list(itertools.product(dep_cols, indep_cols)), columns=["dep", "indep"]
-    )
+    )    
 
-    grid["r2"] = [
-        round(
-            abs(
-                smf.ols(
-                    grid.iloc[[i]]["dep"].values[0]
-                    + " ~ "
-                    + grid.iloc[[i]]["indep"].values[0],
-                    data=dt,
-                )
-                .fit()
-                .rsquared_adj
-            ),
-            2,
+    res = []
+    for i in range(grid.shape[0]):
+        # print(i)
+        res.append(
+            round(
+                abs(
+                    smf.ols(
+                        grid.iloc[[i]]["dep"].values[0]
+                        + " ~ "
+                        + grid.iloc[[i]]["indep"].values[0],
+                        data=dt,
+                    )
+                    .fit()
+                    .rsquared_adj
+                ),
+                2,
+            )
         )
-        for i in range(grid.shape[0])
-    ]
+
+    grid["r2"] = res
+
     return grid
 
 
@@ -123,13 +133,14 @@ def define_period(dt_select):
     return dt_event
 
 
-def grid_define_pquant(grid, out_path="data/grid.csv"):
+def grid_define_pquant(grid, dt, dt_event, out_path="data/grid.csv"):
     if not os.path.exists(out_path):
         grid["pquant"] = [
             round(
                 abs(
                     p_quantile(
                         dt,
+                        dt_event,
                         grid.iloc[[i]]["dep"].values[0],
                         grid.iloc[[i]]["indep"].values[0],
                     )
@@ -143,9 +154,57 @@ def grid_define_pquant(grid, out_path="data/grid.csv"):
         grid.to_csv(out_path, index=False)
 
 
-# ---
 dep_cols = ["co2", "fc", "le", "h"]
 indep_cols = ["ws", "p", "pa", "rh", "ppfd_in", "ta", "netrad"]
+
+# ---
+site = "be-vie"
+file_in = "../../Data/Euroflux/BE-Vie/EFDC_L2_Flx_BEVie_2008_v010_30m.txt"
+
+dt, dt_select = preprocess_dt(file_in, dep_cols, indep_cols)
+dt = janitor.remove_empty(dt)
+grid = make_grid(dt, dep_cols, indep_cols)
+
+ax = sns.heatmap(grid.pivot("dep", "indep", values="r2"), annot=True)
+ax.set(xlabel="", ylabel="")
+ax.xaxis.tick_top()
+plt.suptitle(site + ": Regression R2")
+# plt.show()
+plt.savefig("figures/__rolling_heatmap_" + site + ".pdf")
+plt.close()
+
+dt_event = define_period(dt_select)
+grid_define_pquant(grid, dt, dt_event, "data/grid_" + site + ".csv")
+grid = pd.read_csv("data/grid_" + site + ".csv")
+test = grid[grid["r2"] > 0.05].reset_index(drop=True)
+
+mdtable = tabulate.tabulate(
+    test,
+    headers=["Explanatory", "Regressor", "R2", r"Event Percentile"],
+    tablefmt="simple",
+    showindex=False,
+)
+with open("mdtable.md", "w") as f:
+    f.write(mdtable)
+
+subprocess.call(
+    "echo ## " + site + "| cat - mdtable.md > temp && mv temp mdtable.md",
+    shell=True,
+)
+subprocess.call(
+    "echo \\pagenumbering{gobble}| cat - mdtable.md > temp && mv temp mdtable.md",
+    shell=True,
+)
+subprocess.call(
+    "pandoc mdtable.md -V fontsize=14pt -o figures/__rolling_grid_" + site + ".pdf"
+)
+subprocess.call(
+    "pdfcrop figures/__rolling_grid_"
+    + site
+    + ".pdf figures/__rolling_grid_"
+    + site
+    + ".pdf"
+)
 
 # ---
 site = "be-bra"
@@ -162,7 +221,7 @@ plt.savefig("figures/__rolling_heatmap_" + site + ".pdf")
 plt.close()
 
 dt_event = define_period(dt_select)
-grid_define_pquant(grid, "data/grid_" + site + ".csv")
+grid_define_pquant(grid, dt, dt_event, "data/grid_" + site + ".csv")
 grid = pd.read_csv("data/grid_" + site + ".csv")
 test = grid[grid["r2"] > 0.05].reset_index(drop=True)
 
@@ -212,7 +271,7 @@ plt.savefig("figures/__rolling_heatmap_" + site + ".pdf")
 plt.close()
 
 dt_event = define_period(dt_select)
-grid_define_pquant(grid, "data/grid_" + site + ".csv")
+grid_define_pquant(grid, dt, dt_event, "data/grid_" + site + ".csv")
 grid = pd.read_csv("data/grid_" + site + ".csv")
 test = grid[grid["r2"] > 0.05].reset_index(drop=True)
 
