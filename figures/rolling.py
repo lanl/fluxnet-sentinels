@@ -25,8 +25,8 @@ def p_interact(x, y):
 
 
 def p_quantile(dt, dt_event, dep, indep):
-    # p_quantile("co2", "ta") # ~ 0.14
-    # p_quantile("fc", "ws")
+    # p_quantile(dt, dt_event, "co2", "ta") # ~ 0.14
+    # p_quantile(dt, dt_event, "fc", "ws")
     # dep = "fc"
     # indep = "ws"
     print((dep, indep))
@@ -36,7 +36,8 @@ def p_quantile(dt, dt_event, dep, indep):
     # dt_event["period"].value_counts()
     test = rolling_apply_ext(p_interact, 566, dt[indep].values, dt[dep].values)
     test = test[~np.isnan(test)]
-    return stats.percentileofscore(test, p_fl) / 100
+
+    return (stats.percentileofscore(test, p_fl) / 100, test, dt_event.index[0], p_fl)
 
 
 def preprocess_dt(file_in, dep_cols, indep_cols):
@@ -143,7 +144,7 @@ def grid_define_pquant(grid, dt, dt_event, out_path="data/grid.csv"):
                         dt_event,
                         grid.iloc[[i]]["dep"].values[0],
                         grid.iloc[[i]]["indep"].values[0],
-                    )
+                    )[0]
                 ),
                 2,
             )
@@ -255,7 +256,6 @@ subprocess.call(
     + ".pdf"
 )
 
-
 # ---
 site = "be-lon"
 file_in = (
@@ -306,6 +306,29 @@ subprocess.call(
 )
 
 # ---
+
+# try plotting a timeseries and distribution of quantiles
+_, pdist, event_index, p_event = p_quantile(dt, dt_event, "co2", "ta")
+g = sns.histplot(abs(np.log(pdist)))
+g.axvline(abs(np.log(p_event)))
+# plt.show()
+plt.savefig("figures/__co2vta_belon_hist.pdf")
+
+g = sns.lineplot(
+    data=pd.DataFrame(
+        {"index": [x for x in range(len(pdist))], "p": abs(np.log(pdist))}
+    ),
+    x="index",
+    y="p",
+)
+g.axvline(event_index, color="yellow")
+g.axhline(abs(np.log(p_event)), color="darkgreen")
+# plt.show()
+plt.ylim(0, 150)
+plt.savefig("figures/__co2vta_belon_line.pdf")
+
+# ---
+
 # dep = grid["dep"][0]
 # indep = grid["indep"][0]
 
