@@ -73,7 +73,7 @@ def preprocess_dt(file_in, dep_cols, indep_cols):
     return (dt, dt_select)
 
 
-def make_grid(dt, dep_cols, indep_cols):    
+def make_grid(dt, dep_cols, indep_cols):
     if not "ppfd_in" in dt.columns:
         indep_cols = [x for x in indep_cols if x != "ppfd_in"]
     dep_cols = [x for x in dep_cols if x in dt.columns]
@@ -81,7 +81,7 @@ def make_grid(dt, dep_cols, indep_cols):
 
     grid = pd.DataFrame(
         list(itertools.product(dep_cols, indep_cols)), columns=["dep", "indep"]
-    )    
+    )
 
     res = []
     for i in range(grid.shape[0]):
@@ -177,6 +177,8 @@ dt_event = define_period(dt_select)
 grid_define_pquant(grid, dt, dt_event, "data/grid_" + site + ".csv")
 grid = pd.read_csv("data/grid_" + site + ".csv")
 test = grid[grid["r2"] > 0.05].reset_index(drop=True)
+test = test[[x != "ppfd_in" for x in test["indep"]]].reset_index(drop=True)
+
 
 mdtable = tabulate.tabulate(
     test,
