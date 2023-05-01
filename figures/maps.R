@@ -11,12 +11,14 @@ coords_ire$site_code <- "Fleurus"
 dt_sites <- read.csv(
     system.file("extdata", "Site_metadata.csv", package = "FluxnetLSM")) %>%
     clean_names() %>%
-    dplyr::mutate_all(na_if, "") %>%
+    # dplyr::mutate_all(na_if, "") %>%
     st_as_sf(coords = c("site_longitude", "site_latitude"), crs = 4326)
 
 dt_sites$dist <- unlist(list(unlist(st_distance(coords_ire, dt_sites)))) / 1609.34
 dt_sites_close <- dt_sites[dt_sites$dist < 100,] %>%
     dplyr::arrange(dist)
+
+sf::st_write(dt_sites_close, "dt_sites_close.gpkg")
 
 # head(dplyr::select(dt_sites_close, site_code, dist))
 # st_coordinates(dt_sites_close[1,])
