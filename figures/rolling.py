@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt
 import statsmodels.formula.api as smf
 from numpy_ext import rolling_apply as rolling_apply_ext
 
+n_days = 15
+
 
 def p_interact(x, y):
     dt_sub = pd.DataFrame({"x": x, "y": y})
@@ -183,9 +185,9 @@ plt.suptitle(site + ": Regression R2")
 plt.savefig("figures/__rolling_heatmap_" + site + ".pdf")
 plt.close()
 
-dt_event = define_period(dt_select)
-grid_define_pquant(grid, dt, dt_event, "data/grid_" + site + ".csv")
-grid = pd.read_csv("data/grid_" + site + ".csv")
+dt_event = define_period(dt_select, n_days=n_days)
+grid_define_pquant(grid, dt, dt_event, "data/grid_" + site + "_" + str(n_days) + ".csv")
+grid = pd.read_csv("data/grid_" + site + "_" + str(n_days) + ".csv")
 test = grid[grid["r2"] > 0.05].reset_index(drop=True)
 test = test[[x != "ppfd_in" for x in test["indep"]]].reset_index(drop=True)
 
@@ -232,9 +234,9 @@ plt.suptitle(site + ": Regression R2")
 plt.savefig("figures/__rolling_heatmap_" + site + ".pdf")
 plt.close()
 
-dt_event = define_period(dt_select)
-grid_define_pquant(grid, dt, dt_event, "data/grid_" + site + ".csv")
-grid = pd.read_csv("data/grid_" + site + ".csv")
+dt_event = define_period(dt_select, n_days=n_days)
+grid_define_pquant(grid, dt, dt_event, "data/grid_" + site + "_" + str(n_days) + ".csv")
+grid = pd.read_csv("data/grid_" + site + "_" + str(n_days) + ".csv")
 test = grid[grid["r2"] > 0.05].reset_index(drop=True)
 
 mdtable = tabulate.tabulate(
@@ -281,9 +283,9 @@ plt.suptitle(site + ": Regression R2")
 plt.savefig("figures/__rolling_heatmap_" + site + ".pdf")
 plt.close()
 
-dt_event = define_period(dt_select)
-grid_define_pquant(grid, dt, dt_event, "data/grid_" + site + ".csv")
-grid = pd.read_csv("data/grid_" + site + ".csv")
+dt_event = define_period(dt_select, n_days=n_days)
+grid_define_pquant(grid, dt, dt_event, "data/grid_" + site + "_" + str(n_days) + ".csv")
+grid = pd.read_csv("data/grid_" + site + "_" + str(n_days) + ".csv")
 test = grid[grid["r2"] > 0.05].reset_index(drop=True)
 
 mdtable = tabulate.tabulate(
