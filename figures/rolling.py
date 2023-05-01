@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import statsmodels.formula.api as smf
 from numpy_ext import rolling_apply as rolling_apply_ext
 
-n_days = 15
+n_days = 7
 
 
 def p_interact(x, y):
