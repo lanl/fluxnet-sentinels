@@ -8,6 +8,7 @@ import pandas as pd
 import seaborn as sns
 from scipy import stats
 import statsmodels.api as sm
+from datetime import timedelta
 import matplotlib.pyplot as plt
 import statsmodels.formula.api as smf
 from numpy_ext import rolling_apply as rolling_apply_ext
@@ -108,26 +109,34 @@ def make_grid(dt, dep_cols, indep_cols):
     return grid
 
 
-def define_period(dt_select):
+def define_period(dt_select, date_event="2008-08-23", n_days=10):
     # 10 days before and after
-    # Before: Aug 12, 13, 14, 15, 16, 17, 18, 19, 20, 21
-    # During: Aug 22, 23, 24
-    # After: Aug 25, 26, 27, 28, 29, 30, 31, 1,2,3
+
     dt_select = dt_select.copy()
     dt_select["period"] = None
+
     dt_select.loc[
-        (dt_select["timestamp_end"] < pd.to_datetime("2008-08-22"))
-        & (dt_select["timestamp_start"] > pd.to_datetime("2008-08-11")),
+        (dt_select["timestamp_end"] < pd.to_datetime(date_event) - timedelta(days=1))
+        & (
+            dt_select["timestamp_start"]
+            > pd.to_datetime(date_event) - timedelta(days=n_days + 2)
+        ),
         "period",
     ] = "before"
     dt_select.loc[
-        (dt_select["timestamp_end"] < pd.to_datetime("2008-08-25"))
-        & (dt_select["timestamp_start"] > pd.to_datetime("2008-08-21")),
+        (dt_select["timestamp_end"] < pd.to_datetime(date_event) + timedelta(days=2))
+        & (
+            dt_select["timestamp_start"]
+            > pd.to_datetime(date_event) - timedelta(days=2)
+        ),
         "period",
     ] = "during"
     dt_select.loc[
-        (dt_select["timestamp_start"] > pd.to_datetime("2008-08-24"))
-        & (dt_select["timestamp_start"] < pd.to_datetime("2008-09-04")),
+        (dt_select["timestamp_start"] > pd.to_datetime(date_event) + timedelta(days=1))
+        & (
+            dt_select["timestamp_start"]
+            < pd.to_datetime(date_event) + timedelta(days=n_days + 2)
+        ),
         "period",
     ] = "after"
     dt_event = dt_select[[x is not None for x in dt_select["period"]]].copy()
