@@ -1,5 +1,9 @@
 ## Fluxnet signatures
 
+### Products
+
+`/figures/all.pdf`
+
 ### Setup
 
 ```R
