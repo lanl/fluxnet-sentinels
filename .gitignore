@@ -2,3 +2,4 @@
 *.pdf
 *.gpkg
 figures/*.tex
+data/*.csv
