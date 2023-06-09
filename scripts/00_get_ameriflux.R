@@ -1,6 +1,4 @@
-library(dplyr)
-library(janitor)
-library(amerifluxr)
+source("scripts/99_utils.R")
 
 site <- amf_site_info()
 
@@ -32,16 +30,7 @@ check_site <- function(site_id) {
     )
   }
 
-  base_raw <- amf_read_base(
-    file = fpath,
-    unzip = TRUE,
-    parse_timestamp = TRUE
-  ) %>% clean_names()
-
-  base1 <- setNames(base_raw,
-    gsub("_\\d{1}_\\d{1}_\\d{1}", "", names(base_raw))) %>%
-    dplyr::select(which(!duplicated(names(.)))) %>%
-    remove_empty("cols")
+  base1 <- amf_clean(fpath)
 
   res <- base1 %>%
     dplyr::filter(year == 2011, month == 3) %>%
@@ -49,9 +38,17 @@ check_site <- function(site_id) {
     nrow() > 0
 
   print(res)
-  res
+  data.frame(covers_fukushima = res, path = fpath)
 }
 
 res <- lapply(site_filtered$site_id, check_site)
 
-site_filtered$site_id[unlist(res)]
+covers_fukushima <- as.logical(unlist(lapply(res, function(x) x[1])))
+res_out <- site_filtered[covers_fukushima, ]
+res_out$path <- as.character(unlist(lapply(res, function(x) x[2])))[covers_fukushima]
+
+write.csv(res_out, "data/ameriflux_ak.csv", row.names = FALSE)
+
+# library(ggplot2)
+# ggplot(data = base1) +
+# geom_point(aes(x = timestamp, y = co2, color = year))
