@@ -13,7 +13,7 @@ site_filtered <- site %>%
 head(site_filtered)
 
 check_site <- function(site_id) {
-  # site_id = "US-Prr"
+  # site_id <- "US-Uaf"
   print(site_id)
 
   fpaths <- list.files(path = "../../data/ameriflux/",
@@ -32,13 +32,16 @@ check_site <- function(site_id) {
     )
   }
 
-  base1 <- amf_read_base(
+  base_raw <- amf_read_base(
     file = fpath,
     unzip = TRUE,
     parse_timestamp = TRUE
   ) %>% clean_names()
 
-    base1 <- setNames(base1, sub("_1_1_1", "", names(base1)))
+  base1 <- setNames(base_raw,
+    gsub("_\\d{1}_\\d{1}_\\d{1}", "", names(base_raw))) %>%
+    dplyr::select(which(!duplicated(names(.)))) %>%
+    remove_empty("cols")
 
   res <- base1 %>%
     dplyr::filter(year == 2011, month == 3) %>%
@@ -50,3 +53,5 @@ check_site <- function(site_id) {
 }
 
 res <- lapply(site_filtered$site_id, check_site)
+
+site_filtered$site_id[unlist(res)]
