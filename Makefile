@@ -20,11 +20,14 @@ figures/__map.pdf: figures/maps.R
 figures/__footprint.pdf: figures/footprint.py
 	python $<
 
-figures/all.pdf: figures/__rolling_grid_be-lon.pdf figures/__map.pdf figures/__footprint.pdf
+figures/all.pdf: figures/__rolling_grid_be-lon.pdf figures/__map.pdf figures/__footprint.pdf figures/__map_fukushima.pdf
 	pdftk $(wildcard figures/__*.pdf) output $@
 
 # ---
 data/ameriflux_ak.csv: scripts/00_get_ameriflux.R
+	Rscript $<
+
+figures/__map_fukushima.pdf: figures/fukushima.R data/ameriflux_ak.csv
 	Rscript $<
 
 # ---

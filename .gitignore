@@ -3,3 +3,5 @@
 *.gpkg
 figures/*.tex
 data/*.csv
+mdtable.md
+eddypro-metadata_be-lon.md
