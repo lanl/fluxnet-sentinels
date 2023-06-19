@@ -31,6 +31,8 @@ check_site <- function(site_id) {
   }
 
   base1 <- amf_clean(fpath)
+  outpath <- paste0("../../data/ameriflux/", site_id, ".csv")
+  write.csv(base1, outpath, row.names = FALSE)
 
   res <- base1 %>%
     dplyr::filter(year == 2011, month == 3) %>%
@@ -38,7 +40,7 @@ check_site <- function(site_id) {
     nrow() > 0
 
   print(res)
-  data.frame(covers_fukushima = res, path = fpath)
+  data.frame(covers_fukushima = res, path = outpath)
 }
 
 res <- lapply(site_filtered$site_id, check_site)
