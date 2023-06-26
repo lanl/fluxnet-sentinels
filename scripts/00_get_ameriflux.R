@@ -5,8 +5,10 @@ site <- amf_site_info()
 site_filtered <- site %>%
   clean_names() %>%
   dplyr::filter(data_start < 2011, data_end > 2012) %>%
-  dplyr::filter(location_lat > 58, location_long < -124) %>%
-  dplyr::filter(data_policy == "CCBY4.0")
+  dplyr::filter(location_lat > 42, location_lat < 48.9,
+    location_long < -116.9, location_long > -124.5) %>%
+  dplyr::filter(data_policy == "CCBY4.0") %>%
+  dplyr::filter(data_start < 2002)
 
 head(site_filtered)
 
@@ -49,7 +51,7 @@ covers_fukushima <- as.logical(unlist(lapply(res, function(x) x[1])))
 res_out <- site_filtered[covers_fukushima, ]
 res_out$path <- as.character(unlist(lapply(res, function(x) x[2])))[covers_fukushima]
 
-write.csv(res_out, "data/ameriflux_ak.csv", row.names = FALSE)
+write.csv(res_out, "data/ameriflux_pnw.csv", row.names = FALSE)
 
 # library(ggplot2)
 # ggplot(data = base1) +
