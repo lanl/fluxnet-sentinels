@@ -42,6 +42,7 @@ def preprocess_dt(file_in, dep_cols, indep_cols):
         file_in,
         na_values=["-9999.0"],
     ).clean_names()
+
     dt = janitor.remove_empty(dt)
     dt["timestamp_start"] = pd.to_datetime(dt["timestamp_start"], format="%Y%m%d%H%M")
     dt["timestamp_end"] = pd.to_datetime(dt["timestamp_end"], format="%Y%m%d%H%M")
@@ -52,20 +53,26 @@ def preprocess_dt(file_in, dep_cols, indep_cols):
     # ax.set_xlim(pd.to_datetime("2008-01-01"), pd.to_datetime("2008-03-01"))
     # plt.show()
 
+    # calculate which hours have low ppfd, exclude those hours
     if "ppfd_in" in dt.columns:
-        dt = dt[dt["ppfd_in"] > 100]  # daytime
+        test = dt[["hour", "ppfd_in"]].groupby("hour", as_index=False).mean()
+        daylight_hours = test[test["ppfd_in"] > 100]["hour"].values.tolist()
+        dt = dt[[x in daylight_hours for x in dt["hour"]]]
     else:
         indep_cols = [x for x in indep_cols if x != "ppfd_in"]
         dt = dt[dt["netrad"] > 0]  # daytime
 
     dt = janitor.remove_empty(dt)
     dep_cols = [x for x in dep_cols if x in dt.columns]
+    indep_cols = [x for x in indep_cols if x in dt.columns]
 
     # dt[dep_cols].head()
     # dt[indep_cols].describe()
-    dt[dep_cols[1]] = dt[dep_cols[1]] + abs(min(dt[dep_cols[1]])) + 0.01
-    dt[dep_cols[2]] = dt[dep_cols[2]] + abs(min(dt[dep_cols[2]])) + 0.01
-    dt[dep_cols[3]] = dt[dep_cols[3]] + abs(min(dt[dep_cols[3]])) + 0.01
+    # breakpoint()
+    # sum(pd.isna(dt["co2"])) / dt.shape[0]
+    for i in range(len(dep_cols)):
+        # i = 0
+        dt[dep_cols[i]] = dt[dep_cols[i]] + abs(dt[dep_cols[i]].min()) + 0.01
 
     dt_select = dt[["timestamp_start", "timestamp_end"] + dep_cols + indep_cols]
     return (dt, dt_select)
