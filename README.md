@@ -2,7 +2,7 @@
 
 ### Products
 
-`/figures/all.pdf`
+[figures/all.pdf](figures/all.pdf)
 
 ### Setup
 
