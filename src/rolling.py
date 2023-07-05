@@ -1,8 +1,8 @@
-import janitor
 import os
+import janitor
+import itertools
 import numpy as np
 import pandas as pd
-import itertools
 from scipy import stats
 import statsmodels.api as sm
 from datetime import timedelta
@@ -13,12 +13,24 @@ from numpy_ext import rolling_apply as rolling_apply_ext
 def p_interact(x, y):
     dt_sub = pd.DataFrame({"x": x, "y": y})
     dt_sub["period"] = (
-        ["before" for i in range(247)]
-        + ["during" for i in range(70)]
-        + ["after" for i in range(249)]
+        ["before" for _ in range(247)]
+        + ["during" for _ in range(70)]
+        + ["after" for _ in range(249)]
     )
-    model = smf.ols("np.log(y) ~ x * period", data=dt_sub).fit()
-    return sm.stats.anova_lm(model, typ=1).to_dict()["PR(>F)"]["x:period"]
+
+    if (not any(pd.notna(dt_sub.y.values))) or (not any(pd.notna(dt_sub.x.values))):
+        return np.nan
+
+    if (sum(pd.notna(dt_sub.y.values)) < 7) or (sum(pd.notna(dt_sub.x.values)) < 7):
+        return np.nan
+
+    try:
+        model = smf.ols("np.log(y) ~ x * period", data=dt_sub).fit()
+        res = sm.stats.anova_lm(model, typ=1)
+        res = res.to_dict()["PR(>F)"]["x:period"]
+        return res
+    except:  # SVD did not converge. or too much missing data?
+        return np.nan
 
 
 def p_quantile(dt, dt_event, dep, indep):
@@ -31,13 +43,31 @@ def p_quantile(dt, dt_event, dep, indep):
     p_fl = sm.stats.anova_lm(model, typ=1).to_dict()["PR(>F)"][indep + ":period"]
 
     # dt_event["period"].value_counts()
-    test = rolling_apply_ext(p_interact, 566, dt[indep].values, dt[dep].values)
+
+    window_size = 566  # 30 min * (3 + 7 + 7) days?
+    # i = 1
+    # dt.iloc[[566 * i]]["timestamp_start"]
+    # dt.iloc[[566 + (566 * i)]]["timestamp_start"]
+    # dt["timestamp_start"].tail()
+    # p_interact(dt[indep].values[0:window_size], dt[dep].values[0:window_size])
+
+    # breakpoint()
+    # any(pd.notna(dt[indep].values))
+    # any(pd.notna(dt[dep].values))
+    # p_interact(dt[indep].values[0:566], dt[dep].values[0:566])
+    # p_interact(dt[indep].values[566:1132], dt[dep].values[566:1132])
+    # any(pd.notna(dt[dep].values[566:1132]))
+    # any(pd.notna(dt[indep].values[566:1132]))
+
+    test = rolling_apply_ext(
+        p_interact, window_size, dt[indep].values, dt[dep].values, n_jobs=3
+    )
     test = test[~np.isnan(test)]
 
     return (stats.percentileofscore(test, p_fl) / 100, test, dt_event.index[0], p_fl)
 
 
-def preprocess_dt(file_in, dep_cols, indep_cols):
+def preprocess_dt(file_in, dep_cols, indep_cols, daylight_threshold=100):
     dt = pd.read_csv(
         file_in,
         na_values=["-9999.0"],
@@ -56,7 +86,9 @@ def preprocess_dt(file_in, dep_cols, indep_cols):
     # calculate which hours have low ppfd, exclude those hours
     if "ppfd_in" in dt.columns:
         test = dt[["hour", "ppfd_in"]].groupby("hour", as_index=False).mean()
-        daylight_hours = test[test["ppfd_in"] > 100]["hour"].values.tolist()
+        daylight_hours = test[test["ppfd_in"] > daylight_threshold][
+            "hour"
+        ].values.tolist()
         dt = dt[[x in daylight_hours for x in dt["hour"]]]
     else:
         indep_cols = [x for x in indep_cols if x != "ppfd_in"]
@@ -65,6 +97,8 @@ def preprocess_dt(file_in, dep_cols, indep_cols):
     dt = janitor.remove_empty(dt)
     dep_cols = [x for x in dep_cols if x in dt.columns]
     indep_cols = [x for x in indep_cols if x in dt.columns]
+
+    dt = dt[[x for x in ~dt[dep_cols + indep_cols].isna().all(axis=1)]]
 
     # dt[dep_cols].head()
     # dt[indep_cols].describe()
@@ -146,10 +180,13 @@ def define_period(dt_select, date_event="2008-08-23", n_days=10):
     return dt_event
 
 
-def grid_define_pquant(grid, dt, dt_event, out_path="data/grid.csv"):
-    if not os.path.exists(out_path):
-        grid["pquant"] = [
-            round(
+def grid_define_pquant(grid, dt, dt_event, out_path="data/grid.csv", overwrite=False):
+    if not os.path.exists(out_path) or overwrite:
+        breakpoint()
+        grid["pquant"] = None
+        for i in range(grid.shape[0]):
+            print(i)
+            grid["pquant"].iloc[i] = round(
                 abs(
                     p_quantile(
                         dt,
@@ -160,8 +197,9 @@ def grid_define_pquant(grid, dt, dt_event, out_path="data/grid.csv"):
                 ),
                 2,
             )
-            for i in range(grid.shape[0])
-        ]
+        # TODO: why is the processing ending before this line?
+
+        breakpoint()
 
         grid = grid.sort_values("pquant")
         grid.to_csv(out_path, index=False)
