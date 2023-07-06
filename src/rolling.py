@@ -60,7 +60,7 @@ def p_quantile(dt, dt_event, dep, indep):
     # any(pd.notna(dt[indep].values[566:1132]))
 
     test = rolling_apply_ext(
-        p_interact, window_size, dt[indep].values, dt[dep].values, n_jobs=3
+        p_interact, window_size, dt[indep].values, dt[dep].values, n_jobs=1
     )
     test = test[~np.isnan(test)]
 
@@ -182,7 +182,7 @@ def define_period(dt_select, date_event="2008-08-23", n_days=10):
 
 def grid_define_pquant(grid, dt, dt_event, out_path="data/grid.csv", overwrite=False):
     if not os.path.exists(out_path) or overwrite:
-        breakpoint()
+        # breakpoint()
         grid["pquant"] = None
         for i in range(grid.shape[0]):
             print(i)
