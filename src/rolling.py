@@ -183,23 +183,24 @@ def define_period(dt_select, date_event="2008-08-23", n_days=10):
 def grid_define_pquant(grid, dt, dt_event, out_path="data/grid.csv", overwrite=False):
     if not os.path.exists(out_path) or overwrite:
         # breakpoint()
-        grid["pquant"] = None
+        pquant = []
         for i in range(grid.shape[0]):
-            print(i)
-            grid["pquant"].iloc[i] = round(
-                abs(
-                    p_quantile(
-                        dt,
-                        dt_event,
-                        grid.iloc[[i]]["dep"].values[0],
-                        grid.iloc[[i]]["indep"].values[0],
-                    )[0]
-                ),
-                2,
+            pquant.append(
+                round(
+                    abs(
+                        p_quantile(
+                            dt,
+                            dt_event,
+                            grid.iloc[[i]]["dep"].values[0],
+                            grid.iloc[[i]]["indep"].values[0],
+                        )[0]
+                    ),
+                    2,
+                )
             )
         # TODO: why is the processing ending before this line?
+        # breakpoint()
 
-        breakpoint()
-
+        grid["pquant"] = pquant
         grid = grid.sort_values("pquant")
         grid.to_csv(out_path, index=False)
