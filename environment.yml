@@ -1,21 +1,22 @@
 name: fluxnet
 channels:
-- conda-forge
+        - conda-forge
 dependencies:
-        - python>3
-        - pandas        
+        # basics
+        - pandas
+        - pyjanitor
+        - seaborn
+        # utilities
         - pytest
         - black
-        - geopy
-        - geopandas
-        - scipy
-        - pyjanitor
-        - seaborn        
-        - cartopy
         - tabulate
         - pip
+        # geospatial
+        - geopy
+        - geopandas
+        - cartopy
         - pip:
-                - pyffp
-                - geojson
-                - geojsoncontour
-                - numpy-ext
+                  # - pyffp
+                  # - geojson
+                  # - geojsoncontour
+                  - numpy-ext
