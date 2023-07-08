@@ -58,7 +58,7 @@ subprocess.call(
     shell=True,
 )
 subprocess.call(
-    "pdfcrop figures/__rolling_grid_"
+    "pdfcrop.pl figures/__rolling_grid_"
     + site_id
     + ".pdf figures/__rolling_grid_"
     + site_id
