@@ -1,4 +1,5 @@
 import os
+import pyproj
 import janitor
 import itertools
 import numpy as np
@@ -59,12 +60,13 @@ def p_quantile(dt, dt_event, dep, indep):
     # any(pd.notna(dt[dep].values[566:1132]))
     # any(pd.notna(dt[indep].values[566:1132]))
 
-    test = rolling_apply_ext(
+    pdist = rolling_apply_ext(
         p_interact, window_size, dt[indep].values, dt[dep].values, n_jobs=1
     )
-    test = test[~np.isnan(test)]
+    pdist = pdist[~np.isnan(pdist)]
 
-    return (stats.percentileofscore(test, p_fl) / 100, test, dt_event.index[0], p_fl)
+    # _, pdist, event_index, p_event
+    return (stats.percentileofscore(pdist, p_fl) / 100, pdist, dt_event.index[0], p_fl)
 
 
 def preprocess_dt(file_in, dep_cols, indep_cols, daylight_threshold=100):
@@ -198,9 +200,26 @@ def grid_define_pquant(grid, dt, dt_event, out_path="data/grid.csv", overwrite=F
                     2,
                 )
             )
-        # TODO: why is the processing ending before this line?
+        # TODO: why is process being killed before this line when running with multiprocessing?
         # breakpoint()
 
         grid["pquant"] = pquant
         grid = grid.sort_values("pquant")
         grid.to_csv(out_path, index=False)
+
+
+def bearing(p1, p2):
+    geodesic = pyproj.Geod(
+        ellps="WGS84"
+    )  # See: https://stackoverflow.com/questions/54873868/python-calculate-bearing-between-two-lat-long
+
+    fwd_azimuth_goal, back_azimuth, distance = geodesic.inv(
+        p1.geometry.x, p1.geometry.y, p2.geometry.x, p2.geometry.y
+    )
+    if fwd_azimuth_goal < 0:
+        fwd_azimuth_goal = fwd_azimuth_goal + 365
+
+    return fwd_azimuth_goal
+
+
+# TODO: make rolling fxn to identify time points where wd falls within "towards" tolerance

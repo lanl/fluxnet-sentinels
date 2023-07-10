@@ -1,10 +1,14 @@
 # https://gis.stackexchange.com/a/378750/32531
+import sys
 import pyproj
 import janitor
 import pandas as pd
 import seaborn as sns
 import geopandas as gpd
 import matplotlib.pyplot as plt
+
+sys.path.append(".")
+from src import rolling
 
 
 def preprocess_dt(file_in, dep_cols, indep_cols):
@@ -52,22 +56,10 @@ file_in = (
 
 dt, dt_select = preprocess_dt(file_in, dep_cols, indep_cols)
 
-geodesic = pyproj.Geod(
-    ellps="WGS84"
-)  # See: https://stackoverflow.com/questions/54873868/python-calculate-bearing-between-two-lat-long
-
+# Find azimuth of the two points by using their indexes
 df = gpd.read_file("dt_sites_close.gpkg")[["site_code", "geometry"]]
 df = df[[x in ["BE-Lon", "BE-Bra"] for x in df["site_code"]]].reset_index(drop=True)
-
-# Find azimuth of the two points by using their indexes
-p1 = df.iloc[0]
-p2 = df.iloc[1]
-fwd_azimuth_goal, back_azimuth, distance = geodesic.inv(
-    p1.geometry.x, p1.geometry.y, p2.geometry.x, p2.geometry.y
-)
-if fwd_azimuth_goal < 0:
-    fwd_azimuth_goal = fwd_azimuth_goal + 365
-
+fwd_azimuth_goal = rolling.bearing(df.iloc[0], df.iloc[1])
 
 plt.close()
 ax = df.plot("site_code")
@@ -77,6 +69,13 @@ for i in range(df["site_code"].shape[0]):
 plt.show()
 
 plt.close()
-g = sns.histplot(data = dt, x="wd")
+g = sns.histplot(data=dt, x="wd")
 g.axvline(fwd_azimuth_goal)
 plt.show()
+
+
+# given:
+#   2 gdf points
+#
+
+# return
