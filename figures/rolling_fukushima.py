@@ -1,3 +1,4 @@
+import os
 import sys
 import janitor
 import tabulate
@@ -82,7 +83,16 @@ except:  # system pdfcrop
 # ---
 
 # try plotting a timeseries and distribution of quantiles
-_, pdist, event_index, p_event = rolling.p_quantile(dt, dt_event, "le", "rh")
+path_pdist = "data/pdist_levrh_uswrc.csv"
+path_pevent = "data/p_event_levrh_uswrc.csv"
+if (not os.path.exists(path_pdist)) or (not os.path.exists(path_pevent)):
+    _, pdist, event_index, p_event = rolling.p_quantile(dt, dt_event, "le", "rh")
+    breakpoint()
+    pdist.to_csv(path_pdist, index=False)
+    p_event.to_csv(path_pevent, index=False)
+pdist = pd.read_csv(path_pdist)
+p_event = pd.read_csv(path_pevent)
+
 g = sns.histplot(abs(np.log(pdist)))
 g.axvline(abs(np.log(p_event)))
 # plt.show()
