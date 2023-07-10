@@ -2,7 +2,9 @@
 import pyproj
 import janitor
 import pandas as pd
+import seaborn as sns
 import geopandas as gpd
+import matplotlib.pyplot as plt
 
 
 def preprocess_dt(file_in, dep_cols, indep_cols):
@@ -63,4 +65,18 @@ p2 = df.iloc[1]
 fwd_azimuth_goal, back_azimuth, distance = geodesic.inv(
     p1.geometry.x, p1.geometry.y, p2.geometry.x, p2.geometry.y
 )
-fwd_azimuth_goal
+if fwd_azimuth_goal < 0:
+    fwd_azimuth_goal = fwd_azimuth_goal + 365
+
+
+plt.close()
+ax = df.plot("site_code")
+for i in range(df["site_code"].shape[0]):
+    coords = df.iloc[i].geometry.coords
+    ax.text(float(coords.xy[0][0]), float(coords.xy[1][0]), s=df.iloc[i]["site_code"])
+plt.show()
+
+plt.close()
+g = sns.histplot(data = dt, x="wd")
+g.axvline(fwd_azimuth_goal)
+plt.show()
