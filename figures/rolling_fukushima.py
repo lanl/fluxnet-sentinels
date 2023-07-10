@@ -29,8 +29,8 @@ grid = rolling.make_grid(dt, dep_cols, indep_cols)
 
 dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event)
 
+test = rolling.towards(dt, 285, 80)
 
-# rolling.towards(dt, dt_event, 285, 160)
 # ---
 rolling.grid_define_pquant(
     grid, dt, dt_event, "data/grid_" + site_id + "_" + str(n_days) + ".csv"

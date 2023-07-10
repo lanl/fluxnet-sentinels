@@ -63,7 +63,7 @@ def p_quantile(dt, dt_event, dep, indep):
     pdist = rolling_apply_ext(
         p_interact, window_size, dt[indep].values, dt[dep].values, n_jobs=1
     )
-    pdist = pdist[~np.isnan(pdist)]
+    # pdist = pdist[~np.isnan(pdist)]
 
     # _, pdist, event_index, p_event
     return (stats.percentileofscore(pdist, p_fl) / 100, pdist, dt_event.index[0], p_fl)
@@ -222,15 +222,28 @@ def bearing(p1, p2):
     return fwd_azimuth_goal
 
 
-def within_bearing(wd, bearing, tolerance):
-    breakpoint()
-    return None
+def within_bearing(wd, within_bearing_args={"bearing": 20, "tolerance": 10}):
+    bearing = within_bearing_args["bearing"]
+    tolerance = within_bearing_args["tolerance"]
+    lower = bearing - tolerance
+    upper = bearing + tolerance
+
+    if upper > 365:
+        upper = 365 - upper
+
+    if lower < 0:
+        lower = lower + 365
+
+    is_within = [(x <= upper) and (x >= lower) for x in wd]
+    res = round(sum(is_within) / len(is_within), 3)
+    # breakpoint()
+    return res
 
 
-def towards(dt, dt_event, bearing, tolerance):
+def towards(dt, bearing, tolerance):
     # identify time points where wd falls within "towards" tolerance
 
-    breakpoint()
+    within_bearing_args = {"bearing": bearing, "tolerance": tolerance}
 
     window_size = 566  # 30 min * (3 + 7 + 7) days?
 
@@ -238,11 +251,9 @@ def towards(dt, dt_event, bearing, tolerance):
         within_bearing,
         window_size,
         dt["wd"].values,
-        dt["wd"].values,
         n_jobs=1,
-        bearing=bearing,
-        tolerance=tolerance,
+        within_bearing_args=within_bearing_args,
     )
-    is_towards = is_towards[~np.isnan(is_towards)]
+    # is_towards = is_towards[~np.isnan(is_towards)]
 
     return is_towards
