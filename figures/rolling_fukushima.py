@@ -29,8 +29,8 @@ grid = rolling.make_grid(dt, dep_cols, indep_cols)
 
 dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event)
 
-test = rolling.towards(dt, 285, 80)
-pd.DataFrame({"test": test}).to_csv("data/test.csv", index=False)
+test2 = rolling.towards(dt, 285, 80)
+pd.DataFrame({"test": test2}).to_csv("data/test.csv", index=False)
 
 # ---
 rolling.grid_define_pquant(
@@ -112,16 +112,37 @@ g.axvline(abs(np.log(p_event)))
 # plt.show()
 plt.savefig("figures/__levrh_uswrc_hist.pdf")
 
-g = sns.lineplot(
-    data=pd.DataFrame(
-        {"index": [x for x in range(len(pdist))], "p": abs(np.log(pdist))}
-    ),
-    x="index",
-    y="p",
+
+g_data = pd.DataFrame(
+    {"index": [x for x in range(len(pdist))], "p": abs(np.log(pdist)), "test": test2}
 )
+tt = [
+    (g_data.iloc[i]["test"] > 0.637) and (g_data.iloc[i]["p"] >= 24.6)
+    for i in range(g_data.shape[0])
+]
+
+plt.close()
+fig, ax1 = plt.subplots(figsize=(9, 6))
+g = sns.lineplot(data=g_data, x="index", y="p", ax=ax1)
 g.axvline(event_index, color="yellow")
 g.axhline(abs(np.log(p_event)), color="darkgreen")
+g.set_ylim(0, 180)
+ax1.set_ylabel("effect size (blue line, green line [event])")
+ax1.text(event_index, 3, "<-\nFukushima\nDisaster")
 
-plt.ylim(0, 150)
-# plt.show()
-plt.savefig("figures/__levrh_uswrc_line.pdf")
+ax2 = ax1.twinx()
+g2 = sns.lineplot(data=g_data, x="index", y="test", ax=ax2, color="black")
+g2.set_ylim(-1, 1)
+# g_data.iloc[int(event_index)]["p"]
+[
+    g2.axvline(g_data[tt].iloc[i]["index"], color="orange")
+    for i in range(g_data[tt].shape[0])
+]
+# g_data[
+#     (g_data["p"] > abs(np.log(p_event))).values and (g_data["test"] > 0.7).values
+# ].shape
+ax2.set_ylabel("fraction wind towards (black line)")
+plt.suptitle("US-Wrc")
+plt.show()
+
+# plt.savefig("figures/__levrh_uswrc_line.pdf")
