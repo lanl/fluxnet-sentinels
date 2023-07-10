@@ -30,6 +30,7 @@ grid = rolling.make_grid(dt, dep_cols, indep_cols)
 dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event)
 
 test = rolling.towards(dt, 285, 80)
+pd.DataFrame({"test": test}).to_csv("data/test.csv", index=False)
 
 # ---
 rolling.grid_define_pquant(
