@@ -85,9 +85,6 @@ except:  # system pdfcrop
     )
 
 # ---
-rolling.towards(dt, dt_event, 285, 160)
-
-
 path_pdist = "data/pdist_levrh_uswrc.csv"
 path_pevent = "data/p_event_levrh_uswrc.csv"
 path_event_index = "data/event_index_levrh_uswrc.csv"
