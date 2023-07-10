@@ -222,4 +222,27 @@ def bearing(p1, p2):
     return fwd_azimuth_goal
 
 
-# TODO: make rolling fxn to identify time points where wd falls within "towards" tolerance
+def within_bearing(wd, bearing, tolerance):
+    breakpoint()
+    return None
+
+
+def towards(dt, dt_event, bearing, tolerance):
+    # identify time points where wd falls within "towards" tolerance
+
+    breakpoint()
+
+    window_size = 566  # 30 min * (3 + 7 + 7) days?
+
+    is_towards = rolling_apply_ext(
+        within_bearing,
+        window_size,
+        dt["wd"].values,
+        dt["wd"].values,
+        n_jobs=1,
+        bearing=bearing,
+        tolerance=tolerance,
+    )
+    is_towards = is_towards[~np.isnan(is_towards)]
+
+    return is_towards

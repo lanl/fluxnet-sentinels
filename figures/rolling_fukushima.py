@@ -29,6 +29,9 @@ grid = rolling.make_grid(dt, dep_cols, indep_cols)
 
 dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event)
 
+
+# rolling.towards(dt, dt_event, 285, 160)
+# ---
 rolling.grid_define_pquant(
     grid, dt, dt_event, "data/grid_" + site_id + "_" + str(n_days) + ".csv"
 )
@@ -81,8 +84,9 @@ except:  # system pdfcrop
     )
 
 # ---
+rolling.towards(dt, dt_event, 285, 160)
 
-# try plotting a timeseries and distribution of quantiles
+
 path_pdist = "data/pdist_levrh_uswrc.csv"
 path_pevent = "data/p_event_levrh_uswrc.csv"
 path_event_index = "data/event_index_levrh_uswrc.csv"
