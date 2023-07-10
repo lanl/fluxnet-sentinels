@@ -7,3 +7,4 @@ mdtable.md
 eddypro-metadata_be-lon.md
 *.pyc
 */__pycache__
+*.tmp

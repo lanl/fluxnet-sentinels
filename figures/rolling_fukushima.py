@@ -57,11 +57,21 @@ subprocess.call(
     "pandoc mdtable.md -V fontsize=14pt -o figures/__rolling_grid_" + site_id + ".pdf",
     shell=True,
 )
-subprocess.call(
-    "pdfcrop.pl figures/__rolling_grid_"
-    + site_id
-    + ".pdf figures/__rolling_grid_"
-    + site_id
-    + ".pdf",
-    shell=True,
-)
+try:  # conda pdfcrop
+    subprocess.call(
+        "pdfcrop.pl figures/__rolling_grid_"
+        + site_id
+        + ".pdf figures/__rolling_grid_"
+        + site_id
+        + ".pdf",
+        shell=True,
+    )
+except:  # system pdfcrop
+    subprocess.call(
+        "pdfcrop figures/__rolling_grid_"
+        + site_id
+        + ".pdf figures/__rolling_grid_"
+        + site_id
+        + ".pdf",
+        shell=True,
+    )
