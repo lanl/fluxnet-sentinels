@@ -58,7 +58,7 @@ subprocess.call(
     shell=True,
 )
 try:  # conda pdfcrop
-    subprocess.call(
+    subprocess.check_call(
         "pdfcrop.pl figures/__rolling_grid_"
         + site_id
         + ".pdf figures/__rolling_grid_"
