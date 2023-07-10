@@ -2,7 +2,10 @@ import sys
 import janitor
 import tabulate
 import subprocess
+import numpy as np
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 sys.path.append(".")
 from src import rolling
@@ -75,3 +78,25 @@ except:  # system pdfcrop
         + ".pdf",
         shell=True,
     )
+
+# ---
+
+# try plotting a timeseries and distribution of quantiles
+_, pdist, event_index, p_event = rolling.p_quantile(dt, dt_event, "le", "rh")
+g = sns.histplot(abs(np.log(pdist)))
+g.axvline(abs(np.log(p_event)))
+# plt.show()
+plt.savefig("figures/__levrh_uswrc_hist.pdf")
+
+g = sns.lineplot(
+    data=pd.DataFrame(
+        {"index": [x for x in range(len(pdist))], "p": abs(np.log(pdist))}
+    ),
+    x="index",
+    y="p",
+)
+g.axvline(event_index, color="yellow")
+g.axhline(abs(np.log(p_event)), color="darkgreen")
+# plt.show()
+# plt.ylim(0, 150)
+plt.savefig("figures/__levrh_uswrc_line.pdf")
