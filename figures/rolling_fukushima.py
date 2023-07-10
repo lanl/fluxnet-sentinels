@@ -85,13 +85,25 @@ except:  # system pdfcrop
 # try plotting a timeseries and distribution of quantiles
 path_pdist = "data/pdist_levrh_uswrc.csv"
 path_pevent = "data/p_event_levrh_uswrc.csv"
+path_event_index = "data/event_index_levrh_uswrc.csv"
 if (not os.path.exists(path_pdist)) or (not os.path.exists(path_pevent)):
     _, pdist, event_index, p_event = rolling.p_quantile(dt, dt_event, "le", "rh")
-    breakpoint()
-    pdist.to_csv(path_pdist, index=False)
-    p_event.to_csv(path_pevent, index=False)
-pdist = pd.read_csv(path_pdist)
-p_event = pd.read_csv(path_pevent)
+    pd.DataFrame({"pdist": pdist}).to_csv(path_pdist, index=False)
+    pd.DataFrame({"pevent": p_event}, index=[0]).to_csv(path_pevent, index=False)
+    pd.DataFrame({"event_index": event_index}, index=[0]).to_csv(
+        path_event_index, index=False
+    )
+pdist = [float(x) for x in pd.read_csv(path_pdist).values]
+p_event = float(
+    pd.read_csv(
+        path_pevent,
+    ).values[0]
+)
+event_index = float(
+    pd.read_csv(
+        path_event_index,
+    ).values[0]
+)
 
 g = sns.histplot(abs(np.log(pdist)))
 g.axvline(abs(np.log(p_event)))
@@ -107,6 +119,7 @@ g = sns.lineplot(
 )
 g.axvline(event_index, color="yellow")
 g.axhline(abs(np.log(p_event)), color="darkgreen")
-# plt.show()
+
 plt.ylim(0, 150)
+# plt.show()
 plt.savefig("figures/__levrh_uswrc_line.pdf")
