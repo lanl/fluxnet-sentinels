@@ -98,5 +98,5 @@ g = sns.lineplot(
 g.axvline(event_index, color="yellow")
 g.axhline(abs(np.log(p_event)), color="darkgreen")
 # plt.show()
-# plt.ylim(0, 150)
+plt.ylim(0, 150)
 plt.savefig("figures/__levrh_uswrc_line.pdf")
