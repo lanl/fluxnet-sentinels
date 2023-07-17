@@ -112,7 +112,6 @@ g.axvline(abs(np.log(p_event)))
 # plt.show()
 plt.savefig("figures/__levrh_uswrc_hist.pdf")
 
-
 g_data = pd.DataFrame(
     {"index": [x for x in range(len(pdist))], "p": abs(np.log(pdist)), "test": test2}
 )
@@ -128,7 +127,7 @@ g.axvline(event_index, color="yellow")
 g.axhline(abs(np.log(p_event)), color="darkgreen")
 g.set_ylim(0, 180)
 ax1.set_ylabel("effect size (blue line, green line [event])")
-ax1.text(event_index, 3, "<-\nFukushima\nDisaster")
+ax1.text(event_index, 3, "<-\nFukushima\nDisaster", color="red")
 
 ax2 = ax1.twinx()
 g2 = sns.lineplot(data=g_data, x="index", y="test", ax=ax2, color="black")
@@ -143,6 +142,5 @@ g2.set_ylim(-1, 1)
 # ].shape
 ax2.set_ylabel("fraction wind towards (black line)")
 plt.suptitle("US-Wrc")
-plt.show()
-
-# plt.savefig("figures/__levrh_uswrc_line.pdf")
+# plt.show()
+plt.savefig("figures/__rolling_fukushima.pdf")

@@ -1,6 +1,6 @@
 source("scripts/99_utils.R")
 
-sites <- read.csv("data/ameriflux_ak.csv")
+sites <- read.csv("data/ameriflux_pnw.csv")
 
 # ---
 coords <- sf::st_as_sf(

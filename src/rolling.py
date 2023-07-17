@@ -243,7 +243,7 @@ def within_bearing(wd, within_bearing_args={"bearing": 20, "tolerance": 10}):
 def towards(dt, bearing, tolerance):
     # identify time points where wd falls within "towards" tolerance
 
-    within_bearing_args = {"bearing": bearing, "tolerance": tolerance}
+    within_bearing_args = {"bearing": bearing, "tolerance": tolerance}    
 
     window_size = 566  # 30 min * (3 + 7 + 7) days?
 
