@@ -1,8 +1,6 @@
 import os
 import sys
 import janitor
-import tabulate
-import subprocess
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -25,66 +23,16 @@ site_id = "us-wrc"
 
 dt, dt_select = rolling.preprocess_dt(file_in, dep_cols, indep_cols)
 dt = janitor.remove_empty(dt)
-grid = rolling.make_grid(dt, dep_cols, indep_cols)
-
 dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event)
 
+# ---
+grid = rolling.make_grid(dt, dep_cols, indep_cols)
+rolling.regression_grid(grid, dt, dt_event, site_id, n_days)
+
+# ---
 test2 = rolling.towards(dt, 285, 80)
 pd.DataFrame({"test": test2}).to_csv("data/test.csv", index=False)
 
-# ---
-rolling.grid_define_pquant(
-    grid, dt, dt_event, "data/grid_" + site_id + "_" + str(n_days) + ".csv"
-)
-
-# ---
-
-grid = pd.read_csv("data/grid_" + site_id + "_" + str(n_days) + ".csv")
-test = grid[grid["r2"] > 0.05].reset_index(drop=True)
-test = test[[x != "ppfd_in" for x in test["indep"]]].reset_index(drop=True)
-
-
-mdtable = tabulate.tabulate(
-    test,
-    headers=["Explanatory", "Regressor", "R2", r"Event Percentile"],
-    tablefmt="simple",
-    showindex=False,
-)
-with open("mdtable.md", "w") as f:
-    f.write(mdtable)
-
-subprocess.call(
-    "echo ## " + site_id + "| cat - mdtable.md > temp && mv temp mdtable.md",
-    shell=True,
-)
-subprocess.call(
-    "echo \\pagenumbering{gobble}| cat - mdtable.md > temp && mv temp mdtable.md",
-    shell=True,
-)
-subprocess.call(
-    "pandoc mdtable.md -V fontsize=14pt -o figures/__rolling_grid_" + site_id + ".pdf",
-    shell=True,
-)
-try:  # conda pdfcrop
-    subprocess.check_call(
-        "pdfcrop.pl figures/__rolling_grid_"
-        + site_id
-        + ".pdf figures/__rolling_grid_"
-        + site_id
-        + ".pdf",
-        shell=True,
-    )
-except:  # system pdfcrop
-    subprocess.call(
-        "pdfcrop figures/__rolling_grid_"
-        + site_id
-        + ".pdf figures/__rolling_grid_"
-        + site_id
-        + ".pdf",
-        shell=True,
-    )
-
-# ---
 path_pdist = "data/pdist_levrh_uswrc.csv"
 path_pevent = "data/p_event_levrh_uswrc.csv"
 path_event_index = "data/event_index_levrh_uswrc.csv"

@@ -1,7 +1,9 @@
 import os
 import pyproj
 import janitor
+import tabulate
 import itertools
+import subprocess
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -243,7 +245,7 @@ def within_bearing(wd, within_bearing_args={"bearing": 20, "tolerance": 10}):
 def towards(dt, bearing, tolerance):
     # identify time points where wd falls within "towards" tolerance
 
-    within_bearing_args = {"bearing": bearing, "tolerance": tolerance}    
+    within_bearing_args = {"bearing": bearing, "tolerance": tolerance}
 
     window_size = 566  # 30 min * (3 + 7 + 7) days?
 
@@ -257,3 +259,59 @@ def towards(dt, bearing, tolerance):
     # is_towards = is_towards[~np.isnan(is_towards)]
 
     return is_towards
+
+
+def regression_grid(grid, dt, dt_event, site_id, n_days, overwrite=False):
+    grid_define_pquant(
+        grid,
+        dt,
+        dt_event,
+        "data/grid_" + site_id + "_" + str(n_days) + ".csv",
+        overwrite,
+    )
+
+    grid = pd.read_csv("data/grid_" + site_id + "_" + str(n_days) + ".csv")
+    test = grid[grid["r2"] > 0.05].reset_index(drop=True)
+    test = test[[x != "ppfd_in" for x in test["indep"]]].reset_index(drop=True)
+
+    mdtable = tabulate.tabulate(
+        test,
+        headers=["Explanatory", "Regressor", "R2", r"Event Percentile"],
+        tablefmt="simple",
+        showindex=False,
+    )
+    with open("mdtable.md", "w") as f:
+        f.write(mdtable)
+
+    subprocess.call(
+        "echo ## " + site_id + "| cat - mdtable.md > temp && mv temp mdtable.md",
+        shell=True,
+    )
+    subprocess.call(
+        "echo \\pagenumbering{gobble}| cat - mdtable.md > temp && mv temp mdtable.md",
+        shell=True,
+    )
+    subprocess.call(
+        "pandoc mdtable.md -V fontsize=14pt -o figures/__rolling_grid_"
+        + site_id
+        + ".pdf",
+        shell=True,
+    )
+    try:  # conda pdfcrop
+        subprocess.check_call(
+            "pdfcrop.pl figures/__rolling_grid_"
+            + site_id
+            + ".pdf figures/__rolling_grid_"
+            + site_id
+            + ".pdf",
+            shell=True,
+        )
+    except:  # system pdfcrop
+        subprocess.call(
+            "pdfcrop figures/__rolling_grid_"
+            + site_id
+            + ".pdf figures/__rolling_grid_"
+            + site_id
+            + ".pdf",
+            shell=True,
+        )
