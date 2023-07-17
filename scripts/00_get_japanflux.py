@@ -1,4 +1,6 @@
+import glob
 import janitor
+import itertools
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -51,29 +53,22 @@ def preprocess_dt(file_in):
     if "rg_32" in dt.columns:
         dt = dt[dt["rg_32"] > 0]  # daytime
 
-
     return dt
 
 
 # ---
 
-file_in = "../../Data/Asiaflux/FxMt_FHK_2011_30m_02/FxMt_FHK_2011_30m_02.csv"
-dt_2011 = preprocess_dt(file_in)
+site_id = "FHK"
 
-file_in = "../../Data/Asiaflux/FxMt_FHK_2010_30m_02/FxMt_FHK_2010_30m_02.csv"
-dt_2010 = preprocess_dt(file_in)
-
-file_in = "../../Data/Asiaflux/FxMt_FHK_2012_30m_02/FxMt_FHK_2012_30m_02.csv"
-dt_2012 = preprocess_dt(file_in)
-
-dt = pd.concat(
-    [
-        dt_2010[["timestamp", "nee", "co", "year", "doy"]],
-        dt_2011[["timestamp", "nee", "co", "year", "doy"]],
-        dt_2012[["timestamp", "nee", "co", "year", "doy"]],
-    ]
-).reset_index(drop=True)
+f_list = glob.glob("../../Data/Asiaflux/*" + site_id + "*")
+f_list = list(itertools.compress(f_list, [".csv" not in ff for ff in f_list]))
+f_list = [glob.glob(ff + "/*.csv")[0] for ff in f_list]
+dt_list = [preprocess_dt(ff) for ff in f_list]
+dt = [dd[["timestamp", "nee", "co", "year", "doy"]] for dd in dt_list]
+dt = pd.concat(dt_list).reset_index(drop=True)
 dt = dt[dt["year"] < 2013]
+dt.to_csv("../../Data/Asiaflux/" + site_id + ".csv", index=False)
+
 
 # ---
 
