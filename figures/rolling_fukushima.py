@@ -13,13 +13,34 @@ from src import rolling
 n_days = 7
 dep_cols = ["co2", "fc", "le", "h"]
 indep_cols = ["ws", "p", "pa", "rh", "ppfd_in", "ta", "netrad"]
-
+bearing = 285
+tolerance = 80
 date_event = "2011-03-11"
+
+# ---
+site = "FHK"
+file_in = "../../Data/Asiaflux/" + site + ".csv"
+site_id = site.lower()
+site_code = site_id.replace("-", "")
+
+dt, dt_select = rolling.preprocess_dt(file_in, dep_cols, indep_cols)
+# dt_event.iloc[[np.min(np.where([x == "during" for x in dt_event["period"]]))]].index
+# dt = dt[0:115560]
+# dt_select = dt_select[0:115560]
+dt = janitor.remove_empty(dt)
+dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event)
+
+# ---
+grid = rolling.make_grid(dt, dep_cols, indep_cols)
+rolling.regression_grid(grid, dt, dt_event, site_id, n_days)
+
+# ...
 
 # ---
 site = "US-Wrc"
 file_in = "../../Data/Ameriflux/" + site + ".csv"
-site_id = "us-wrc"
+site_id = site.lower()
+site_code = site_id.replace("-", "")
 
 dt, dt_select = rolling.preprocess_dt(file_in, dep_cols, indep_cols)
 # dt_event.iloc[[np.min(np.where([x == "during" for x in dt_event["period"]]))]].index
@@ -33,7 +54,7 @@ grid = rolling.make_grid(dt, dep_cols, indep_cols)
 rolling.regression_grid(grid, dt, dt_event, site_id, n_days)
 
 # ---
-wind_fraction = rolling.towards(dt, 285, 80)
+wind_fraction = rolling.towards(dt, bearing, tolerance)
 pd.DataFrame({"wind_fraction": wind_fraction}).to_csv(
     "data/wind_fraction.csv", index=False
 )
@@ -108,4 +129,4 @@ plt.suptitle("US-Wrc")
 ax1.set_xlabel("")
 ax2.set_xlabel("")
 # plt.show()
-plt.savefig("figures/__rolling_fukushima.pdf")
+plt.savefig("figures/__rolling_fukushima_" + site_code + ".pdf")

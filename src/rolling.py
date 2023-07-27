@@ -91,10 +91,20 @@ def preprocess_dt(file_in, dep_cols, indep_cols, daylight_threshold=100):
         file_in,
         na_values=["-9999.0"],
     ).clean_names()
-
     dt = janitor.remove_empty(dt)
-    dt["timestamp_start"] = pd.to_datetime(dt["timestamp_start"], format="%Y%m%d%H%M")
-    dt["timestamp_end"] = pd.to_datetime(dt["timestamp_end"], format="%Y%m%d%H%M")
+
+    try:  # ameriflux format
+        dt["timestamp_start"] = pd.to_datetime(
+            dt["timestamp_start"], format="%Y%m%d%H%M"
+        )
+        dt["timestamp_end"] = pd.to_datetime(dt["timestamp_end"], format="%Y%m%d%H%M")
+    except:  # japanflux format
+        dt["timestamp_start"] = pd.to_datetime(
+            dt["timestamp_start"], format="%Y%m%d %H:%M:%S"
+        )
+        dt["timestamp_end"] = pd.to_datetime(
+            dt["timestamp_end"], format="%Y%m%d %H:%M:%S"
+        )
     dt["hour"] = [int(x.strftime("%H")) for x in dt["timestamp_start"]]
 
     # breakpoint()
@@ -109,9 +119,14 @@ def preprocess_dt(file_in, dep_cols, indep_cols, daylight_threshold=100):
             "hour"
         ].values.tolist()
         dt = dt[[x in daylight_hours for x in dt["hour"]]]
-    else:
+    elif "netrad" in dt.columns:
         indep_cols = [x for x in indep_cols if x != "ppfd_in"]
         dt = dt[dt["netrad"] > 0]  # daytime
+    else:
+        indep_cols = [x for x in indep_cols if x != "ppfd_in"]
+        test = dt[["hour", "ppfd"]].groupby("hour", as_index=False).mean()
+        daylight_hours = test[test["ppfd"] > daylight_threshold]["hour"].values.tolist()
+        dt = dt[[x in daylight_hours for x in dt["hour"]]]
 
     dt = janitor.remove_empty(dt)
     dep_cols = [x for x in dep_cols if x in dt.columns]
