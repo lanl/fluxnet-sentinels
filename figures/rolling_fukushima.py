@@ -22,6 +22,9 @@ file_in = "../../Data/Ameriflux/" + site + ".csv"
 site_id = "us-wrc"
 
 dt, dt_select = rolling.preprocess_dt(file_in, dep_cols, indep_cols)
+# dt_event.iloc[[np.min(np.where([x == "during" for x in dt_event["period"]]))]].index
+# dt = dt[0:115560]
+# dt_select = dt_select[0:115560]
 dt = janitor.remove_empty(dt)
 dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event)
 
@@ -30,20 +33,26 @@ grid = rolling.make_grid(dt, dep_cols, indep_cols)
 rolling.regression_grid(grid, dt, dt_event, site_id, n_days)
 
 # ---
-test2 = rolling.towards(dt, 285, 80)
-pd.DataFrame({"test": test2}).to_csv("data/test.csv", index=False)
+wind_fraction = rolling.towards(dt, 285, 80)
+pd.DataFrame({"wind_fraction": wind_fraction}).to_csv(
+    "data/wind_fraction.csv", index=False
+)
 
 path_pdist = "data/pdist_levrh_uswrc.csv"
 path_pevent = "data/p_event_levrh_uswrc.csv"
 path_event_index = "data/event_index_levrh_uswrc.csv"
 if (not os.path.exists(path_pdist)) or (not os.path.exists(path_pevent)):
-    _, pdist, event_index, p_event = rolling.p_quantile(dt, dt_event, "le", "rh")
-    pd.DataFrame({"pdist": pdist}).to_csv(path_pdist, index=False)
+    _, pdist, timestamps, event_index, p_event = rolling.p_quantile(
+        dt, dt_event, "le", "rh"
+    )
+    pd.DataFrame({"timestamp": timestamps, "pdist": pdist}).to_csv(
+        path_pdist, index=False
+    )
     pd.DataFrame({"pevent": p_event}, index=[0]).to_csv(path_pevent, index=False)
     pd.DataFrame({"event_index": event_index}, index=[0]).to_csv(
         path_event_index, index=False
     )
-pdist = [float(x) for x in pd.read_csv(path_pdist).values]
+pdist = pd.read_csv(path_pdist)
 p_event = float(
     pd.read_csv(
         path_pevent,
@@ -61,28 +70,34 @@ g.axvline(abs(np.log(p_event)))
 plt.savefig("figures/__levrh_uswrc_hist.pdf")
 
 g_data = pd.DataFrame(
-    {"index": [x for x in range(len(pdist))], "p": abs(np.log(pdist)), "test": test2}
+    {
+        "timestamp": timestamps,
+        "index": [x for x in range(len(pdist))],
+        "p": abs(np.log([x for x in pdist["pdist"]])),
+        "wind_fraction": wind_fraction,
+    }
 )
+g_data["timestamp"] = pd.to_datetime(g_data["timestamp"])
 tt = [
-    (g_data.iloc[i]["test"] > 0.637) and (g_data.iloc[i]["p"] >= 24.6)
+    (g_data.iloc[i]["wind_fraction"] > 0.637) and (g_data.iloc[i]["p"] >= 24.6)
     for i in range(g_data.shape[0])
 ]
 
 plt.close()
 fig, ax1 = plt.subplots(figsize=(9, 6))
-g = sns.lineplot(data=g_data, x="index", y="p", ax=ax1)
-g.axvline(event_index, color="yellow")
+g = sns.lineplot(data=g_data, x="timestamp", y="p", ax=ax1)
+g.axvline(pd.to_datetime(date_event), color="yellow")
 g.axhline(abs(np.log(p_event)), color="darkgreen")
 g.set_ylim(0, 180)
 ax1.set_ylabel("effect size (blue line, green line [event])")
-ax1.text(event_index, 3, "<-\nFukushima\nDisaster", color="red")
+ax1.text(pd.to_datetime(date_event), 3, "<-\nFukushima\nDisaster", color="red")
 
 ax2 = ax1.twinx()
-g2 = sns.lineplot(data=g_data, x="index", y="test", ax=ax2, color="black")
+g2 = sns.lineplot(data=g_data, x="timestamp", y="wind_fraction", ax=ax2, color="black")
 g2.set_ylim(-1, 1)
 # g_data.iloc[int(event_index)]["p"]
 [
-    g2.axvline(g_data[tt].iloc[i]["index"], color="orange")
+    g2.axvline(g_data[tt].iloc[i]["timestamp"], color="orange")
     for i in range(g_data[tt].shape[0])
 ]
 # g_data[
@@ -90,5 +105,7 @@ g2.set_ylim(-1, 1)
 # ].shape
 ax2.set_ylabel("fraction wind towards (black line)")
 plt.suptitle("US-Wrc")
+ax1.set_xlabel("")
+ax2.set_xlabel("")
 # plt.show()
 plt.savefig("figures/__rolling_fukushima.pdf")

@@ -13,7 +13,7 @@ import statsmodels.formula.api as smf
 from numpy_ext import rolling_apply as rolling_apply_ext
 
 
-def p_interact(x, y):
+def p_interact(x, y, timestamp):
     dt_sub = pd.DataFrame({"x": x, "y": y})
     dt_sub["period"] = (
         ["before" for _ in range(247)]
@@ -21,19 +21,21 @@ def p_interact(x, y):
         + ["after" for _ in range(249)]
     )
 
+    date = timestamp.reset_index(drop=True)[int(np.floor(len(timestamp) / 2))]
+
     if (not any(pd.notna(dt_sub.y.values))) or (not any(pd.notna(dt_sub.x.values))):
-        return np.nan
+        return np.nan, date
 
     if (sum(pd.notna(dt_sub.y.values)) < 7) or (sum(pd.notna(dt_sub.x.values)) < 7):
-        return np.nan
+        return np.nan, date
 
     try:
         model = smf.ols("np.log(y) ~ x * period", data=dt_sub).fit()
         res = sm.stats.anova_lm(model, typ=1)
         res = res.to_dict()["PR(>F)"]["x:period"]
-        return res
+        return res, date
     except:  # SVD did not converge. or too much missing data?
-        return np.nan
+        return np.nan, date
 
 
 def p_quantile(dt, dt_event, dep, indep):
@@ -63,12 +65,25 @@ def p_quantile(dt, dt_event, dep, indep):
     # any(pd.notna(dt[indep].values[566:1132]))
 
     pdist = rolling_apply_ext(
-        p_interact, window_size, dt[indep].values, dt[dep].values, n_jobs=1
+        p_interact,
+        window_size,
+        dt[indep].values,
+        dt[dep].values,
+        dt["timestamp"],
+        n_jobs=1,
     )
-    # pdist = pdist[~np.isnan(pdist)]
+
+    pdist_compilation = [float(x[0]) for x in pdist]
+    timestamps = [x[1] for x in pdist]
 
     # _, pdist, event_index, p_event
-    return (stats.percentileofscore(pdist, p_fl) / 100, pdist, dt_event.index[0], p_fl)
+    return (
+        stats.percentileofscore(pdist_compilation, p_fl) / 100,
+        pdist_compilation,
+        timestamps,
+        dt_event.index[0],
+        p_fl,
+    )
 
 
 def preprocess_dt(file_in, dep_cols, indep_cols, daylight_threshold=100):
