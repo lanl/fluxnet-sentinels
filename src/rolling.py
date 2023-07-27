@@ -100,10 +100,10 @@ def preprocess_dt(file_in, dep_cols, indep_cols, daylight_threshold=100):
         dt["timestamp_end"] = pd.to_datetime(dt["timestamp_end"], format="%Y%m%d%H%M")
     except:  # japanflux format
         dt["timestamp_start"] = pd.to_datetime(
-            dt["timestamp_start"], format="%Y%m%d %H:%M:%S"
+            dt["timestamp_start"], format="%Y-%m-%d %H:%M:%S"
         )
         dt["timestamp_end"] = pd.to_datetime(
-            dt["timestamp_end"], format="%Y%m%d %H:%M:%S"
+            dt["timestamp_end"], format="%Y-%m-%d %H:%M:%S"
         )
     dt["hour"] = [int(x.strftime("%H")) for x in dt["timestamp_start"]]
 
