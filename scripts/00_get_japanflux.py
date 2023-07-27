@@ -1,9 +1,13 @@
+import sys
 import glob
 import janitor
 import itertools
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+
+sys.path.append(".")
+from src import utils
 
 
 def get_hour(x):
@@ -26,6 +30,7 @@ def preprocess_dt(file_in):
     )
     dt.columns = [x for x in names.columns]
     dt = janitor.remove_empty(dt)
+    dt = utils.amf_clean(dt)
     dt["i"] = [x for x in range(dt.shape[0])]
 
     # ---
@@ -57,7 +62,6 @@ def preprocess_dt(file_in):
 
 
 # ---
-
 site_id = "FHK"
 
 f_list = glob.glob("../../Data/Asiaflux/*" + site_id + "*")
@@ -65,13 +69,12 @@ f_list = list(itertools.compress(f_list, [".csv" not in ff for ff in f_list]))
 f_list = [glob.glob(ff + "/*.csv")[0] for ff in f_list]
 dt_list = [preprocess_dt(ff) for ff in f_list]
 dt = [dd[["timestamp", "nee", "co", "year", "doy"]] for dd in dt_list]
-dt = pd.concat(dt_list).reset_index(drop=True)
+dt = pd.concat(dt).reset_index(drop=True)
 dt = dt[dt["year"] < 2013]
 dt.to_csv("../../Data/Asiaflux/" + site_id + ".csv", index=False)
 
 
 # ---
-
 g = sns.relplot(data=dt, x="doy", y="nee", row="year", hue="year", kind="line")
 g.refline(x=70)
 # plt.show()
