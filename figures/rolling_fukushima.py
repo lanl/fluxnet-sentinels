@@ -74,6 +74,7 @@ if (not os.path.exists(path_pdist)) or (not os.path.exists(path_pevent)):
         path_event_index, index=False
     )
 pdist = pd.read_csv(path_pdist)
+timestamps = [x for x in pdist["timestamp"]]
 p_event = float(
     pd.read_csv(
         path_pevent,
