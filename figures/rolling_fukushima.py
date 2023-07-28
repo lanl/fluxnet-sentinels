@@ -11,7 +11,7 @@ from src import rolling
 
 
 n_days = 7
-dep_cols = ["co2", "fc", "le", "h"]
+dep_cols = ["co2", "fc", "le", "h", "co"]
 indep_cols = ["ws", "p", "pa", "rh", "ppfd_in", "ta", "netrad"]
 bearing = 285
 tolerance = 80

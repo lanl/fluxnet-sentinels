@@ -63,11 +63,14 @@ def preprocess_dt(file_in):
 
 # ---
 site_id = "FHK"
+# dt = pd.read_csv("../../Data/Asiaflux/" + site_id + ".csv")
+# dt.head()
 
 f_list = glob.glob("../../Data/Asiaflux/*" + site_id + "*")
 f_list = list(itertools.compress(f_list, [".csv" not in ff for ff in f_list]))
 f_list = [glob.glob(ff + "/*.csv")[0] for ff in f_list]
 dt_list = [preprocess_dt(ff) for ff in f_list]
+# dt_list[0].columns
 dt = [
     dd[
         [
