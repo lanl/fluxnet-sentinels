@@ -232,8 +232,8 @@ def grid_define_pquant(grid, dt, dt_event, out_path="data/grid.csv", overwrite=F
                     2,
                 )
             )
-        # TODO: why is process being killed before this line when running with multiprocessing?
-        # breakpoint()
+        # TODO: why is the process being killed before this line when running with multiprocessing?
+        breakpoint()
 
         grid["pquant"] = pquant
         grid = grid.sort_values("pquant")
@@ -258,7 +258,7 @@ def within_bearing(wd, within_bearing_args={"bearing": 20, "tolerance": 10}):
     bearing = within_bearing_args["bearing"]
     tolerance = within_bearing_args["tolerance"]
     lower = bearing - tolerance
-    upper = bearing + tolerance    
+    upper = bearing + tolerance
 
     if upper > 365:
         upper = 365 - upper
@@ -275,11 +275,11 @@ def within_bearing(wd, within_bearing_args={"bearing": 20, "tolerance": 10}):
         if pd.isna(x):
             return False
         else:
-            return (x <= upper) and (x >= lower)    
+            return (x <= upper) and (x >= lower)
 
     is_within = [_compute(x, upper, lower) for x in wd]
-    res = round(sum(is_within) / len(is_within), 3)    
-    
+    res = round(sum(is_within) / len(is_within), 3)
+
     return res
 
 
