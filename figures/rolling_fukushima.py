@@ -108,7 +108,7 @@ g2.set_ylim(-1, 1)
 #     (g_data["p"] > abs(np.log(p_event))).values and (g_data["test"] > 0.7).values
 # ].shape
 ax2.set_ylabel("fraction wind towards (black line)")
-plt.suptitle(site)
+plt.suptitle(site + "(" + ",".join(varpair) + ")")
 ax1.set_xlabel("")
 ax2.set_xlabel("")
 # plt.show()
@@ -129,7 +129,10 @@ dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event
 
 # ---
 grid = rolling.make_grid(dt, dep_cols, indep_cols)
-rolling.regression_grid(grid, dt, dt_event, site_id, n_days)
+grid = rolling.regression_grid(grid, dt, dt_event, site_id, n_days)
+
+varpair = ("le", "rh")
+varpair_code = "v".join(varpair) + "_"
 
 # ---
 bearing = 285
@@ -206,7 +209,7 @@ g2.set_ylim(-1, 1)
 #     (g_data["p"] > abs(np.log(p_event))).values and (g_data["test"] > 0.7).values
 # ].shape
 ax2.set_ylabel("fraction wind towards (black line)")
-plt.suptitle("US-Wrc")
+plt.suptitle("US-Wrc (" + ",".join(varpair) + ")")
 ax1.set_xlabel("")
 ax2.set_xlabel("")
 # plt.show()
