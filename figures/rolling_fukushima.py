@@ -31,7 +31,7 @@ dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event
 
 # ---
 grid = rolling.make_grid(dt, dep_cols, indep_cols)
-rolling.regression_grid(grid, dt, dt_event, site_id, n_days, overwrite=True)
+grid = rolling.regression_grid(grid, dt, dt_event, site_id, n_days, overwrite=True)
 
 varpair = ("le", "rh")
 varpair_code = "v".join(varpair) + "_"

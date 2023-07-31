@@ -78,7 +78,7 @@ def p_quantile(dt, dt_event, dep, indep):
 
     # _, pdist, event_index, p_event
     return (
-        stats.percentileofscore(pdist_compilation, p_fl) / 100,
+        stats.percentileofscore(pdist_compilation, p_fl, nan_policy="omit") / 100,
         pdist_compilation,
         timestamps,
         dt_event.index[0],
@@ -219,25 +219,25 @@ def grid_define_pquant(grid, dt, dt_event, out_path="data/grid.csv", overwrite=F
         print("Making: " + out_path)
         pquant = []
         for i in range(grid.shape[0]):
+            # i = 0
+            pquant_i = p_quantile(
+                dt,
+                dt_event,
+                grid.iloc[[i]]["dep"].values[0],
+                grid.iloc[[i]]["indep"].values[0],
+            )
             pquant.append(
                 round(
-                    abs(
-                        p_quantile(
-                            dt,
-                            dt_event,
-                            grid.iloc[[i]]["dep"].values[0],
-                            grid.iloc[[i]]["indep"].values[0],
-                        )[0]
-                    ),
+                    abs(pquant_i[0]),
                     2,
                 )
             )
         # TODO: why is the process being killed before this line when running with multiprocessing?
-        breakpoint()
 
         grid["pquant"] = pquant
         grid = grid.sort_values("pquant")
         grid.to_csv(out_path, index=False)
+        return grid
 
 
 def bearing(p1, p2):
