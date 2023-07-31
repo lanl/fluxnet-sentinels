@@ -50,6 +50,12 @@ def p_quantile(dt, dt_event, dep, indep):
     # dt_event["period"].value_counts()
 
     window_size = 566  # 30 min * (3 + 7 + 7) days?
+
+    if ("timestamp_start" in [x for x in dt.columns]) and (
+        "timestamp" not in [x for x in dt.columns]
+    ):
+        dt["timestamp"] = dt["timestamp_start"]
+
     # i = 1
     # dt.iloc[[566 * i]]["timestamp_start"]
     # dt.iloc[[566 + (566 * i)]]["timestamp_start"]
