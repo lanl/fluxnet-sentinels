@@ -83,7 +83,7 @@ g_data = pd.DataFrame(
 )
 g_data["timestamp"] = pd.to_datetime(g_data["timestamp"])
 tt = [
-    (g_data.iloc[i]["wind_fraction"] > 0.25) and (g_data.iloc[i]["p"] >= 8)
+    (g_data.iloc[i]["wind_fraction"] > 0.27) and (g_data.iloc[i]["p"] >= 8)
     for i in range(g_data.shape[0])
 ]
 
