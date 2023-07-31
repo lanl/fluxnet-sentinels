@@ -83,7 +83,7 @@ g_data = pd.DataFrame(
 )
 g_data["timestamp"] = pd.to_datetime(g_data["timestamp"])
 tt = [
-    (g_data.iloc[i]["wind_fraction"] > 0.25) and (g_data.iloc[i]["p"] >= 37)
+    (g_data.iloc[i]["wind_fraction"] > 0.25) and (g_data.iloc[i]["p"] >= 14)
     for i in range(g_data.shape[0])
 ]
 
@@ -92,7 +92,7 @@ fig, ax1 = plt.subplots(figsize=(9, 6))
 g = sns.lineplot(data=g_data, x="timestamp", y="p", ax=ax1)
 g.axvline(pd.to_datetime(date_event), color="yellow")
 g.axhline(abs(np.log(p_event)), color="darkgreen")
-g.set_ylim(0, 180)
+g.set_ylim(0, 50)
 ax1.set_ylabel("effect size (blue line, green line [event])")
 ax1.text(pd.to_datetime(date_event), 3, "<-\nFukushima\nDisaster", color="red")
 
