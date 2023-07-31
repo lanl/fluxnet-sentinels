@@ -258,7 +258,7 @@ def within_bearing(wd, within_bearing_args={"bearing": 20, "tolerance": 10}):
     bearing = within_bearing_args["bearing"]
     tolerance = within_bearing_args["tolerance"]
     lower = bearing - tolerance
-    upper = bearing + tolerance
+    upper = bearing + tolerance    
 
     if upper > 365:
         upper = 365 - upper
@@ -266,15 +266,20 @@ def within_bearing(wd, within_bearing_args={"bearing": 20, "tolerance": 10}):
     if lower < 0:
         lower = lower + 365
 
-    wd = wd[~pd.isna(wd)]
-    if len(wd) == 0:
-        return 0
+    if lower > upper:
+        temp = lower
+        lower = upper
+        upper = temp
 
-    is_within = [(x <= upper) and (x >= lower) for x in wd]
-    res = round(sum(is_within) / len(is_within), 3)
-    # breakpoint()
-    if pd.isna(res):
-        breakpoint()
+    def _compute(x, upper, lower):
+        if pd.isna(x):
+            return False
+        else:
+            return (x <= upper) and (x >= lower)    
+
+    is_within = [_compute(x, upper, lower) for x in wd]
+    res = round(sum(is_within) / len(is_within), 3)    
+    
     return res
 
 
@@ -325,7 +330,7 @@ def towards(dt, bearing, tolerance, uses_letters=False):
                 ],
             }
         )
-        dt = dt.merge(compass_key)
+        dt = dt.merge(compass_key, how="left")
 
     within_bearing_args = {"bearing": bearing, "tolerance": tolerance}
 

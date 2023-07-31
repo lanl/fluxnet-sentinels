@@ -13,7 +13,7 @@ from src import rolling
 n_days = 7
 dep_cols = ["co2", "fc", "le", "h", "co"]
 indep_cols = ["ws", "p", "pa", "rh", "ppfd_in", "ta", "netrad"]
-tolerance = 80
+tolerance = 40
 date_event = "2011-03-11"
 
 # ---
@@ -32,12 +32,6 @@ dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event
 # ---
 grid = rolling.make_grid(dt, dep_cols, indep_cols)
 rolling.regression_grid(grid, dt, dt_event, site_id, n_days)
-
-bearing = 45
-wind_fraction = rolling.towards(dt, bearing, tolerance, uses_letters=True)
-pd.DataFrame({"wind_fraction": wind_fraction}).to_csv(
-    "data/wind_fraction.csv", index=False
-)
 
 path_pdist = "data/pdist_covta_" + site_code + ".csv"
 path_pevent = "data/p_event_covta_" + site_code + ".csv"
@@ -66,11 +60,16 @@ event_index = float(
     ).values[0]
 )
 
-g = sns.histplot(abs(np.log(pdist)))
+g = sns.histplot(abs(np.log(pdist["pdist"])))
 g.axvline(abs(np.log(p_event)))
 # plt.show()
-plt.savefig("figures/__levrh_" + site_code + "_hist.pdf")
+plt.savefig("figures/__covta_" + site_code + "_hist.pdf")
 
+bearing = 45
+wind_fraction = rolling.towards(dt, bearing, tolerance, uses_letters=True)
+pd.DataFrame({"wind_fraction": wind_fraction}).to_csv(
+    "data/wind_fraction.csv", index=False
+)
 g_data = pd.DataFrame(
     {
         "timestamp": timestamps,
@@ -81,7 +80,7 @@ g_data = pd.DataFrame(
 )
 g_data["timestamp"] = pd.to_datetime(g_data["timestamp"])
 tt = [
-    (g_data.iloc[i]["wind_fraction"] > 0.637) and (g_data.iloc[i]["p"] >= 24.6)
+    (g_data.iloc[i]["wind_fraction"] > 0.25) and (g_data.iloc[i]["p"] >= 37)
     for i in range(g_data.shape[0])
 ]
 
@@ -106,7 +105,7 @@ g2.set_ylim(-1, 1)
 #     (g_data["p"] > abs(np.log(p_event))).values and (g_data["test"] > 0.7).values
 # ].shape
 ax2.set_ylabel("fraction wind towards (black line)")
-plt.suptitle("US-Wrc")
+plt.suptitle(site)
 ax1.set_xlabel("")
 ax2.set_xlabel("")
 # plt.show()
@@ -163,7 +162,7 @@ event_index = float(
     ).values[0]
 )
 
-g = sns.histplot(abs(np.log(pdist)))
+g = sns.histplot(abs(np.log(pdist["pdist"])))
 g.axvline(abs(np.log(p_event)))
 # plt.show()
 plt.savefig("figures/__levrh_" + site_code + "_hist.pdf")
