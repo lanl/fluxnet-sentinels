@@ -170,6 +170,7 @@ g.axvline(abs(np.log(p_event)))
 # plt.show()
 plt.savefig("figures/__levrh_" + site_code + "_hist.pdf")
 
+# ---
 g_data = pd.DataFrame(
     {
         "timestamp": timestamps,
@@ -180,7 +181,7 @@ g_data = pd.DataFrame(
 )
 g_data["timestamp"] = pd.to_datetime(g_data["timestamp"])
 tt = [
-    (g_data.iloc[i]["wind_fraction"] > 0.637) and (g_data.iloc[i]["p"] >= 24.6)
+    (g_data.iloc[i]["wind_fraction"] > 0.4) and (g_data.iloc[i]["p"] >= 24.6)
     for i in range(g_data.shape[0])
 ]
 
