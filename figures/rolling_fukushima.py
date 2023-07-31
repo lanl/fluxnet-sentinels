@@ -33,12 +33,15 @@ dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event
 grid = rolling.make_grid(dt, dep_cols, indep_cols)
 rolling.regression_grid(grid, dt, dt_event, site_id, n_days)
 
-path_pdist = "data/pdist_covta_" + site_code + ".csv"
-path_pevent = "data/p_event_covta_" + site_code + ".csv"
-path_event_index = "data/event_index_covta_" + site_code + ".csv"
+varpair = ("co", "ta")
+varpair_code = "v".join(varpair) + "_"
+
+path_pdist = "data/pdist_" + varpair_code + site_code + ".csv"
+path_pevent = "data/p_event_" + varpair_code + site_code + ".csv"
+path_event_index = "data/event_index_" + varpair_code + site_code + ".csv"
 if (not os.path.exists(path_pdist)) or (not os.path.exists(path_pevent)):
     _, pdist, timestamps, event_index, p_event = rolling.p_quantile(
-        dt, dt_event, "co", "ta"
+        dt, dt_event, varpair[0], varpair[1]
     )
     pd.DataFrame({"timestamp": timestamps, "pdist": pdist}).to_csv(
         path_pdist, index=False
@@ -63,7 +66,7 @@ event_index = float(
 g = sns.histplot(abs(np.log(pdist["pdist"])))
 g.axvline(abs(np.log(p_event)))
 # plt.show()
-plt.savefig("figures/__covta_" + site_code + "_hist.pdf")
+plt.savefig("figures/__" + varpair_code + site_code + "_hist.pdf")
 
 bearing = 45
 wind_fraction = rolling.towards(dt, bearing, tolerance, uses_letters=True)
