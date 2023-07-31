@@ -13,7 +13,6 @@ from src import rolling
 n_days = 7
 dep_cols = ["co2", "fc", "le", "h", "co"]
 indep_cols = ["ws", "p", "pa", "rh", "ppfd_in", "ta", "netrad"]
-bearing = 285
 tolerance = 80
 date_event = "2011-03-11"
 
@@ -34,7 +33,84 @@ dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event
 grid = rolling.make_grid(dt, dep_cols, indep_cols)
 rolling.regression_grid(grid, dt, dt_event, site_id, n_days)
 
-# ...
+bearing = 45
+wind_fraction = rolling.towards(dt, bearing, tolerance, uses_letters=True)
+pd.DataFrame({"wind_fraction": wind_fraction}).to_csv(
+    "data/wind_fraction.csv", index=False
+)
+
+path_pdist = "data/pdist_covta_" + site_code + ".csv"
+path_pevent = "data/p_event_covta_" + site_code + ".csv"
+path_event_index = "data/event_index_covta_" + site_code + ".csv"
+if (not os.path.exists(path_pdist)) or (not os.path.exists(path_pevent)):
+    _, pdist, timestamps, event_index, p_event = rolling.p_quantile(
+        dt, dt_event, "co", "ta"
+    )
+    pd.DataFrame({"timestamp": timestamps, "pdist": pdist}).to_csv(
+        path_pdist, index=False
+    )
+    pd.DataFrame({"pevent": p_event}, index=[0]).to_csv(path_pevent, index=False)
+    pd.DataFrame({"event_index": event_index}, index=[0]).to_csv(
+        path_event_index, index=False
+    )
+pdist = pd.read_csv(path_pdist)
+timestamps = [x for x in pdist["timestamp"]]
+p_event = float(
+    pd.read_csv(
+        path_pevent,
+    ).values[0]
+)
+event_index = float(
+    pd.read_csv(
+        path_event_index,
+    ).values[0]
+)
+
+g = sns.histplot(abs(np.log(pdist)))
+g.axvline(abs(np.log(p_event)))
+# plt.show()
+plt.savefig("figures/__levrh_" + site_code + "_hist.pdf")
+
+g_data = pd.DataFrame(
+    {
+        "timestamp": timestamps,
+        "index": [x for x in range(len(pdist))],
+        "p": abs(np.log([x for x in pdist["pdist"]])),
+        "wind_fraction": wind_fraction,
+    }
+)
+g_data["timestamp"] = pd.to_datetime(g_data["timestamp"])
+tt = [
+    (g_data.iloc[i]["wind_fraction"] > 0.637) and (g_data.iloc[i]["p"] >= 24.6)
+    for i in range(g_data.shape[0])
+]
+
+plt.close()
+fig, ax1 = plt.subplots(figsize=(9, 6))
+g = sns.lineplot(data=g_data, x="timestamp", y="p", ax=ax1)
+g.axvline(pd.to_datetime(date_event), color="yellow")
+g.axhline(abs(np.log(p_event)), color="darkgreen")
+g.set_ylim(0, 180)
+ax1.set_ylabel("effect size (blue line, green line [event])")
+ax1.text(pd.to_datetime(date_event), 3, "<-\nFukushima\nDisaster", color="red")
+
+ax2 = ax1.twinx()
+g2 = sns.lineplot(data=g_data, x="timestamp", y="wind_fraction", ax=ax2, color="black")
+g2.set_ylim(-1, 1)
+# g_data.iloc[int(event_index)]["p"]
+[
+    g2.axvline(g_data[tt].iloc[i]["timestamp"], color="orange")
+    for i in range(g_data[tt].shape[0])
+]
+# g_data[
+#     (g_data["p"] > abs(np.log(p_event))).values and (g_data["test"] > 0.7).values
+# ].shape
+ax2.set_ylabel("fraction wind towards (black line)")
+plt.suptitle("US-Wrc")
+ax1.set_xlabel("")
+ax2.set_xlabel("")
+# plt.show()
+plt.savefig("figures/__rolling_fukushima_" + site_code + ".pdf")
 
 # ---
 site = "US-Wrc"
@@ -54,14 +130,15 @@ grid = rolling.make_grid(dt, dep_cols, indep_cols)
 rolling.regression_grid(grid, dt, dt_event, site_id, n_days)
 
 # ---
+bearing = 285
 wind_fraction = rolling.towards(dt, bearing, tolerance)
 pd.DataFrame({"wind_fraction": wind_fraction}).to_csv(
     "data/wind_fraction.csv", index=False
 )
 
-path_pdist = "data/pdist_levrh_uswrc.csv"
-path_pevent = "data/p_event_levrh_uswrc.csv"
-path_event_index = "data/event_index_levrh_uswrc.csv"
+path_pdist = "data/pdist_levrh_" + site_code + ".csv"
+path_pevent = "data/p_event_levrh_" + site_code + ".csv"
+path_event_index = "data/event_index_levrh_" + site_code + ".csv"
 if (not os.path.exists(path_pdist)) or (not os.path.exists(path_pevent)):
     _, pdist, timestamps, event_index, p_event = rolling.p_quantile(
         dt, dt_event, "le", "rh"
@@ -89,7 +166,7 @@ event_index = float(
 g = sns.histplot(abs(np.log(pdist)))
 g.axvline(abs(np.log(p_event)))
 # plt.show()
-plt.savefig("figures/__levrh_uswrc_hist.pdf")
+plt.savefig("figures/__levrh_" + site_code + "_hist.pdf")
 
 g_data = pd.DataFrame(
     {

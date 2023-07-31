@@ -266,14 +266,66 @@ def within_bearing(wd, within_bearing_args={"bearing": 20, "tolerance": 10}):
     if lower < 0:
         lower = lower + 365
 
+    wd = wd[~pd.isna(wd)]
+    if len(wd) == 0:
+        return 0
+
     is_within = [(x <= upper) and (x >= lower) for x in wd]
     res = round(sum(is_within) / len(is_within), 3)
     # breakpoint()
+    if pd.isna(res):
+        breakpoint()
     return res
 
 
-def towards(dt, bearing, tolerance):
+def towards(dt, bearing, tolerance, uses_letters=False):
     # identify time points where wd falls within "towards" tolerance
+
+    if uses_letters:
+        dt = dt.rename(columns={"wd": "direction"})
+        compass_key = pd.DataFrame(
+            {
+                "direction": [
+                    "CLM",
+                    "N",
+                    "NW",
+                    "NNE",
+                    "WSW",
+                    "SW",
+                    "WNW",
+                    "NNW",
+                    "W",
+                    "NE",
+                    "ESE",
+                    "E",
+                    "ENE",
+                    "S",
+                    "SSW",
+                    "SSE",
+                    "SE",
+                ],
+                "wd": [
+                    pd.NA,
+                    0,
+                    315,
+                    22.5,
+                    247.5,
+                    225,
+                    292.5,
+                    337.5,
+                    270,
+                    45,
+                    112.5,
+                    90,
+                    67.5,
+                    180,
+                    202.5,
+                    157.5,
+                    135,
+                ],
+            }
+        )
+        dt = dt.merge(compass_key)
 
     within_bearing_args = {"bearing": bearing, "tolerance": tolerance}
 

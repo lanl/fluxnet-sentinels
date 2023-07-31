@@ -71,6 +71,8 @@ f_list = list(itertools.compress(f_list, [".csv" not in ff for ff in f_list]))
 f_list = [glob.glob(ff + "/*.csv")[0] for ff in f_list]
 dt_list = [preprocess_dt(ff) for ff in f_list]
 # dt_list[0].columns
+# dt_list[0].head()
+# dt_list[0]["wd"].unique()
 dt = [
     dd[
         [
@@ -84,6 +86,7 @@ dt = [
             "ta",
             "nee",
             "co",
+            "wd",
             "year",
             "doy",
         ]
