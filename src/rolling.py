@@ -216,7 +216,7 @@ def define_period(dt_select, date_event="2008-08-23", n_days=10):
 
 def grid_define_pquant(grid, dt, dt_event, out_path="data/grid.csv", overwrite=False):
     if not os.path.exists(out_path) or overwrite:
-        # breakpoint()
+        print("Making: " + out_path)
         pquant = []
         for i in range(grid.shape[0]):
             pquant.append(
