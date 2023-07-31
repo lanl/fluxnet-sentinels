@@ -255,27 +255,39 @@ def bearing(p1, p2):
 
 
 def within_bearing(wd, within_bearing_args={"bearing": 20, "tolerance": 10}):
+    """
+    within_bearing([10, 30, 45, 115, 280], {"bearing":45, "tolerance":40}) # 0.6
+    within_bearing([10, 30, 45, 115, 280], {"bearing":45, "tolerance":50}) # 0.6
+
+    within_bearing([10, 30, 45, 115, 280], {"bearing":315, "tolerance":40}) # 0.2
+    within_bearing([10, 30, 45, 115, 280], {"bearing":315, "tolerance":55}) # 0.4
+    """
     bearing = within_bearing_args["bearing"]
     tolerance = within_bearing_args["tolerance"]
     lower = bearing - tolerance
     upper = bearing + tolerance
 
     if upper > 365:
-        upper = 365 - upper
+        upper = abs(365 - upper)
 
     if lower < 0:
         lower = lower + 365
 
-    if lower > upper:
-        temp = lower
-        lower = upper
-        upper = temp
-
     def _compute(x, upper, lower):
+        """
+        _compute(10, upper = 95, lower = 360) # True
+        _compute(10, upper = 85, lower = 5) # True
+        _compute(10, upper = 5, lower = 260) # False
+        _compute(2, upper = 5, lower = 260) # True
+        _compute(350, upper = 5, lower = 260) # True
+        """
         if pd.isna(x):
             return False
-        else:
+
+        if lower < upper:
             return (x <= upper) and (x >= lower)
+        else:
+            return (x <= upper) or (x >= lower)
 
     is_within = [_compute(x, upper, lower) for x in wd]
     res = round(sum(is_within) / len(is_within), 3)
