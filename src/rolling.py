@@ -147,7 +147,7 @@ def preprocess_dt(file_in, dep_cols, indep_cols, daylight_threshold=100):
     # dt[indep_cols].describe()
     # breakpoint()
     # sum(pd.isna(dt["co2"])) / dt.shape[0]
-    for i in range(len(dep_cols)):
+    for i, _ in enumerate(dep_cols):
         # i = 0
         dt[dep_cols[i]] = dt[dep_cols[i]] + abs(dt[dep_cols[i]].min()) + 0.01
 

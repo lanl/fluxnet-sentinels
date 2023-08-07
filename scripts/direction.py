@@ -1,6 +1,7 @@
-# https://gis.stackexchange.com/a/378750/32531
+"""
+    https://gis.stackexchange.com/a/378750/32531
+"""
 import sys
-import pyproj
 import janitor
 import pandas as pd
 import seaborn as sns
