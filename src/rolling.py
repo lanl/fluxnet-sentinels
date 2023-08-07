@@ -251,7 +251,7 @@ def bearing(p1, p2):
         ellps="WGS84"
     )  # See: https://stackoverflow.com/questions/54873868/python-calculate-bearing-between-two-lat-long
 
-    fwd_azimuth_goal, back_azimuth, distance = geodesic.inv(
+    fwd_azimuth_goal, _, _ = geodesic.inv(
         p1.geometry.x, p1.geometry.y, p2.geometry.x, p2.geometry.y
     )
     if fwd_azimuth_goal < 0:
@@ -376,11 +376,11 @@ def regression_grid(grid, dt, dt_event, site_id, n_days, overwrite=False):
     )
 
     grid = pd.read_csv("data/grid_" + site_id + "_" + str(n_days) + ".csv")
-    test = grid[grid["r2"] > 0.05].reset_index(drop=True)
-    test = test[[x != "ppfd_in" for x in test["indep"]]].reset_index(drop=True)
+    res = grid[grid["r2"] > 0.05].reset_index(drop=True)
+    res = res[[x != "ppfd_in" for x in res["indep"]]].reset_index(drop=True)
 
     mdtable = tabulate.tabulate(
-        test,
+        res,
         headers=["Explanatory", "Regressor", "R2", r"Event Percentile"],
         tablefmt="simple",
         showindex=False,
@@ -420,3 +420,5 @@ def regression_grid(grid, dt, dt_event, site_id, n_days, overwrite=False):
             + ".pdf",
             shell=True,
         )
+
+    return res
