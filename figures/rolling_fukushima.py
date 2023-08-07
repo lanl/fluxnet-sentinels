@@ -1,3 +1,6 @@
+"""
+    Analyze flux tower data associated with the Fukushima disaster
+"""
 import os
 import sys
 import janitor
