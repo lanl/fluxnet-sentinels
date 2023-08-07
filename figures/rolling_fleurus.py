@@ -1,3 +1,6 @@
+"""
+    Analyze flux tower data associated with the Fleurus abnormal release
+"""
 import os
 import sys
 import janitor
@@ -66,3 +69,53 @@ g = sns.histplot(abs(np.log(pdist["pdist"])))
 g.axvline(abs(np.log(p_event)))
 # plt.show()
 plt.savefig("figures/__" + varpair_code + site_code + "_hist.pdf")
+
+# ---
+bearing = 235
+wind_fraction = rolling.towards(dt, bearing, tolerance)
+pd.DataFrame({"wind_fraction": wind_fraction}).to_csv(
+    "data/wind_fraction.csv", index=False
+)
+
+g_data = pd.DataFrame(
+    {
+        "timestamp": timestamps,
+        "index": [x for x in range(len(pdist))],
+        "p": abs(np.log([x for x in pdist["pdist"]])),
+        "wind_fraction": wind_fraction,
+    }
+)
+
+g_data["timestamp"] = pd.to_datetime(g_data["timestamp"])
+
+tt = [
+    (g_data.iloc[i]["wind_fraction"] >= g_data.iloc[int(event_index)]["wind_fraction"])
+    and (g_data.iloc[i]["p"] >= g_data.iloc[int(event_index)]["p"])
+    for i in range(g_data.shape[0])
+]
+
+plt.close()
+fig, ax1 = plt.subplots(figsize=(9, 6))
+g = sns.lineplot(data=g_data, x="timestamp", y="p", ax=ax1)
+g.axvline(pd.to_datetime(date_event), color="yellow")
+g.axhline(abs(np.log(p_event)), color="darkgreen")
+g.set_ylim(0, 60)
+ax1.set_ylabel("effect size (blue line, green line [event])")
+ax1.text(pd.to_datetime(date_event), 3, "<-\nAbnormal\nEvent", color="red")
+
+ax2 = ax1.twinx()
+g2 = sns.lineplot(data=g_data, x="timestamp", y="wind_fraction", ax=ax2, color="black")
+g2.set_ylim(-1, 1)
+[
+    g2.axvline(g_data[tt].iloc[i]["timestamp"], color="orange")
+    for i in range(g_data[tt].shape[0])
+]
+# g_data[
+#     (g_data["p"] > abs(np.log(p_event))).values and (g_data["test"] > 0.7).values
+# ].shape
+ax2.set_ylabel("fraction wind towards (black line)")
+plt.suptitle(site + "(" + ",".join(varpair) + ")")
+ax1.set_xlabel("")
+ax2.set_xlabel("")
+# plt.show()
+plt.savefig("figures/__rolling_fleurus_" + site_code + ".pdf")
