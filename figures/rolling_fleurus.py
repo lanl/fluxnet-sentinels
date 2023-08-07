@@ -21,9 +21,7 @@ date_event = "2008-08-23"
 
 # ---
 site = "BE-Lon"
-file_in = (
-    r"../../Data/Euroflux/BE-Lon/L2-L4_2004-2012/EFDC_L2_Flx_BELon_2008_v017_30m.txt"
-)
+file_in = "../../Data/Euroflux/BELon.csv"
 site_id = site.lower()
 site_code = site_id.replace("-", "")
 
@@ -33,7 +31,7 @@ dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event
 
 # ---
 grid = rolling.make_grid(dt, dep_cols, indep_cols)
-grid = rolling.regression_grid(grid, dt, dt_event, site_id, n_days)
+grid = rolling.regression_grid(grid, dt, dt_event, site_id, n_days, overwrite=True)
 
 varpair = ("co2", "ta")
 varpair_code = "v".join(varpair) + "_"
