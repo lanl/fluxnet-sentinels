@@ -1,3 +1,6 @@
+"""
+    Utility functions for driving rolling analyses
+"""
 import os
 import pyproj
 import janitor

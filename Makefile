@@ -20,11 +20,14 @@ figures/__map.pdf: figures/maps.R
 figures/__footprint.pdf: figures/footprint.py
 	python $<
 
-figures/__rolling_fukushima.pdf: figures/rolling_fukushima.py
+figures/__rolling_fukushima_uswrc.pdf: figures/rolling_fukushima.py
+	python $<
+
+figures/__rolling_fleurus_belon.pdf: figures/rolling_fleurus.py
 	python $<
 
 figures/all.pdf: figures/__rolling_grid_be-lon.pdf figures/__map.pdf figures/__footprint.pdf \
-	figures/__map_fukushima.pdf figures/__rolling_fukushima.pdf
+	figures/__map_fukushima.pdf figures/__rolling_fukushima_uswrc.pdf figures/__rolling_fleurus_belon.pdf
 	pdftk $(wildcard figures/__*.pdf) output $@
 
 # ---
