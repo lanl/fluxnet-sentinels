@@ -6,6 +6,7 @@ suppressMessages(library(janitor))
 coords_ire <- sf::st_as_sf(
   data.frame(lat = 50.45055, lon = 4.5350415),
   coords = c("lon", "lat"), crs = 4326)
+sf::st_write(coords_ire, "data/fleurus.gpkg")
 coords_ire$site_code <- "Fleurus"
 
 dt_sites <- read.csv(
