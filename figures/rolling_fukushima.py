@@ -66,9 +66,11 @@ event_index = float(
     ).values[0]
 )
 
+plt.close()
 g = sns.histplot(abs(np.log(pdist["pdist"])))
 g.axvline(abs(np.log(p_event)))
 # plt.show()
+print("figures/__" + varpair_code + site_code + "_hist.pdf")
 plt.savefig("figures/__" + varpair_code + site_code + "_hist.pdf")
 
 bearing = 45
@@ -171,6 +173,7 @@ event_index = float(
     ).values[0]
 )
 
+plt.close()
 g = sns.histplot(abs(np.log(pdist["pdist"])))
 g.axvline(abs(np.log(p_event)))
 # plt.show()
