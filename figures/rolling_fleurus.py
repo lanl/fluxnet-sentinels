@@ -16,7 +16,7 @@ from src import rolling
 n_days = 7
 dep_cols = ["co2", "fc", "le", "h", "co"]
 indep_cols = ["ws", "p", "pa", "rh", "ppfd_in", "ta", "netrad"]
-tolerance = 40
+tolerance = 10
 date_event = "2008-08-23"
 
 # ---
@@ -31,7 +31,7 @@ dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event
 
 # ---
 grid = rolling.make_grid(dt, dep_cols, indep_cols)
-grid = rolling.regression_grid(grid, dt, dt_event, site_id, n_days, overwrite=True)
+grid = rolling.regression_grid(grid, dt, dt_event, site_id, n_days)
 
 varpair = ("co2", "ta")
 varpair_code = "v".join(varpair) + "_"
@@ -97,7 +97,7 @@ fig, ax1 = plt.subplots(figsize=(9, 6))
 g = sns.lineplot(data=g_data, x="timestamp", y="p", ax=ax1)
 g.axvline(pd.to_datetime(date_event), color="yellow")
 g.axhline(abs(np.log(p_event)), color="darkgreen")
-g.set_ylim(0, 60)
+g.set_ylim(0, np.nanquantile(g_data["p"], [1]) + 10)
 ax1.set_ylabel("effect size (blue line, green line [event])")
 ax1.text(pd.to_datetime(date_event), 3, "<-\nAbnormal\nEvent", color="red")
 
@@ -112,7 +112,15 @@ g2.set_ylim(-1, 1)
 #     (g_data["p"] > abs(np.log(p_event))).values and (g_data["test"] > 0.7).values
 # ].shape
 ax2.set_ylabel("fraction wind towards (black line)")
-plt.suptitle(site + "(" + ",".join(varpair) + ")")
+plt.suptitle(
+    site
+    + "("
+    + ",".join(varpair)
+    + ")"
+    + r"$\alpha$"
+    + "="
+    + str(round(sum(tt) / g_data.shape[0], 2))
+)
 ax1.set_xlabel("")
 ax2.set_xlabel("")
 # plt.show()
