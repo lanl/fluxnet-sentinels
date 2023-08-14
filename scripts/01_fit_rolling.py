@@ -1,6 +1,9 @@
-# python scripts/01_fit_rolling.py --site FHK --date_event 2011-03-11 --path_in ../../Data/Asiaflux/FHK.csv --path_out figures/__rolling_fukushima_ --var_dep le --var_idep rh --bearing 45 --tolerance 10 --n_days 7 --uses_letters
+"""
+    Fitting a rolling interaction model of specified variable pair
+"""
+# python scripts/01_fit_rolling.py --site FHK --date_event 2011-03-11 --path_in ../../Data/Asiaflux/FHK.csv --path_out figures/__rolling_fukushima_ --var_dep le --var_idep rh --bearing 45 --tolerance 10 --n_days 7 --uses_letters --run_detailed
 #
-# python scripts/01_fit_rolling.py --site BE-Lon --date_event 2008-08-23 --path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7
+# python scripts/01_fit_rolling.py --site BE-Lon --date_event 2008-08-23 --path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --run_detailed
 #
 import os
 import sys
@@ -107,21 +110,29 @@ def fit_rolling(
         }
     )
     g_data["timestamp"] = pd.to_datetime(g_data["timestamp"])
+    event_wind_max = np.quantile(
+        [
+            g_data.iloc[int(event_index + i)]["wind_fraction"]
+            for i in range(2 * 24 * n_days)  # half-hourly data
+        ],
+        [0.5],
+    )[0]
+    event_effect_max = np.quantile(
+        [g_data.iloc[int(event_index + i)]["p"] for i in range(2 * 24 * n_days)], [0.5]
+    )[0]
     tt = [
-        (
-            g_data.iloc[i]["wind_fraction"]
-            >= g_data.iloc[int(event_index)]["wind_fraction"]
-        )
-        and (g_data.iloc[i]["p"] >= g_data.iloc[int(event_index)]["p"])
+        (g_data.iloc[i]["wind_fraction"] >= event_wind_max)
+        and (g_data.iloc[i]["p"] >= event_effect_max)
         for i in range(g_data.shape[0])
     ]
+    # sum(tt)
 
     plt.close()
     _, ax1 = plt.subplots(figsize=(9, 6))
     g = sns.lineplot(data=g_data, x="timestamp", y="p", ax=ax1)
     g.axvline(pd.to_datetime(date_event), color="yellow")
     g.axhline(abs(np.log(p_event)), color="darkgreen")
-    g.set_ylim(0, 60)
+    g.set_ylim(0, np.nanquantile(g_data["p"], [1]) + 10)
     ax1.set_ylabel("effect size (blue line, green line [event])")
     ax1.text(pd.to_datetime(date_event), 3, "<-Event", color="red")
 
@@ -139,7 +150,15 @@ def fit_rolling(
     #     (g_data["p"] > abs(np.log(p_event))).values and (g_data["test"] > 0.7).values
     # ].shape
     ax2.set_ylabel("fraction wind towards (black line)")
-    plt.suptitle(site + "(" + ",".join(varpair) + ")")
+    plt.suptitle(
+        site
+        + "("
+        + ",".join(varpair)
+        + ")"
+        + r"$\alpha$"
+        + "="
+        + str(round(sum(tt) / g_data.shape[0], 2))
+    )
     ax1.set_xlabel("")
     ax2.set_xlabel("")
     # plt.show()
