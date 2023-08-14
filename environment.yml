@@ -12,6 +12,7 @@ dependencies:
         - tabulate
         - pdfcrop.pl
         - pip
+        - click
         # geospatial
         - geopy
         - geopandas
