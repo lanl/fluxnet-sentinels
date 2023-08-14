@@ -20,7 +20,10 @@ figures/__map.pdf: figures/maps.R
 figures/__footprint.pdf: figures/footprint.py
 	python $<
 
-figures/__rolling_fukushima_uswrc.pdf: figures/rolling_fukushima.py
+../../Data/Asiaflux/FHK.csv: scripts/00_get_japanflux.py
+	python $<
+
+figures/__rolling_fukushima_uswrc.pdf: figures/rolling_fukushima.py ../../Data/Asiaflux/FHK.csv
 	python $<
 
 figures/__rolling_fleurus_belon.pdf: figures/rolling_fleurus.py

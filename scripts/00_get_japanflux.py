@@ -96,16 +96,18 @@ dt = [
 dt = pd.concat(dt).reset_index(drop=True)
 dt["timestamp_start"] = dt["timestamp"]
 dt["timestamp_end"] = dt["timestamp"]
-dt = dt[dt["year"] < 2013]
+# dt = dt[dt["year"] < 2013]
 dt.to_csv("../../Data/Asiaflux/" + site_id + ".csv", index=False)
 
 # ---
-g = sns.relplot(data=dt, x="doy", y="nee", row="year", hue="year", kind="line")
+plt.close()
+g = sns.relplot(data=dt.dropna(), x="doy", y="nee", row="year", hue="year", kind="line")
 g.refline(x=70)
 # plt.show()
 plt.savefig("figures/__japanflux_nee.pdf")
 
-g = sns.relplot(data=dt, x="doy", y="co", row="year", hue="year", kind="line")
+plt.close()
+g = sns.relplot(data=dt.dropna(), x="doy", y="co", row="year", hue="year", kind="line")
 g.refline(x=70)
 # plt.show()
 plt.savefig("figures/__japanflux_co.pdf")
