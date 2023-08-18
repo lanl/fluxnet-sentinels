@@ -16,12 +16,12 @@ import statsmodels.formula.api as smf
 from numpy_ext import rolling_apply as rolling_apply_ext
 
 
-def p_interact(x, y, timestamp):
+def p_interact(x, y, timestamp, n_before, n_during, n_after):
     dt_sub = pd.DataFrame({"x": x, "y": y})
     dt_sub["period"] = (
-        ["before" for _ in range(247)]
-        + ["during" for _ in range(70)]
-        + ["after" for _ in range(249)]
+        ["before" for _ in range(n_before[0])]
+        + ["during" for _ in range(n_during[0])]
+        + ["after" for _ in range(n_after[0])]
     )
 
     date = timestamp.reset_index(drop=True)[int(np.floor(len(timestamp) / 2))]
@@ -57,12 +57,19 @@ def p_quantile(dt, dt_event, dep, indep, window_size):
     ):
         dt["timestamp"] = dt["timestamp_start"]
 
+    n_before = np.repeat(dt_event[dt_event["period"] == "before"].shape[0], dt.shape[0])
+    n_during = np.repeat(dt_event[dt_event["period"] == "during"].shape[0], dt.shape[0])
+    n_after = np.repeat(dt_event[dt_event["period"] == "after"].shape[0], dt.shape[0])
+
     pdist = rolling_apply_ext(
         p_interact,
         window_size,
         dt[indep].values,
         dt[dep].values,
         dt["timestamp"],
+        n_before,
+        n_during,
+        n_after,
         n_jobs=1,
     )
 
@@ -208,7 +215,12 @@ def define_period(dt_select, date_event="2008-08-23", n_days=10):
 
 
 def grid_define_pquant(
-    grid, dt, dt_event, out_path="data/grid.csv", overwrite=False, window_size=432
+    grid,
+    dt,
+    dt_event,
+    out_path="data/grid.csv",
+    overwrite=False,
+    window_size=432,
 ):
     if not os.path.exists(out_path) or overwrite:
         print("Making: " + out_path)

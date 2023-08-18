@@ -68,7 +68,15 @@ def fit_rolling(
     window_size = dt_event.shape[0]
 
     grid = rolling.make_grid(dt, dep_cols, indep_cols)
-    grid = rolling.regression_grid(grid, dt, dt_event, site_id, n_days)
+    grid = rolling.regression_grid(
+        grid,
+        dt,
+        dt_event,
+        site_id,
+        n_days,
+        overwrite=overwrite,
+        window_size=window_size,
+    )
 
     if not run_detailed:
         return None

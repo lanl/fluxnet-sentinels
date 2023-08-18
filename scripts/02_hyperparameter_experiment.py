@@ -16,6 +16,7 @@ site = "BE-Lon"
 date_event = "2008-08-23"
 
 for i in range(res.shape[0]):
+    # i = 0
     print(i)
     cmd = f"python scripts/01_fit_rolling.py --site {site} --date_event {date_event} --path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance {int(res.iloc[i]['wind_tolerance'])} --n_days {int(res.iloc[i]['n_days'])} --event_quantile {res.iloc[i]['event_quantile']} --run_detailed"
     subprocess.call(cmd, shell=True)
