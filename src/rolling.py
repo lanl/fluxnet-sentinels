@@ -415,13 +415,16 @@ def regression_grid(grid, dt, dt_event, site_id, n_days, overwrite=False):
             shell=True,
         )
     except:  # system pdfcrop
-        subprocess.call(
-            "pdfcrop figures/__rolling_grid_"
-            + site_id
-            + ".pdf figures/__rolling_grid_"
-            + site_id
-            + ".pdf",
-            shell=True,
-        )
+        try:
+            subprocess.call(
+                "pdfcrop figures/__rolling_grid_"
+                + site_id
+                + ".pdf figures/__rolling_grid_"
+                + site_id
+                + ".pdf",
+                shell=True,
+            )
+        except:
+            pass
 
     return res
