@@ -3,7 +3,7 @@
 """
 # python scripts/01_fit_rolling.py --site FHK --date_event 2011-03-11 --path_in ../../Data/Asiaflux/FHK.csv --path_out figures/__rolling_fukushima_ --var_dep le --var_idep rh --bearing 45 --tolerance 10 --n_days 7 --uses_letters --run_detailed
 #
-# python scripts/01_fit_rolling.py --site BE-Lon --date_event 2008-08-23 --path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --run_detailed
+# python scripts/01_fit_rolling.py --site BE-Lon --date_event 2008-08-23 --path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile 0.5 --run_detailed
 #
 import os
 import sys
@@ -29,8 +29,10 @@ from src import rolling
 @click.option("--bearing", type=int)
 @click.option("--tolerance", type=int)
 @click.option("--n_days", type=int)
+@click.option("--event_quantile", type=float)
 @click.option("--uses_letters", is_flag=True, default=False)
 @click.option("--run_detailed", is_flag=True, default=False)
+@click.option("--overwrite", is_flag=True, default=False)
 def fit_rolling(
     site,
     date_event,
@@ -41,14 +43,23 @@ def fit_rolling(
     bearing,
     tolerance,
     n_days,
+    event_quantile,
     uses_letters,
     run_detailed,
+    overwrite,
 ):
     dep_cols = ["co2", "fc", "le", "h", "co"]
     indep_cols = ["ws", "p", "pa", "rh", "ppfd_in", "ta", "netrad"]
 
     site_id = site.lower()
     site_code = site_id.replace("-", "")
+
+    path_slug = (
+        site_code + "_" + str(tolerance) + "_" + str(n_days) + "_" + str(event_quantile)
+    )
+    path_fig = path_out + path_slug + ".pdf"
+    if os.path.exists(path_fig) and not overwrite:
+        return None
 
     dt, dt_select = rolling.preprocess_dt(path_in, dep_cols, indep_cols)
     dt = janitor.remove_empty(dt)
@@ -63,9 +74,9 @@ def fit_rolling(
     varpair = (var_dep, var_idep)
     varpair_code = "v".join(varpair) + "_"
 
-    path_pdist = "data/pdist_" + varpair_code + site_code + ".csv"
-    path_pevent = "data/p_event_" + varpair_code + site_code + ".csv"
-    path_event_index = "data/event_index_" + varpair_code + site_code + ".csv"
+    path_pdist = "data/pdist_" + varpair_code + path_slug + ".csv"
+    path_pevent = "data/p_event_" + varpair_code + path_slug + ".csv"
+    path_event_index = "data/event_index_" + varpair_code + path_slug + ".csv"
     if (not os.path.exists(path_pdist)) or (not os.path.exists(path_pevent)):
         _, pdist, timestamps, event_index, p_event = rolling.p_quantile(
             dt, dt_event, varpair[0], varpair[1]
@@ -126,6 +137,7 @@ def fit_rolling(
         for i in range(g_data.shape[0])
     ]
     # sum(tt)
+    false_positive_rate = round(sum(tt) / g_data.shape[0], 2)
 
     plt.close()
     _, ax1 = plt.subplots(figsize=(9, 6))
@@ -157,14 +169,26 @@ def fit_rolling(
         + ")"
         + r"$\alpha$"
         + "="
-        + str(round(sum(tt) / g_data.shape[0], 2))
+        + str(false_positive_rate)
     )
     ax1.set_xlabel("")
     ax2.set_xlabel("")
     # plt.show()
-    plt.savefig(path_out + site_code + ".pdf")
+    plt.savefig(path_fig)
 
-    return path_out + site_code + ".pdf"
+    log_info = pd.DataFrame(
+        {
+            "site": site,
+            "wind_tolerance": tolerance,
+            "n_days": n_days,
+            "event_quantile": event_quantile,
+            "false_positive_rate": false_positive_rate,
+        },
+        index=[0],
+    )
+    log_info.to_csv("data/log.csv", mode="a", header=False)
+
+    return log_info
 
 
 if __name__ == "__main__":
