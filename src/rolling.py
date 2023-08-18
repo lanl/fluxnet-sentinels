@@ -41,7 +41,7 @@ def p_interact(x, y, timestamp):
         return np.nan, date
 
 
-def p_quantile(dt, dt_event, dep, indep):
+def p_quantile(dt, dt_event, dep, indep, window_size):
     # p_quantile(dt, dt_event, "co2", "ta") # ~ 0.14
     # p_quantile(dt, dt_event, "fc", "ws")
     # dep = "fc"
@@ -52,26 +52,10 @@ def p_quantile(dt, dt_event, dep, indep):
 
     # dt_event["period"].value_counts()
 
-    window_size = 566  # 30 min * (3 + 7 + 7) days?
-
     if ("timestamp_start" in [x for x in dt.columns]) and (
         "timestamp" not in [x for x in dt.columns]
     ):
         dt["timestamp"] = dt["timestamp_start"]
-
-    # i = 1
-    # dt.iloc[[566 * i]]["timestamp_start"]
-    # dt.iloc[[566 + (566 * i)]]["timestamp_start"]
-    # dt["timestamp_start"].tail()
-    # p_interact(dt[indep].values[0:window_size], dt[dep].values[0:window_size])
-
-    # breakpoint()
-    # any(pd.notna(dt[indep].values))
-    # any(pd.notna(dt[dep].values))
-    # p_interact(dt[indep].values[0:566], dt[dep].values[0:566])
-    # p_interact(dt[indep].values[566:1132], dt[dep].values[566:1132])
-    # any(pd.notna(dt[dep].values[566:1132]))
-    # any(pd.notna(dt[indep].values[566:1132]))
 
     pdist = rolling_apply_ext(
         p_interact,
@@ -223,7 +207,9 @@ def define_period(dt_select, date_event="2008-08-23", n_days=10):
     return dt_event
 
 
-def grid_define_pquant(grid, dt, dt_event, out_path="data/grid.csv", overwrite=False):
+def grid_define_pquant(
+    grid, dt, dt_event, out_path="data/grid.csv", overwrite=False, window_size=432
+):
     if not os.path.exists(out_path) or overwrite:
         print("Making: " + out_path)
         pquant = []
@@ -234,6 +220,7 @@ def grid_define_pquant(grid, dt, dt_event, out_path="data/grid.csv", overwrite=F
                 dt_event,
                 grid.iloc[[i]]["dep"].values[0],
                 grid.iloc[[i]]["indep"].values[0],
+                window_size,
             )
             pquant.append(
                 round(
@@ -304,7 +291,7 @@ def within_bearing(wd, within_bearing_args={"bearing": 20, "tolerance": 10}):
     return res
 
 
-def towards(dt, bearing, tolerance, uses_letters=False):
+def towards(dt, bearing, tolerance, uses_letters=False, window_size=432):
     # identify time points where wd falls within "towards" tolerance
 
     if uses_letters:
@@ -355,8 +342,6 @@ def towards(dt, bearing, tolerance, uses_letters=False):
 
     within_bearing_args = {"bearing": bearing, "tolerance": tolerance}
 
-    window_size = 566  # 30 min * (3 + 7 + 7) days?
-
     is_towards = rolling_apply_ext(
         within_bearing,
         window_size,
@@ -369,13 +354,16 @@ def towards(dt, bearing, tolerance, uses_letters=False):
     return is_towards
 
 
-def regression_grid(grid, dt, dt_event, site_id, n_days, overwrite=False):
+def regression_grid(
+    grid, dt, dt_event, site_id, n_days, overwrite=False, window_size=432
+):
     grid_define_pquant(
         grid,
         dt,
         dt_event,
         "data/grid_" + site_id + "_" + str(n_days) + ".csv",
         overwrite,
+        window_size,
     )
 
     grid = pd.read_csv("data/grid_" + site_id + "_" + str(n_days) + ".csv")

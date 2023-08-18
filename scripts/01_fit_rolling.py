@@ -3,7 +3,7 @@
 """
 # python scripts/01_fit_rolling.py --site FHK --date_event 2011-03-11 --path_in ../../Data/Asiaflux/FHK.csv --path_out figures/__rolling_fukushima_ --var_dep le --var_idep rh --bearing 45 --tolerance 10 --n_days 7 --uses_letters --run_detailed
 #
-# python scripts/01_fit_rolling.py --site BE-Lon --date_event 2008-08-23 --path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile 0.5 --run_detailed
+# python scripts/01_fit_rolling.py --site BE-Lon --date_event 2008-08-23 --path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile 0.5 --run_detailed --overwrite
 #
 import os
 import sys
@@ -12,6 +12,7 @@ import janitor
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from datetime import datetime
 import matplotlib.pyplot as plt
 
 
@@ -64,6 +65,7 @@ def fit_rolling(
     dt, dt_select = rolling.preprocess_dt(path_in, dep_cols, indep_cols)
     dt = janitor.remove_empty(dt)
     dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event)
+    window_size = dt_event.shape[0]
 
     grid = rolling.make_grid(dt, dep_cols, indep_cols)
     grid = rolling.regression_grid(grid, dt, dt_event, site_id, n_days)
@@ -79,7 +81,7 @@ def fit_rolling(
     path_event_index = "data/event_index_" + varpair_code + path_slug + ".csv"
     if (not os.path.exists(path_pdist)) or (not os.path.exists(path_pevent)):
         _, pdist, timestamps, event_index, p_event = rolling.p_quantile(
-            dt, dt_event, varpair[0], varpair[1]
+            dt, dt_event, varpair[0], varpair[1], window_size
         )
         pd.DataFrame({"timestamp": timestamps, "pdist": pdist}).to_csv(
             path_pdist, index=False
@@ -108,7 +110,9 @@ def fit_rolling(
     print("figures/__" + varpair_code + site_code + "_hist.pdf")
     plt.savefig("figures/__" + varpair_code + site_code + "_hist.pdf")
 
-    wind_fraction = rolling.towards(dt, bearing, tolerance, uses_letters=uses_letters)
+    wind_fraction = rolling.towards(
+        dt, bearing, tolerance, uses_letters=uses_letters, window_size=window_size
+    )
     pd.DataFrame({"wind_fraction": wind_fraction}).to_csv(
         "data/wind_fraction.csv", index=False
     )
@@ -178,6 +182,7 @@ def fit_rolling(
 
     log_info = pd.DataFrame(
         {
+            "date": str(datetime.now()),
             "site": site,
             "wind_tolerance": tolerance,
             "n_days": n_days,
@@ -186,7 +191,7 @@ def fit_rolling(
         },
         index=[0],
     )
-    log_info.to_csv("data/log.csv", mode="a", header=False)
+    log_info.to_csv("data/log.csv", mode="a", header=False, index=False)
 
     return log_info
 
