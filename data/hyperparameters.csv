@@ -1,0 +1,9 @@
+parameter,value
+wind_tolerance,5
+wind_tolerance,10
+wind_tolerance,20
+n_days,7
+n_days,10
+n_days,14
+event_quantile,0.5
+event_quantile,0.7
