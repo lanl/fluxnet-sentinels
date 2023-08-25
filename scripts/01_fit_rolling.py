@@ -1,5 +1,5 @@
 """
-    Fitting a rolling interaction model of specified variable pair
+    Fitting a rolling interaction model first of all pairs then of a specified variable pair
 """
 # python scripts/01_fit_rolling.py --site FHK --date_event 2011-03-11 --path_in ../../Data/Asiaflux/FHK.csv --path_out figures/__rolling_fukushima_ --var_dep le --var_idep rh --bearing 45 --tolerance 10 --n_days 7 --uses_letters --run_detailed
 #
@@ -49,6 +49,7 @@ def fit_rolling(
     run_detailed,
     overwrite,
 ):
+    # --- setup
     dep_cols = ["co2", "fc", "le", "h", "co"]
     indep_cols = ["ws", "p", "pa", "rh", "ppfd_in", "ta", "netrad"]
 
@@ -62,6 +63,7 @@ def fit_rolling(
     if os.path.exists(path_fig) and not overwrite:
         return None
 
+    # --- grid pair-wise analysis
     dt, dt_select = rolling.preprocess_dt(path_in, dep_cols, indep_cols)
     dt = janitor.remove_empty(dt)
     dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event)
@@ -81,6 +83,7 @@ def fit_rolling(
     if not run_detailed:
         return None
 
+    # --- detailed single pair analysis
     varpair = (var_dep, var_idep)
     varpair_code = "v".join(varpair) + "_"
 
@@ -111,13 +114,6 @@ def fit_rolling(
         ).values[0]
     )
 
-    plt.close()
-    g = sns.histplot(abs(np.log(pdist["pdist"])))
-    g.axvline(abs(np.log(p_event)))
-    # plt.show()
-    print("figures/__" + varpair_code + site_code + "_hist.pdf")
-    plt.savefig("figures/__" + varpair_code + site_code + "_hist.pdf")
-
     wind_fraction = rolling.towards(
         dt, bearing, tolerance, uses_letters=uses_letters, window_size=window_size
     )
@@ -138,10 +134,11 @@ def fit_rolling(
             g_data.iloc[int(event_index + i)]["wind_fraction"]
             for i in range(2 * 24 * n_days)  # half-hourly data
         ],
-        [0.5],
+        [event_quantile],
     )[0]
     event_effect_max = np.quantile(
-        [g_data.iloc[int(event_index + i)]["p"] for i in range(2 * 24 * n_days)], [0.5]
+        [g_data.iloc[int(event_index + i)]["p"] for i in range(2 * 24 * n_days)],
+        [event_quantile],
     )[0]
     tt = [
         (g_data.iloc[i]["wind_fraction"] >= event_wind_max)
@@ -150,6 +147,14 @@ def fit_rolling(
     ]
     # sum(tt)
     false_positive_rate = round(sum(tt) / g_data.shape[0], 2)
+
+    # --- plotting
+    plt.close()
+    g = sns.histplot(abs(np.log(pdist["pdist"])))
+    g.axvline(abs(np.log(p_event)))
+    # plt.show()
+    print("figures/__" + varpair_code + site_code + "_hist.pdf")
+    plt.savefig("figures/__" + varpair_code + site_code + "_hist.pdf")
 
     plt.close()
     _, ax1 = plt.subplots(figsize=(9, 6))
