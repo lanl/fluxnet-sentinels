@@ -1,3 +1,7 @@
+"""
+    Given a site, event date, input/output data paths, variable pair, and bearing; Compute a sensitivity analysis to:
+        event length, wind direction tolerance, and event averaging scheme
+"""
 import itertools
 import subprocess
 import pandas as pd
