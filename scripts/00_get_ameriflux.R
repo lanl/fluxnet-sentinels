@@ -19,6 +19,7 @@ check_site <- function(site_id) {
   fpaths <- list.files(path = "../../data/ameriflux/",
     pattern = "*.zip", full.names = TRUE)
   fpath <- fpaths[grep(site_id, fpaths)]
+  dir.create("../../data/ameriflux", showWarnings = FALSE)
   if (length(grep(site_id, fpaths)) == 0) {
     fpath <- amf_download_base(
       user_id = "jstaaa",
