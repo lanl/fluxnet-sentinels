@@ -11,3 +11,4 @@ eddypro-metadata_be-lon.md
 *.tmp
 *.png
 figures/*.db
+.smbdelete*

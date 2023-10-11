@@ -1,13 +1,18 @@
-library(ggmap)
+library(ggmap) # install_github("stadiamaps/ggmap")
 suppressWarnings(suppressMessages(library(sf)))
 suppressWarnings(suppressMessages(library(dplyr)))
 suppressMessages(library(janitor))
+library(FluxnetLSM)
+
+source("scripts/99_utils.R")
 
 coords_ire <- sf::st_as_sf(
   data.frame(lat = 50.45055, lon = 4.5350415),
   coords = c("lon", "lat"), crs = 4326)
-sf::st_write(coords_ire, "data/fleurus.gpkg", append = FALSE)
 coords_ire$site_code <- "Fleurus"
+if (!file.exists("data/fleurus.gpkg")) {
+  sf::st_write(coords_ire, "data/fleurus.gpkg", append = FALSE)
+}
 
 dt_sites <- read.csv(
   system.file("extdata", "Site_metadata.csv", package = "FluxnetLSM")) %>%
@@ -18,7 +23,6 @@ dt_sites <- read.csv(
 dt_sites$dist <- unlist(list(unlist(st_distance(coords_ire, dt_sites)))) / 1609.34
 dt_sites_close <- dt_sites[dt_sites$dist < 100, ] %>%
   dplyr::arrange(dist)
-
 sf::st_write(dt_sites_close, "dt_sites_close.gpkg", append = FALSE)
 
 # head(dplyr::select(dt_sites_close, site_code, dist))
@@ -27,11 +31,26 @@ sf::st_write(dt_sites_close, "dt_sites_close.gpkg", append = FALSE)
 m1_data <- dplyr::bind_rows(dt_sites_close, coords_ire)
 m1_data <- cbind(m1_data, st_coordinates(m1_data))
 m1_data <- sf::st_drop_geometry(dplyr::select(m1_data, X, Y, site_code))
+m1_data <- dplyr::filter(m1_data,
+  site_code %in% c("BE-Lon", "BE-Vie", "BE-Bra", "Fleurus"))
 
-gg <- qmplot(X, Y, data = m1_data,
-  maptype = "toner-background", color = I("red")) +
+gg_euro_overview <- qmplot(X, Y, data = m1_data,
+  maptype = "stamen_toner_background", color = I("red")) +
   geom_text(data = m1_data, aes(label = site_code),
     vjust = 0,
     hjust = 0)
+# gg_euro_overview
 
-ggsave("figures/__map.pdf", gg)
+dt_sub <- dplyr::filter(m1_data, site_code == "BE-Lon")
+gg_euro_belon <- get_gg_sub(dt_sub)
+
+dt_sub <- dplyr::filter(m1_data, site_code == "BE-Vie")
+gg_euro_bevie <- get_gg_sub(dt_sub)
+
+dt_sub <- dplyr::filter(m1_data, site_code == "BE-Bra")
+gg_euro_bebra <- get_gg_sub(dt_sub)
+
+
+gg <- cowplot::plot_grid(gg_euro_overview, gg_euro_bebra, gg_euro_belon, gg_euro_bevie)
+
+# ggsave("figures/__map.pdf", gg)
