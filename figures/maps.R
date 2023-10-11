@@ -1,9 +1,4 @@
 library(ggmap) # install_github("stadiamaps/ggmap")
-suppressWarnings(suppressMessages(library(sf)))
-suppressWarnings(suppressMessages(library(dplyr)))
-suppressMessages(library(janitor))
-library(FluxnetLSM)
-
 source("scripts/99_utils.R")
 
 coords_ire <- sf::st_as_sf(
@@ -58,7 +53,5 @@ gg_euro_bevie <- get_gg_sub(dt_sub)
 dt_sub <- dplyr::filter(m1_data, site_code == "BE-Bra")
 gg_euro_bebra <- get_gg_sub(dt_sub)
 
-
 gg <- cowplot::plot_grid(gg_euro_overview, gg_euro_bebra, gg_euro_belon, gg_euro_bevie)
-
-# ggsave("figures/__map.pdf", gg)
+ggsave("figures/__map.pdf", gg)
