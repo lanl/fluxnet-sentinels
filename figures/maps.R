@@ -8,14 +8,16 @@ source("scripts/99_utils.R")
 
 coords_ire <- sf::st_as_sf(
   data.frame(lat = 50.45055, lon = 4.5350415),
-  coords = c("lon", "lat"), crs = 4326)
+  coords = c("lon", "lat"), crs = 4326
+)
 coords_ire$site_code <- "Fleurus"
 if (!file.exists("data/fleurus.gpkg")) {
   sf::st_write(coords_ire, "data/fleurus.gpkg", append = FALSE)
 }
 
 dt_sites <- read.csv(
-  system.file("extdata", "Site_metadata.csv", package = "FluxnetLSM")) %>%
+  system.file("extdata", "Site_metadata.csv", package = "FluxnetLSM")
+) %>%
   clean_names() %>%
   # dplyr::mutate_all(na_if, "") %>%
   st_as_sf(coords = c("site_longitude", "site_latitude"), crs = 4326)
@@ -31,14 +33,20 @@ sf::st_write(dt_sites_close, "dt_sites_close.gpkg", append = FALSE)
 m1_data <- dplyr::bind_rows(dt_sites_close, coords_ire)
 m1_data <- cbind(m1_data, st_coordinates(m1_data))
 m1_data <- sf::st_drop_geometry(dplyr::select(m1_data, X, Y, site_code))
-m1_data <- dplyr::filter(m1_data,
-  site_code %in% c("BE-Lon", "BE-Vie", "BE-Bra", "Fleurus"))
+m1_data <- dplyr::filter(
+  m1_data,
+  site_code %in% c("BE-Lon", "BE-Vie", "BE-Bra", "Fleurus")
+)
 
-gg_euro_overview <- qmplot(X, Y, data = m1_data,
-  maptype = "stamen_toner_background", color = I("red")) +
-  geom_text(data = m1_data, aes(label = site_code),
+gg_euro_overview <- qmplot(X, Y,
+  data = m1_data,
+  maptype = "stamen_toner_background", color = I("red")
+) +
+  geom_text(
+    data = m1_data, aes(label = site_code),
     vjust = 0,
-    hjust = 0)
+    hjust = 0
+  )
 # gg_euro_overview
 
 dt_sub <- dplyr::filter(m1_data, site_code == "BE-Lon")
