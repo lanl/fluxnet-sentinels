@@ -42,4 +42,7 @@ figures/__map_fukushima.pdf: figures/fukushima.R data/ameriflux_pnw.csv
 
 # ---
 clean:
-	rm figures/figures.pdf
+	-rm figures/figures.pdf
+	-rm *.gpkg
+	-rm test*.gpkg
+	-rm test*.pdf
