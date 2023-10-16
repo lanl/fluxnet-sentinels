@@ -41,7 +41,7 @@ def p_interact(x, y, timestamp, n_before, n_during, n_after):
         return np.nan, date
 
 
-def p_quantile(dt, dt_event, dep, indep, window_size):
+def p_quantile(dt, dt_event, dep, indep, window_size=432):
     # p_quantile(dt, dt_event, "co2", "ta") # ~ 0.14
     # p_quantile(dt, dt_event, "fc", "ws")
     # dep = "fc"
