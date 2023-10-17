@@ -207,6 +207,7 @@ ax2 = ax1.twinx()
 g2 = sns.lineplot(data=g_data, x="timestamp", y="wind_fraction", ax=ax2, color="black")
 g2.set_ylim(-1, 1)
 # g_data.iloc[int(event_index)]["p"]
+# i = 0
 [
     g2.axvline(g_data[tt].iloc[i]["timestamp"], color="orange")
     for i in range(g_data[tt].shape[0])
@@ -218,5 +219,10 @@ ax2.set_ylabel("fraction wind towards (black line)")
 plt.suptitle("US-Wrc (" + ",".join(varpair) + ")")
 ax1.set_xlabel("")
 ax2.set_xlabel("")
+
+nktests = pd.read_csv("data/nktests.csv")
+nktests["date"] = pd.to_datetime(nktests["date"])
+[g2.axvline(x, color="green") for x in nktests["date"]]
+
 # plt.show()
 plt.savefig("figures/__rolling_fukushima_" + site_code + ".pdf")
