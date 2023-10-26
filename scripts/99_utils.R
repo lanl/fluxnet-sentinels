@@ -10,7 +10,7 @@ library(dplyr)
 library(janitor)
 library(amerifluxr)
 library(progress)
-library(ggmap)
+library(ggmap) # devtools::install_github("stadiamaps/ggmap")
 suppressMessages(library(cowplot))
 
 amf_clean <- function(fpath) {

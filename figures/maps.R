@@ -33,12 +33,26 @@ m1_data <- dplyr::filter(
   site_code %in% c("BE-Lon", "BE-Vie", "BE-Bra", "Fleurus")
 )
 
-gg_euro_overview <- qmplot(X, Y,
-  data = m1_data,
-  maptype = "stamen_toner_background", color = I("red")
-) +
+print(m1_data)
+buffer_x <- 0.5
+buffer_y <- 0.2
+bbox <- c(left   = min(m1_data$X) - buffer_x,
+  bottom = min(m1_data$Y) - buffer_y,
+  right  = max(m1_data$X) + buffer_x,
+  top    = max(m1_data$Y) + buffer_y)
+class(bbox) <- "bbox"
+
+gg_map <- get_map(location = bbox,
+  maptype  = "stamen_toner_background")
+gg_euro_overview <- ggmap(gg_map) +
+  geom_point(
+    data = m1_data, aes(x = X, y = Y),
+    vjust = 0,
+    hjust = 0,
+    color = I("red")
+  ) +
   geom_text(
-    data = m1_data, aes(label = site_code),
+    data = m1_data, aes(x = X, y = Y, label = site_code),
     vjust = 0,
     hjust = 0
   )

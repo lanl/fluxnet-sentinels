@@ -10,7 +10,8 @@ coords <- sf::st_as_sf(
 # mapview(coords)
 
 us <- c(left = -126.89, bottom = 41.24, right = -115.83, top = 50.6)
-gg <- get_stamenmap(us, zoom = 5, maptype = "toner-lite") %>%
+gg <- get_map(location = us,
+  maptype  = "stamen_toner_background") %>%
   ggmap() +
   geom_point(aes(x = location_long, y = location_lat),
     data = sites, alpha = .5, color = "red") +
