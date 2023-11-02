@@ -43,10 +43,10 @@ get_gg_sub <- function(dt_sub, buffer_x = 0.02, buffer_y = 0.02) {
     right  = dt_sub$X + buffer_x,
     top    = dt_sub$Y + buffer_y)
   class(bbox_sub) <- "bbox"
-  # ggmap::register_google()
-  gg_map <- get_map(location = bbox_sub,
-    maptype  = "stamen_toner_background",
-    zoom     = 14)
+
+  gg_map <- get_googlemap(center = c(lon = dt_sub$X, lat = dt_sub$Y),
+    maptype  = "satellite",
+    zoom     = 16)
   res <- ggmap(gg_map) +
     geom_point(aes(x = X, y = Y),
       data = dt_sub,
