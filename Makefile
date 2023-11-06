@@ -30,10 +30,10 @@ figures/__rolling_fleurus_belon.pdf: figures/rolling_fleurus.py ../../Data/Eurof
 	python $< --site_id BE-Lon
 
 figures/__rolling_fleurus_bebra.pdf: figures/rolling_fleurus.py ../../Data/Euroflux/BEBra.csv
-	python $< --site_id BE-Bra --window_size 456
+	python $< --site_id BE-Bra --window_size 456 --bearing 180
 
 figures/__rolling_fleurus_bevie.pdf: figures/rolling_fleurus.py ../../Data/Euroflux/BEVie.csv
-	python $< --site_id BE-Vie
+	python $< --site_id BE-Vie --bearing 280
  
 figures/all.pdf: figures/__rolling_grid_be-lon.pdf figures/__map.pdf figures/__footprint.pdf \
 	figures/__map_fukushima.pdf figures/__rolling_fukushima_uswrc.pdf \

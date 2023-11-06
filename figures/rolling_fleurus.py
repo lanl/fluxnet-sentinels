@@ -19,12 +19,15 @@ from src import rolling
 parser = argparse.ArgumentParser()
 parser.add_argument("--site_id", nargs=1, default="", type=str)
 parser.add_argument("--window_size", nargs=1, default="432", type=int)
+parser.add_argument("--bearing", nargs=1, default="235", type=int)
 userargs = vars(parser.parse_args())
 site = userargs["site_id"][0]
 site_code = site.replace("-", "")
 file_in = "../../Data/Euroflux/" + site_code + ".csv"
-site_id = site.lower()
+site_id = site_code.lower()
+
 window_size = userargs["window_size"][0]
+bearing = userargs["bearing"][0]
 
 n_days = 7
 dep_cols = ["co2", "fc", "le", "h", "co"]
@@ -39,7 +42,9 @@ dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event
 
 # ---
 grid = rolling.make_grid(dt, dep_cols, indep_cols)
-grid = rolling.regression_grid(grid, dt, dt_event, site_id, n_days)
+grid = rolling.regression_grid(
+    grid, dt, dt_event, site_id, n_days, window_size=window_size
+)
 
 varpair = ("co2", "ta")
 varpair_code = "v".join(varpair) + "_"
@@ -77,7 +82,6 @@ g.axvline(abs(np.log(p_event)))
 plt.savefig("figures/__" + varpair_code + site_code + "_hist.pdf")
 
 # ---
-bearing = 235
 wind_fraction = rolling.towards(dt, bearing, tolerance)
 pd.DataFrame({"wind_fraction": wind_fraction}).to_csv(
     "data/wind_fraction.csv", index=False
@@ -132,4 +136,4 @@ plt.suptitle(
 ax1.set_xlabel("")
 ax2.set_xlabel("")
 # plt.show()
-plt.savefig("figures/__rolling_fleurus_" + site_code + ".pdf")
+plt.savefig("figures/__rolling_fleurus_" + site_id + ".pdf")
