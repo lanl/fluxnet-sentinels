@@ -17,7 +17,15 @@ gg <- get_map(location = us,
     data = sites, alpha = .5, color = "red") +
   geom_text(aes(x = location_long, y = location_lat, label = site_id), data = sites)
 
-ggsave("figures/__map_fukushima.pdf", gg)
+gg_pnw_wrc <- get_gg_sub(
+  dplyr::rename(sites, c("Y" = "location_lat",
+    "X" = "location_long",
+    "site_code" = "site_id"))
+)
+
+gg2 <- cowplot::plot_grid(gg, gg_pnw_wrc)
+
+ggsave("figures/__map_fukushima.pdf", gg2)
 
 # ---
 
