@@ -26,12 +26,19 @@ figures/__footprint.pdf: figures/footprint.py
 figures/__rolling_fukushima_uswrc.pdf: figures/rolling_fukushima.py ../../Data/Asiaflux/FHK.csv
 	python $<
 
-figures/__rolling_fleurus_belon.pdf: figures/rolling_fleurus.py \
-	../../Data/Euroflux/BELon.csv ../../Data/Euroflux/BEBra.csv ../../Data/Euroflux/BEVie.csv
-	python $<
+figures/__rolling_fleurus_belon.pdf: figures/rolling_fleurus.py ../../Data/Euroflux/BELon.csv
+	python $< --site_id BE-Lon
 
+figures/__rolling_fleurus_bebra.pdf: figures/rolling_fleurus.py ../../Data/Euroflux/BEBra.csv
+	python $< --site_id BE-Bra --window_size 456
+
+figures/__rolling_fleurus_bevie.pdf: figures/rolling_fleurus.py ../../Data/Euroflux/BEVie.csv
+	python $< --site_id BE-Vie
+ 
 figures/all.pdf: figures/__rolling_grid_be-lon.pdf figures/__map.pdf figures/__footprint.pdf \
-	figures/__map_fukushima.pdf figures/__rolling_fukushima_uswrc.pdf figures/__rolling_fleurus_belon.pdf
+	figures/__map_fukushima.pdf figures/__rolling_fukushima_uswrc.pdf \
+	figures/__rolling_fleurus_belon.pdf figures/__rolling_fleurus_bebra.pdf \
+	figures/__rolling_fleurus_bevie.pdf
 	pdftk $(wildcard figures/__*.pdf) output $@
 
 # ---

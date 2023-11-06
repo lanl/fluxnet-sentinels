@@ -1,9 +1,13 @@
 """
     Analyze flux tower data associated with the Fleurus abnormal release
+```
+python figures/rolling_fleurus.py --site_id BE-Lon
+```
 """
 import os
 import sys
 import janitor
+import argparse
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -12,6 +16,15 @@ import matplotlib.pyplot as plt
 sys.path.append(".")
 from src import rolling
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--site_id", nargs=1, default="", type=str)
+parser.add_argument("--window_size", nargs=1, default="432", type=int)
+userargs = vars(parser.parse_args())
+site = userargs["site_id"][0]
+site_code = site.replace("-", "")
+file_in = "../../Data/Euroflux/" + site_code + ".csv"
+site_id = site.lower()
+window_size = userargs["window_size"][0]
 
 n_days = 7
 dep_cols = ["co2", "fc", "le", "h", "co"]
@@ -20,11 +33,6 @@ tolerance = 10
 date_event = "2008-08-23"
 
 # ---
-site = "BE-Lon"
-file_in = "../../Data/Euroflux/BELon.csv"
-site_id = site.lower()
-site_code = site_id.replace("-", "")
-
 dt, dt_select = rolling.preprocess_dt(file_in, dep_cols, indep_cols)
 dt = janitor.remove_empty(dt)
 dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event)
@@ -41,7 +49,7 @@ path_pevent = "data/p_event_" + varpair_code + site_code + ".csv"
 path_event_index = "data/event_index_" + varpair_code + site_code + ".csv"
 if (not os.path.exists(path_pdist)) or (not os.path.exists(path_pevent)):
     _, pdist, timestamps, event_index, p_event = rolling.p_quantile(
-        dt, dt_event, varpair[0], varpair[1]
+        dt, dt_event, varpair[0], varpair[1], window_size=window_size
     )
     pd.DataFrame({"timestamp": timestamps, "pdist": pdist}).to_csv(
         path_pdist, index=False
