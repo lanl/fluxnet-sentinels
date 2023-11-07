@@ -8,6 +8,7 @@ import os
 import sys
 import janitor
 import argparse
+import itertools
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -39,6 +40,13 @@ date_event = "2008-08-23"
 dt, dt_select = rolling.preprocess_dt(file_in, dep_cols, indep_cols)
 dt = janitor.remove_empty(dt)
 dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event)
+dt_event = janitor.remove_empty(dt_event)
+indep_cols = list(
+    itertools.compress(
+        indep_cols, [col in list(dt_event.columns) for col in indep_cols]
+    )
+)
+
 
 # ---
 grid = rolling.make_grid(dt, dep_cols, indep_cols)
