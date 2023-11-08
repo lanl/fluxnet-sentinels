@@ -67,12 +67,12 @@ ax = df.plot("site_code")
 for i in range(df["site_code"].shape[0]):
     coords = df.iloc[i].geometry.coords
     ax.text(float(coords.xy[0][0]), float(coords.xy[1][0]), s=df.iloc[i]["site_code"])
-plt.show()
+# plt.show()
 
 plt.close()
 g = sns.histplot(data=dt, x="wd")
 g.axvline(fwd_azimuth_goal)
-plt.show()
+# plt.show()
 
 
 # given:
