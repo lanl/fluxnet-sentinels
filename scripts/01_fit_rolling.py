@@ -1,13 +1,19 @@
 """
     Fitting a rolling interaction model first of all pairs then of a specified variable pair
 """
+# tolerance: the spread around the specified bearing indicating what counts as "towards"
+# n_days: the number of days to count as included in the event
+# event_quantile: how extreme within the event window do we count as an abnormal event?
+# effect size: prespecify an effect size rather than calculate from the event?
+# run_detailed: run a specified idep/dep pair analysis or only a general overview?
+#
 # python scripts/01_fit_rolling.py --site FHK --date_event 2011-03-11 --path_in ../../Data/Asiaflux/FHK.csv --path_out figures/__rolling_fukushima_ --var_dep le --var_idep rh --bearing 45 --tolerance 10 --n_days 7 --uses_letters --run_detailed
 #
 # python scripts/01_fit_rolling.py --site BE-Lon --date_event 2008-08-23 --path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile 0.5 --run_detailed --overwrite
 #
-# python scripts/01_fit_rolling.py --site BE-Bra --date_event 2008-08-23 --path_in ../../Data/Euroflux/BEBra.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 180 --tolerance 10 --n_days 7  --event_quantile 0.5 --run_detailed --overwrite
+# python scripts/01_fit_rolling.py --site BE-Bra --date_event 2008-08-23 --path_in ../../Data/Euroflux/BEBra.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 180 --tolerance 10 --n_days 7  --event_quantile 0.5 --run_detailed --event_effect 140
 #
-# python scripts/01_fit_rolling.py --site BE-Lon --date_event 2008-08-23 --path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile 0.5 --run_detailed --overwrite
+# python scripts/01_fit_rolling.py --site BE-Vie --date_event 2008-08-23 --path_in ../../Data/Euroflux/BEVie.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile 0.5 --run_detailed --overwrite
 #
 import os
 import sys
@@ -35,6 +41,7 @@ from src import rolling
 @click.option("--tolerance", type=int)
 @click.option("--n_days", type=int)
 @click.option("--event_quantile", type=float)
+@click.option("--event_effect", type=float, default=None)
 @click.option("--uses_letters", is_flag=True, default=False)
 @click.option("--run_detailed", is_flag=True, default=False)
 @click.option("--overwrite", is_flag=True, default=False)
@@ -52,6 +59,7 @@ def fit_rolling(
     uses_letters,
     run_detailed,
     overwrite,
+    event_effect=None,
 ):
     # --- setup
     dep_cols = ["co2", "fc", "le", "h", "co"]
@@ -140,13 +148,14 @@ def fit_rolling(
         ],
         [event_quantile],
     )[0]
-    event_effect_max = np.quantile(
-        [g_data.iloc[int(event_index + i)]["p"] for i in range(2 * 24 * n_days)],
-        [event_quantile],
-    )[0]
+    if event_effect is None:
+        event_effect = np.quantile(
+            [g_data.iloc[int(event_index + i)]["p"] for i in range(2 * 24 * n_days)],
+            [event_quantile],
+        )[0]
     tt = [
         (g_data.iloc[i]["wind_fraction"] >= event_wind_max)
-        and (g_data.iloc[i]["p"] >= event_effect_max)
+        and (g_data.iloc[i]["p"] >= event_effect)
         for i in range(g_data.shape[0])
     ]
     # sum(tt)
@@ -195,6 +204,7 @@ def fit_rolling(
     ax1.set_xlabel("")
     ax2.set_xlabel("")
     # plt.show()
+    print(path_fig)
     plt.savefig(path_fig)
 
     log_info = pd.DataFrame(
