@@ -1,7 +1,7 @@
 # I think the climatology functions return an average over all the inputs not a time-series of footprints
 
 import os
-import janitor # clean_names
+import janitor  # clean_names
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -13,6 +13,7 @@ import cartopy.feature as cfeature
 
 from pyffp import calc_footprint_FFP_climatology as myfootprint
 from pyffp import utils as ffputils
+
 get_dd = ffputils.get_dd
 
 if os.path.exists("../scripts"):
@@ -31,7 +32,7 @@ dt = pd.read_csv(
     shim
     + "../../Data/Euroflux/BE-Lon/L2-L4_2004-2012/EFDC_L2_Flx_BELon_2008_v017_30m.txt",
     na_values=["-9999"],
-    dtype = {"TIMESTAMP_START":str, "TIMESTAMP_END":str}
+    dtype={"TIMESTAMP_START": str, "TIMESTAMP_END": str},
 ).clean_names()
 dt = dt[dt["ustar"] >= 0.1].reset_index(drop=True)
 dt["timestamp_start"] = pd.to_datetime(dt["timestamp_start"])
@@ -47,7 +48,7 @@ wind_dir = list(dt["wd"].values[0:10])
 
 zm = [20.0 for i in range(10)]
 h = [2000.0 for i in range(10)]
-ol = [-100.0  for i in range(10)]
+ol = [-100.0 for i in range(10)]
 
 FFP = myfootprint.FFP_climatology(
     zm=zm,
@@ -57,14 +58,14 @@ FFP = myfootprint.FFP_climatology(
     ol=ol,
     sigmav=sigmav,
     ustar=ustar,
-    wind_dir=wind_dir
+    wind_dir=wind_dir,
 )
 
 [k for k in FFP.keys()]
 len(FFP["rs"])
-len(FFP['fr'])
-len(FFP['xr'][0])
-len(FFP['yr'][0])
+len(FFP["fr"])
+len(FFP["xr"][0])
+len(FFP["yr"][0])
 
 # ---
 
@@ -77,18 +78,18 @@ x_2d_dd = np.vectorize(get_dd)(x_2d) + origin_lon
 y_2d_dd = np.vectorize(get_dd)(y_2d) + origin_lat
 
 # prepare contour inputs
-clevs = FFP["fr"][::-1] # just reverses the order
+clevs = FFP["fr"][::-1]  # just reverses the order
 clevs = [clev for clev in clevs if clev is not None]
 levs = [clev for clev in clevs]
 fs = FFP["fclim_2d"]
 cs = [cm.jet(ix) for ix in np.linspace(0, 1, len(fs))]
 f = fs[0]
 c = cs[0]
-cc = [c]*len(levs)
+cc = [c] * len(levs)
 
 # generate GeoDataFrame of contours
 fig, ax = plt.subplots(figsize=(10, 8))
-cp = ax.contour(x_2d_dd, y_2d_dd, fs, levs, colors = cc, linewidths=0.5)
+cp = ax.contour(x_2d_dd, y_2d_dd, fs, levs, colors=cc, linewidths=0.5)
 gdf = ffputils.contour_to_gdf(cp)
 # plt.show()
 plt.close()
