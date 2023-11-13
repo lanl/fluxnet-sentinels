@@ -1,5 +1,5 @@
 """
-    Analyze flux tower data associated with the Fleurus abnormal release
+    Analyze flux tower data associated with the Fleurus abnormal release. Should likely use scripts/01_fit_rolling.py instead.
 ```
 python figures/rolling_fleurus.py --site_id BE-Lon
 ```
@@ -19,8 +19,8 @@ from src import rolling
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--site_id", nargs=1, default="", type=str)
-parser.add_argument("--window_size", nargs=1, default="432", type=int)
-parser.add_argument("--bearing", nargs=1, default="235", type=int)
+parser.add_argument("--window_size", nargs=1, default=["432"], type=int)
+parser.add_argument("--bearing", nargs=1, default=["235"], type=int)
 userargs = vars(parser.parse_args())
 site = userargs["site_id"][0]
 site_code = site.replace("-", "")
