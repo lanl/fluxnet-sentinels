@@ -34,6 +34,9 @@ figures/__rolling_fleurus_bebra_10_7_0.5.pdf: scripts/01_fit_rolling.py ../../Da
 
 figures/__rolling_fleurus_bevie_10_7_0.5.pdf: scripts/01_fit_rolling.py ../../Data/Euroflux/BEVie.csv
 	python $< --site BE-Vie --date_event 2008-08-23 --path_in ../../Data/Euroflux/BEVie.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 280 --tolerance 10 --n_days 7  --event_quantile 0.5 --run_detailed --event_effect 33.14
+
+figures/__interaction.pdf: figures/interaction.py
+	python $<
  
 figures/all.pdf: figures/__rolling_grid_be-lon.pdf figures/__map.pdf figures/__footprint.pdf \
 	figures/__map_fukushima.pdf figures/__rolling_fukushima_uswrc.pdf \
