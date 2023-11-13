@@ -21,3 +21,22 @@ mamba env create -f environment.yml
 ```shell
 make all
 ```
+
+### Reference
+
+```shell
+## dependent variables
+# co2: carbon dioxide
+# le: latent heat flux
+# h: sensible heat flux
+# fc: co2 flux
+
+## independent variables
+# ta: air temperature
+# pa: atmospheric pressure
+# ws: wind speed
+# ppfd: photon flux density
+# p: precipitation
+# netrad: net solar radiation
+# rh: relative humidity
+```
