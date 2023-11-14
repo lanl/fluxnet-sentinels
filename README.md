@@ -25,6 +25,15 @@ make all
 ### Reference
 
 ```shell
+## "effect size"
+# p-value
+# quantile of p-value relative to other windows
+# abs(np.log(p-value))
+
+# TODO: makes much more sense to have it be a coefficient value?
+```
+
+```shell
 ## dependent variables
 # co2: carbon dioxide
 # le: latent heat flux

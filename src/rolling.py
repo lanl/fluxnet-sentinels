@@ -42,6 +42,12 @@ def p_interact(x, y, timestamp, n_before, n_during, n_after):
 
 
 def p_quantile(dt, dt_event, dep, indep, window_size=432):
+    """
+    1. Fit an interaction model for the event window.
+    2. Calculate a p-value for the model period interaction term (p_fl).
+    3. Roll over all possible windows calculating p-values as in step 2 (pdist_compilation).
+    4. Return p_fl and pdist_compilation
+    """
     # p_quantile(dt, dt_event, "co2", "ta") # ~ 0.14
     # p_quantile(dt, dt_event, "fc", "ws")
     # dep = "fc"
