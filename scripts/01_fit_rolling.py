@@ -9,11 +9,11 @@
 #
 # python scripts/01_fit_rolling.py --site FHK --date_event 2011-03-11 --path_in ../../Data/Asiaflux/FHK.csv --path_out figures/__rolling_fukushima_ --var_dep le --var_idep rh --bearing 45 --tolerance 10 --n_days 7 --uses_letters --run_detailed
 #
-# python scripts/01_fit_rolling.py --site BE-Lon --date_event 2008-08-23 --path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile 0.5 --run_detailed --overwrite
+# python scripts/01_fit_rolling.py --site BE-Lon --date_event 2008-08-23 --path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile 0.9 --run_detailed
 #
-# python scripts/01_fit_rolling.py --site BE-Bra --date_event 2008-08-23 --path_in ../../Data/Euroflux/BEBra.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 180 --tolerance 10 --n_days 7  --event_quantile 0.5 --run_detailed --event_effect 140
+# python scripts/01_fit_rolling.py --site BE-Bra --date_event 2008-08-23 --path_in ../../Data/Euroflux/BEBra.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 180 --tolerance 10 --n_days 7  --event_quantile 0.5 --run_detailed --event_effect 30.47 --event_wind 0.35
 #
-# python scripts/01_fit_rolling.py --site BE-Vie --date_event 2008-08-23 --path_in ../../Data/Euroflux/BEVie.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile 0.5 --run_detailed --overwrite
+# python scripts/01_fit_rolling.py --site BE-Vie --date_event 2008-08-23 --path_in ../../Data/Euroflux/BEVie.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile 0.5 --run_detailed --event_effect 30.47 --event_wind 0.35
 #
 import os
 import sys
@@ -42,9 +42,11 @@ from src import rolling
 @click.option("--n_days", type=int)
 @click.option("--event_quantile", type=float)
 @click.option("--event_effect", type=float, default=None)
+@click.option("--event_wind", type=float, default=None)
 @click.option("--uses_letters", is_flag=True, default=False)
 @click.option("--run_detailed", is_flag=True, default=False)
 @click.option("--overwrite", is_flag=True, default=False)
+@click.option("--no_false_positives", is_flag=True, default=False)
 def fit_rolling(
     site,
     date_event,
@@ -60,6 +62,8 @@ def fit_rolling(
     run_detailed,
     overwrite,
     event_effect=None,
+    event_wind=None,
+    no_false_positives=False,
 ):
     # --- setup
     dep_cols = ["co2", "fc", "le", "h", "co"]
@@ -68,11 +72,22 @@ def fit_rolling(
     site_id = site.lower()
     site_code = site_id.replace("-", "")
 
+    varpair = (var_dep, var_idep)
+    varpair_code = "v".join(varpair) + "_"
+
     path_slug = (
-        site_code + "_" + str(tolerance) + "_" + str(n_days) + "_" + str(event_quantile)
+        site_code
+        + "_"
+        + varpair_code
+        + str(tolerance)
+        + "_"
+        + str(n_days)
+        + "_"
+        + str(event_quantile)
     )
     path_fig = path_out + path_slug + ".pdf"
     if os.path.exists(path_fig) and not overwrite:
+        print(path_fig + " already exists, exiting...")
         return None
 
     # --- grid pair-wise analysis
@@ -96,9 +111,6 @@ def fit_rolling(
         return None
 
     # --- detailed single pair analysis
-    varpair = (var_dep, var_idep)
-    varpair_code = "v".join(varpair) + "_"
-
     path_pdist = "data/pdist_" + varpair_code + path_slug + ".csv"
     path_pevent = "data/p_event_" + varpair_code + path_slug + ".csv"
     path_event_index = "data/event_index_" + varpair_code + path_slug + ".csv"
@@ -141,20 +153,26 @@ def fit_rolling(
         }
     )
     g_data["timestamp"] = pd.to_datetime(g_data["timestamp"])
-    event_wind_max = np.quantile(
-        [
-            g_data.iloc[int(event_index + i)]["wind_fraction"]
-            for i in range(2 * 24 * n_days)  # half-hourly data
-        ],
-        [event_quantile],
-    )[0]
+    if event_wind is None:
+        event_wind = np.quantile(
+            [
+                g_data.iloc[int(event_index + i)]["wind_fraction"]
+                for i in range(2 * 24 * n_days)  # half-hourly data
+            ],
+            [event_quantile],
+        )[0]
     if event_effect is None:
         event_effect = np.quantile(
             [g_data.iloc[int(event_index + i)]["p"] for i in range(2 * 24 * n_days)],
             [event_quantile],
         )[0]
+        print(event_effect)
+        print(np.log(event_effect))
+        print(abs(np.log(p_event)))
+        print("event_wind_max: " + str(event_wind))
+
     tt = [
-        (g_data.iloc[i]["wind_fraction"] >= event_wind_max)
+        (g_data.iloc[i]["wind_fraction"] >= event_wind)
         and (g_data.iloc[i]["p"] >= event_effect)
         for i in range(g_data.shape[0])
     ]
@@ -184,10 +202,11 @@ def fit_rolling(
     )
     g2.set_ylim(-1, 1)
     # g_data.iloc[int(event_index)]["p"]
-    [
-        g2.axvline(g_data[tt].iloc[i]["timestamp"], color="orange")
-        for i in range(g_data[tt].shape[0])
-    ]
+    if not no_false_positives:
+        [
+            g2.axvline(g_data[tt].iloc[i]["timestamp"], color="orange")
+            for i in range(g_data[tt].shape[0])
+        ]
     # g_data[
     #     (g_data["p"] > abs(np.log(p_event))).values and (g_data["test"] > 0.7).values
     # ].shape
