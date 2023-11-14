@@ -22,6 +22,7 @@ import janitor
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from scipy import stats
 from datetime import datetime
 import matplotlib.pyplot as plt
 
@@ -87,7 +88,7 @@ def fit_rolling(
     )
     path_fig = path_out + path_slug + ".pdf"
     if os.path.exists(path_fig) and not overwrite:
-        print(path_fig + " already exists, exiting...")
+        print("'" + path_fig + "' already exists, exiting...")
         return None
 
     # --- grid pair-wise analysis
@@ -111,9 +112,9 @@ def fit_rolling(
         return None
 
     # --- detailed single pair analysis
-    path_pdist = "data/pdist_" + varpair_code + path_slug + ".csv"
-    path_pevent = "data/p_event_" + varpair_code + path_slug + ".csv"
-    path_event_index = "data/event_index_" + varpair_code + path_slug + ".csv"
+    path_pdist = "data/pdist_" + path_slug + ".csv"
+    path_pevent = "data/p_event_" + path_slug + ".csv"
+    path_event_index = "data/event_index_" + path_slug + ".csv"
     if (not os.path.exists(path_pdist)) or (not os.path.exists(path_pevent)):
         _, pdist, timestamps, event_index, p_event = rolling.p_quantile(
             dt, dt_event, varpair[0], varpair[1], window_size
@@ -169,6 +170,7 @@ def fit_rolling(
         print(event_effect)
         print(np.log(event_effect))
         print(abs(np.log(p_event)))
+        print(stats.percentileofscore(pdist["pdist"], p_event, nan_policy="omit") / 100)
         print("event_wind_max: " + str(event_wind))
 
     tt = [
@@ -176,8 +178,9 @@ def fit_rolling(
         and (g_data.iloc[i]["p"] >= event_effect)
         for i in range(g_data.shape[0])
     ]
-    # sum(tt)
     false_positive_rate = round(sum(tt) / g_data.shape[0], 2)
+    if sum(tt) == 0:
+        false_positive_rate = "NA"
 
     # --- plotting
     plt.close()
