@@ -94,8 +94,10 @@ gg2 = sns.histplot(
 )
 gg2.axvline(abs(np.log(pevent["pevent"].values[0])), color="orange")
 ax2.set_xlabel("Effect size")
+plt.suptitle("BE-Lon\nlog(co2) ~ ta * period")
+plt.tight_layout()
 # plt.show()
-plt.savefig("figures/__interaction.pdf")
+plt.savefig("figures/__interaction.pdf", bbox_inches="tight", pad_inches=0.1)
 
 # ---
 # model = smf.ols(
