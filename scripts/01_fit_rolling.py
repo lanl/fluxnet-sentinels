@@ -112,25 +112,32 @@ def fit_rolling(
         return None
 
     # --- detailed single pair analysis
-    path_pdist = "data/pdist_" + path_slug + ".csv"
+    path_pfdist = "data/pfdist_" + path_slug + ".csv"
     path_pevent = "data/p_event_" + path_slug + ".csv"
+    path_fevent = "data/f_event_" + path_slug + ".csv"
     path_event_index = "data/event_index_" + path_slug + ".csv"
-    if (not os.path.exists(path_pdist)) or (not os.path.exists(path_pevent)):
-        _, pdist, timestamps, event_index, p_event = rolling.p_quantile(
+    if (not os.path.exists(path_pfdist)) or (not os.path.exists(path_pevent)):
+        _, pdist, fdist, timestamps, event_index, p_event, f_event = rolling.p_quantile(
             dt, dt_event, varpair[0], varpair[1], window_size
         )
-        pd.DataFrame({"timestamp": timestamps, "pdist": pdist}).to_csv(
-            path_pdist, index=False
+        pd.DataFrame({"timestamp": timestamps, "pdist": pdist, "fdist": fdist}).to_csv(
+            path_pfdist, index=False
         )
         pd.DataFrame({"pevent": p_event}, index=[0]).to_csv(path_pevent, index=False)
+        pd.DataFrame({"fevent": f_event}, index=[0]).to_csv(path_fevent, index=False)
         pd.DataFrame({"event_index": event_index}, index=[0]).to_csv(
             path_event_index, index=False
         )
-    pdist = pd.read_csv(path_pdist)
+    pfdist = pd.read_csv(path_pfdist)
     timestamps = [x for x in pdist["timestamp"]]
     p_event = float(
         pd.read_csv(
             path_pevent,
+        ).values[0]
+    )
+    f_event = float(
+        pd.read_csv(
+            path_fevent,
         ).values[0]
     )
     event_index = float(
@@ -167,6 +174,10 @@ def fit_rolling(
             [g_data.iloc[int(event_index + i)]["p"] for i in range(2 * 24 * n_days)],
             [event_quantile],
         )[0]
+        # p_event is a p-value
+        # pdist is a vector of p-values
+        # g_data["p"] is a vector of abs(log(p-values))
+        # event_effect is the specified quantile value in units of abs(log(p-values))
         print(event_effect)
         print(np.log(event_effect))
         print(abs(np.log(p_event)))

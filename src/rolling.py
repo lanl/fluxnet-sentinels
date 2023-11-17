@@ -35,10 +35,10 @@ def p_interact(x, y, timestamp, n_before, n_during, n_after):
     try:
         model = smf.ols("np.log(y) ~ x * period", data=dt_sub).fit()
         res = sm.stats.anova_lm(model, typ=1)
-        res = res.to_dict()["PR(>F)"]["x:period"]
-        return res, date
+        res = (res.to_dict()["PR(>F)"]["x:period"], res.to_dict()["F"]["x:period"])
+        return res[0], res[1], date
     except:  # SVD did not converge. or too much missing data?
-        return np.nan, date
+        return np.nan, np.nan, date
 
 
 def p_quantile(dt, dt_event, dep, indep, window_size=432):
@@ -55,6 +55,7 @@ def p_quantile(dt, dt_event, dep, indep, window_size=432):
     print((dep, indep))
     model = smf.ols("np.log(" + dep + ") ~ " + indep + " * period", data=dt_event).fit()
     p_fl = sm.stats.anova_lm(model, typ=1).to_dict()["PR(>F)"][indep + ":period"]
+    f_fl = sm.stats.anova_lm(model, typ=1).to_dict()["F"][indep + ":period"]
 
     # dt_event["period"].value_counts()
 
@@ -67,7 +68,7 @@ def p_quantile(dt, dt_event, dep, indep, window_size=432):
     n_during = np.repeat(dt_event[dt_event["period"] == "during"].shape[0], dt.shape[0])
     n_after = np.repeat(dt_event[dt_event["period"] == "after"].shape[0], dt.shape[0])
 
-    pdist = rolling_apply_ext(
+    pfdist = rolling_apply_ext(
         p_interact,
         window_size,
         dt[indep].values,
@@ -79,16 +80,19 @@ def p_quantile(dt, dt_event, dep, indep, window_size=432):
         n_jobs=1,
     )
 
-    pdist_compilation = [float(x[0]) for x in pdist]
-    timestamps = [x[1] for x in pdist]
+    pdist_compilation = [float(x[0]) for x in pfdist]
+    fdist_compilation = [float(x[1]) for x in pfdist]
+    timestamps = [x[2] for x in pfdist]
 
     # _, pdist, event_index, p_event
     return (
         stats.percentileofscore(pdist_compilation, p_fl, nan_policy="omit") / 100,
         pdist_compilation,
+        fdist_compilation,
         timestamps,
         dt_event.index[0],
         p_fl,
+        f_fl,
     )
 
 
