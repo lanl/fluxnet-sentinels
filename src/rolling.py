@@ -56,6 +56,10 @@ def p_quantile(dt, dt_event, dep, indep, window_size=432):
     model = smf.ols("np.log(" + dep + ") ~ " + indep + " * period", data=dt_event).fit()
     p_fl = sm.stats.anova_lm(model, typ=1).to_dict()["PR(>F)"][indep + ":period"]
     f_fl = sm.stats.anova_lm(model, typ=1).to_dict()["F"][indep + ":period"]
+    r2_fl = round(
+        abs(model.rsquared_adj),
+        2,
+    )
 
     # dt_event["period"].value_counts()
 
@@ -86,13 +90,14 @@ def p_quantile(dt, dt_event, dep, indep, window_size=432):
 
     # _, pdist, event_index, p_event
     return (
-        stats.percentileofscore(pdist_compilation, p_fl, nan_policy="omit") / 100,
+        stats.percentileofscore(fdist_compilation, f_fl, nan_policy="omit") / 100,
         pdist_compilation,
         fdist_compilation,
         timestamps,
         dt_event.index[0],
         p_fl,
         f_fl,
+        r2_fl,
     )
 
 
@@ -224,7 +229,7 @@ def define_period(dt_select, date_event="2008-08-23", n_days=10):
     return dt_event
 
 
-def grid_define_pquant(
+def grid_define_fquant(
     grid,
     dt,
     dt_event,
@@ -234,26 +239,26 @@ def grid_define_pquant(
 ):
     if not os.path.exists(out_path) or overwrite:
         print("Making: " + out_path)
-        pquant = []
+        fquant = []
         for i in range(grid.shape[0]):
             # i = 0
-            pquant_i = p_quantile(
+            fquant_i = p_quantile(
                 dt,
                 dt_event,
                 grid.iloc[[i]]["dep"].values[0],
                 grid.iloc[[i]]["indep"].values[0],
                 window_size,
             )
-            pquant.append(
+            fquant.append(
                 round(
-                    abs(pquant_i[0]),
+                    abs(fquant_i[0]),
                     2,
                 )
             )
         # TODO: why is the process being killed before this line when running with multiprocessing?
 
-        grid["pquant"] = pquant
-        grid = grid.sort_values("pquant")
+        grid["fquant"] = fquant
+        grid = grid.sort_values("fquant")
         grid.to_csv(out_path, index=False)
         return grid
 
@@ -379,7 +384,7 @@ def towards(dt, bearing, tolerance, uses_letters=False, window_size=432):
 def regression_grid(
     grid, dt, dt_event, site_id, n_days, overwrite=False, window_size=432
 ):
-    grid_define_pquant(
+    grid_define_fquant(
         grid,
         dt,
         dt_event,

@@ -9,11 +9,11 @@
 #
 # python scripts/01_fit_rolling.py --site FHK --date_event 2011-03-11 --path_in ../../Data/Asiaflux/FHK.csv --path_out figures/__rolling_fukushima_ --var_dep le --var_idep rh --bearing 45 --tolerance 10 --n_days 7 --uses_letters --run_detailed
 #
-# python scripts/01_fit_rolling.py --site BE-Lon --date_event 2008-08-23 --path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile_wind 0.9 --event_quantile_effect 0.9 --run_detailed --overwrite
+# python scripts/01_fit_rolling.py --site BE-Lon --date_event 2008-08-23 --path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile_wind 0.7 --event_quantile_effect 0.9 --run_detailed --overwrite
 #
-# python scripts/01_fit_rolling.py --site BE-Bra --date_event 2008-08-23 --path_in ../../Data/Euroflux/BEBra.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 180 --tolerance 10 --n_days 7  --event_quantile 0.5 --run_detailed --event_effect 30.47 --event_wind 0.35
+# python scripts/01_fit_rolling.py --site BE-Bra --date_event 2008-08-23 --path_in ../../Data/Euroflux/BEBra.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 180 --tolerance 10 --n_days 7  --event_quantile_wind 0.7 --event_quantile_effect 0.9 --run_detailed --overwrite
 #
-# python scripts/01_fit_rolling.py --site BE-Vie --date_event 2008-08-23 --path_in ../../Data/Euroflux/BEVie.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile 0.5 --run_detailed --event_effect 30.47 --event_wind 0.35
+# python scripts/01_fit_rolling.py --site BE-Vie --date_event 2008-08-23 --path_in ../../Data/Euroflux/BEVie.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile_wind 0.7 --event_quantile_effect 0.9 --run_detailed --overwrite
 #
 import os
 import sys
@@ -22,7 +22,6 @@ import janitor
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from scipy import stats
 from datetime import datetime
 import matplotlib.pyplot as plt
 
@@ -117,16 +116,25 @@ def fit_rolling(
     path_pfdist = "data/pfdist_" + path_slug + ".csv"
     path_pevent = "data/p_event_" + path_slug + ".csv"
     path_fevent = "data/f_event_" + path_slug + ".csv"
+    path_r2event = "data/r2_event_" + path_slug + ".csv"
     path_event_index = "data/event_index_" + path_slug + ".csv"
-    if (not os.path.exists(path_pfdist)) or (not os.path.exists(path_pevent)):
-        _, pdist, fdist, timestamps, event_index, p_event, f_event = rolling.p_quantile(
-            dt, dt_event, varpair[0], varpair[1], window_size
-        )
+    if (not os.path.exists(path_pfdist)) or (not os.path.exists(path_r2event)):
+        (
+            _,
+            pdist,
+            fdist,
+            timestamps,
+            event_index,
+            p_event,
+            f_event,
+            r2_event,
+        ) = rolling.p_quantile(dt, dt_event, varpair[0], varpair[1], window_size)
         pd.DataFrame({"timestamp": timestamps, "pdist": pdist, "fdist": fdist}).to_csv(
             path_pfdist, index=False
         )
         pd.DataFrame({"pevent": p_event}, index=[0]).to_csv(path_pevent, index=False)
         pd.DataFrame({"fevent": f_event}, index=[0]).to_csv(path_fevent, index=False)
+        pd.DataFrame({"r2event": r2_event}, index=[0]).to_csv(path_r2event, index=False)
         pd.DataFrame({"event_index": event_index}, index=[0]).to_csv(
             path_event_index, index=False
         )
@@ -140,6 +148,11 @@ def fit_rolling(
     f_event = float(
         pd.read_csv(
             path_fevent,
+        ).values[0]
+    )
+    r2_event = float(
+        pd.read_csv(
+            path_r2event,
         ).values[0]
     )
     event_index = float(
@@ -177,17 +190,6 @@ def fit_rolling(
             [g_data.iloc[int(event_index + i)]["F"] for i in range(2 * 24 * n_days)],
             [event_quantile_effect],
         )[0]
-        # p_event is a p-value
-        # pdist is a vector of p-values
-        # g_data["p"] is a vector of abs(log(p-values))
-        # event_effect is the specified quantile value in units of abs(log(p-values))
-        print(event_effect)
-        print(np.log(event_effect))
-        print(abs(np.log(p_event)))
-        print(
-            stats.percentileofscore(pfdist["pdist"], p_event, nan_policy="omit") / 100
-        )
-        print("event_wind_max: " + str(event_wind))
 
     tt = [
         (g_data.iloc[i]["wind_fraction"] >= event_wind)
@@ -245,6 +247,7 @@ def fit_rolling(
     print(path_fig)
     plt.savefig(path_fig)
 
+    # ---
     log_info = pd.DataFrame(
         {
             "date": str(datetime.now()),
@@ -253,9 +256,13 @@ def fit_rolling(
             "n_days": n_days,
             "event_quantile_effect": event_quantile_effect,
             "false_positive_rate": false_positive_rate,
+            "event_effect": event_effect,
+            "event_wind": event_wind,
+            "event_r2": r2_event,
         },
         index=[0],
     )
+    print(log_info.T)
     log_info.to_csv("data/log.csv", mode="a", header=False, index=False)
 
     return log_info
