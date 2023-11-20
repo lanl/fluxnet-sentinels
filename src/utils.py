@@ -1,4 +1,6 @@
 import re
+import tabulate
+import subprocess
 import pandas as pd
 
 
@@ -30,6 +32,44 @@ def amf_clean(dt_raw):
     ]
     rank_not_missing.reverse()
     dt = dt.iloc[:, rank_not_missing].copy()
-    dt = dt.loc[:,~dt.columns.duplicated()].copy()
+    dt = dt.loc[:, ~dt.columns.duplicated()].copy()
 
     return dt
+
+
+def pdf_table(
+    dt, title, path_pdf, headers=["Explanatory", "Regressor", "R2", r"Event Percentile"]
+):
+    mdtable = tabulate.tabulate(
+        dt,
+        headers=headers,
+        tablefmt="github",
+        showindex=False,
+    )
+    with open("mdtable.md", "w") as f:
+        f.write(mdtable)
+
+    # macos specific commands
+    subprocess.call(
+        'echo "## ' + title + '\n\n$(cat mdtable.md)" > mdtable.md',
+        shell=True,
+    )
+    subprocess.call(
+        'echo "\\pagenumbering{gobble}\n\n$(cat mdtable.md)" > mdtable.md',
+        shell=True,
+    )
+
+    # linux specific commands
+    # subprocess.call(
+    #     "echo ## " + title + "| cat - mdtable.md > temp && mv temp mdtable.md",
+    #     shell=True,
+    # )
+    # subprocess.call(
+    #     "echo \\pagenumbering{gobble}| cat - mdtable.md > temp && mv temp mdtable.md",
+    #     shell=True,
+    # )
+
+    subprocess.call(
+        "pandoc mdtable.md -V fontsize=14pt -o " + path_pdf,
+        shell=True,
+    )
