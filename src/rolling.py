@@ -27,10 +27,10 @@ def p_interact(x, y, timestamp, n_before, n_during, n_after):
     date = timestamp.reset_index(drop=True)[int(np.floor(len(timestamp) / 2))]
 
     if (not any(pd.notna(dt_sub.y.values))) or (not any(pd.notna(dt_sub.x.values))):
-        return np.nan, date
+        return np.nan, np.nan, date
 
     if (sum(pd.notna(dt_sub.y.values)) < 7) or (sum(pd.notna(dt_sub.x.values)) < 7):
-        return np.nan, date
+        return np.nan, np.nan, date
 
     try:
         model = smf.ols("np.log(y) ~ x * period", data=dt_sub).fit()
