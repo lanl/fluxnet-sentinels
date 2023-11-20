@@ -25,6 +25,6 @@ dt = dt[["site", "dep", "idep", "event_r2", "event_effect", "event_wind"]]
 utils.pdf_table(
     dt,
     "test",
-    "test2.pdf",
+    "tables/overview.pdf",
     ["site", "dep", "idep", "event_r2", "event_effect", "event_wind"],
 )
