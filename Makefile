@@ -1,3 +1,4 @@
+.PHONY: test clean
 
 all: figures/all.pdf
 
