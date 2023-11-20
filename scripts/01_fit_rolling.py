@@ -9,7 +9,7 @@
 #
 # python scripts/01_fit_rolling.py --site FHK --date_event 2011-03-11 --path_in ../../Data/Asiaflux/FHK.csv --path_out figures/__rolling_fukushima_ --var_dep le --var_idep rh --bearing 45 --tolerance 10 --n_days 7 --uses_letters --run_detailed
 #
-# python scripts/01_fit_rolling.py --site BE-Lon --date_event 2008-08-23 --path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile 0.9 --run_detailed
+# python scripts/01_fit_rolling.py --site BE-Lon --date_event 2008-08-23 --path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile_wind 0.9 --event_quantile_effect 0.9 --run_detailed --overwrite
 #
 # python scripts/01_fit_rolling.py --site BE-Bra --date_event 2008-08-23 --path_in ../../Data/Euroflux/BEBra.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 180 --tolerance 10 --n_days 7  --event_quantile 0.5 --run_detailed --event_effect 30.47 --event_wind 0.35
 #
@@ -41,7 +41,8 @@ from src import rolling
 @click.option("--bearing", type=int)
 @click.option("--tolerance", type=int)
 @click.option("--n_days", type=int)
-@click.option("--event_quantile", type=float)
+@click.option("--event_quantile_wind", type=float)
+@click.option("--event_quantile_effect", type=float)
 @click.option("--event_effect", type=float, default=None)
 @click.option("--event_wind", type=float, default=None)
 @click.option("--uses_letters", is_flag=True, default=False)
@@ -58,7 +59,8 @@ def fit_rolling(
     bearing,
     tolerance,
     n_days,
-    event_quantile,
+    event_quantile_wind,
+    event_quantile_effect,
     uses_letters,
     run_detailed,
     overwrite,
@@ -84,7 +86,7 @@ def fit_rolling(
         + "_"
         + str(n_days)
         + "_"
-        + str(event_quantile)
+        + str(event_quantile_effect)
     )
     path_fig = path_out + path_slug + ".pdf"
     if os.path.exists(path_fig) and not overwrite:
@@ -104,7 +106,7 @@ def fit_rolling(
         dt_event,
         site_id,
         n_days,
-        overwrite=overwrite,
+        overwrite=False,
         window_size=window_size,
     )
 
@@ -129,7 +131,7 @@ def fit_rolling(
             path_event_index, index=False
         )
     pfdist = pd.read_csv(path_pfdist)
-    timestamps = [x for x in pdist["timestamp"]]
+    timestamps = [x for x in pfdist["timestamp"]]
     p_event = float(
         pd.read_csv(
             path_pevent,
@@ -155,9 +157,10 @@ def fit_rolling(
     g_data = pd.DataFrame(
         {
             "timestamp": timestamps,
-            "index": [x for x in range(len(pdist))],
-            "p": abs(np.log([x for x in pdist["pdist"]])),
+            "index": [x for x in range(len(pfdist))],
+            "p": abs(np.log([x for x in pfdist["pdist"]])),
             "wind_fraction": wind_fraction,
+            "F": [x for x in pfdist["fdist"]],
         }
     )
     g_data["timestamp"] = pd.to_datetime(g_data["timestamp"])
@@ -167,12 +170,12 @@ def fit_rolling(
                 g_data.iloc[int(event_index + i)]["wind_fraction"]
                 for i in range(2 * 24 * n_days)  # half-hourly data
             ],
-            [event_quantile],
+            [event_quantile_wind],
         )[0]
     if event_effect is None:
         event_effect = np.quantile(
-            [g_data.iloc[int(event_index + i)]["p"] for i in range(2 * 24 * n_days)],
-            [event_quantile],
+            [g_data.iloc[int(event_index + i)]["F"] for i in range(2 * 24 * n_days)],
+            [event_quantile_effect],
         )[0]
         # p_event is a p-value
         # pdist is a vector of p-values
@@ -181,12 +184,14 @@ def fit_rolling(
         print(event_effect)
         print(np.log(event_effect))
         print(abs(np.log(p_event)))
-        print(stats.percentileofscore(pdist["pdist"], p_event, nan_policy="omit") / 100)
+        print(
+            stats.percentileofscore(pfdist["pdist"], p_event, nan_policy="omit") / 100
+        )
         print("event_wind_max: " + str(event_wind))
 
     tt = [
         (g_data.iloc[i]["wind_fraction"] >= event_wind)
-        and (g_data.iloc[i]["p"] >= event_effect)
+        and (g_data.iloc[i]["F"] >= event_effect)
         for i in range(g_data.shape[0])
     ]
     false_positive_rate = round(sum(tt) / g_data.shape[0], 2)
@@ -195,7 +200,7 @@ def fit_rolling(
 
     # --- plotting
     plt.close()
-    g = sns.histplot(abs(np.log(pdist["pdist"])))
+    g = sns.histplot(abs(np.log(pfdist["pdist"])))
     g.axvline(abs(np.log(p_event)))
     # plt.show()
     print("figures/__" + varpair_code + site_code + "_hist.pdf")
@@ -203,10 +208,10 @@ def fit_rolling(
 
     plt.close()
     _, ax1 = plt.subplots(figsize=(9, 6))
-    g = sns.lineplot(data=g_data, x="timestamp", y="p", ax=ax1)
+    g = sns.lineplot(data=g_data, x="timestamp", y="F", ax=ax1)
     g.axvline(pd.to_datetime(date_event), color="yellow")
     g.axhline(abs(np.log(p_event)), color="darkgreen")
-    g.set_ylim(0, np.nanquantile(g_data["p"], [1]) + 10)
+    g.set_ylim(0, np.nanquantile(g_data["F"], [1]) + 10)
     ax1.set_ylabel("effect size (blue line, green line [event])")
     ax1.text(pd.to_datetime(date_event), 3, "<-Event", color="red")
 
@@ -246,7 +251,7 @@ def fit_rolling(
             "site": site,
             "wind_tolerance": tolerance,
             "n_days": n_days,
-            "event_quantile": event_quantile,
+            "event_quantile_effect": event_quantile_effect,
             "false_positive_rate": false_positive_rate,
         },
         index=[0],
