@@ -27,6 +27,6 @@ def test_p_quantile(
     dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event)
     window_size = dt_event.shape[0]
 
-    _, pdist, fdist, timestamps, event_index, p_event, f_event = rolling.p_quantile(
+    _, _, _, _, _, _, _ = rolling.p_quantile(
         dt, dt_event, varpair[0], varpair[1], window_size
     )
