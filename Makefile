@@ -27,22 +27,22 @@ figures/__footprint.pdf: figures/footprint.py
 figures/__rolling_fukushima_uswrc.pdf: figures/rolling_fukushima.py ../../Data/Asiaflux/FHK.csv
 	python $<
 
-figures/__rolling_fleurus_belon_10_7_0.95.pdf: scripts/01_fit_rolling.py ../../Data/Euroflux/BELon.csv
-	python $< --site BE-Lon --date_event 2008-08-23 --path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile 0.95 --run_detailed
+figures/__rolling_fleurus_belon_co2vta_10_7_0.9.pdf: scripts/01_fit_rolling.py ../../Data/Euroflux/BELon.csv
+	python $< python scripts/01_fit_rolling.py --site BE-Lon --date_event 2008-08-23 --path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile_wind 0.7 --event_quantile_effect 0.9 --run_detailed
 
-figures/__rolling_fleurus_bebra_10_7_0.5.pdf: scripts/01_fit_rolling.py ../../Data/Euroflux/BEBra.csv
-	python $< --site BE-Bra --date_event 2008-08-23 --path_in ../../Data/Euroflux/BEBra.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 180 --tolerance 10 --n_days 7  --event_quantile 0.5 --run_detailed --event_effect 33.14
+figures/__rolling_fleurus_bebra_co2vta_10_7_0.9.pdf: scripts/01_fit_rolling.py ../../Data/Euroflux/BEBra.csv
+	python $< --site BE-Bra --date_event 2008-08-23 --path_in ../../Data/Euroflux/BEBra.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 180 --tolerance 10 --n_days 7  --event_quantile_wind 0.7 --event_quantile_effect 0.9 --run_detailed
 
-figures/__rolling_fleurus_bevie_10_7_0.5.pdf: scripts/01_fit_rolling.py ../../Data/Euroflux/BEVie.csv
-	python $< --site BE-Vie --date_event 2008-08-23 --path_in ../../Data/Euroflux/BEVie.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 280 --tolerance 10 --n_days 7  --event_quantile 0.5 --run_detailed --event_effect 33.14
+figures/__rolling_fleurus_bevie_co2vta_10_7_0.9.pdf: scripts/01_fit_rolling.py ../../Data/Euroflux/BEVie.csv
+	python $< --site BE-Vie --date_event 2008-08-23 --path_in ../../Data/Euroflux/BEVie.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile_wind 0.7 --event_quantile_effect 0.9 --run_detailed
 
 figures/__interaction.pdf: figures/interaction.py
 	python $<
  
 figures/all.pdf: figures/__rolling_grid_be-lon.pdf figures/__map.pdf figures/__footprint.pdf \
-	figures/__map_fukushima.pdf figures/__rolling_fukushima_uswrc.pdf \
-	figures/__rolling_fleurus_belon.pdf figures/__rolling_fleurus_bebra.pdf \
-	figures/__rolling_fleurus_bevie.pdf
+	figures/__rolling_fleurus_bevie_co2vta_10_7_0.9.pdf \
+	figures/__rolling_fleurus_bebra_co2vta_10_7_0.9.pdf \
+	figures/__rolling_fleurus_belon_co2vta_10_7_0.9.pdf
 	pdftk $(wildcard figures/__*.pdf) output $@
 
 # ---
@@ -70,7 +70,7 @@ test:
 	python -m pytest
 
 clean:
-	-rm figures/figures.pdf
+	-rm figures/all.pdf
 	-rm *.gpkg
 	-rm test*.gpkg
 	-rm test*.pdf
