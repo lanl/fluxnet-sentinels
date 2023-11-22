@@ -21,13 +21,13 @@ dt["dep"] = "co2"
 dt["idep"] = "ta"
 dt = dt.drop_duplicates("site", keep="last")
 
-dt = dt[["site", "dep", "idep", "event_r2", "event_effect", "event_wind"]]
+dt = dt[["site", "event_r2", "event_effect", "event_wind"]]
 dt["event_effect"] = round(dt["event_effect"], 2)
-dt["event_wind"] = round(dt["event_wind"], 2)
+dt["event_wind"] = round(dt["event_wind"] * 100, 0)
 
 utils.pdf_table(
     dt,
     "",
     "tables/overview.pdf",
-    ["site", "dep", "idep", "event_r2", "event_effect", "event_wind"],
+    ["Site", "R2", "Effect", "Wind %"],
 )
