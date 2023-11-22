@@ -20,6 +20,7 @@ import sys
 import click
 import janitor
 import itertools
+import subprocess
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -90,6 +91,7 @@ def fit_rolling(
     )
     path_fig = path_out + path_slug + ".pdf"
     if os.path.exists(path_fig) and not overwrite:
+        subprocess.call("touch " + path_fig, shell=True)
         print("'" + path_fig + "' already exists, exiting...")
         return None
 
