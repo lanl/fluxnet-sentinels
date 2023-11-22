@@ -19,6 +19,7 @@ import os
 import sys
 import click
 import janitor
+import itertools
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -97,6 +98,15 @@ def fit_rolling(
     dt = janitor.remove_empty(dt)
     dt_event = rolling.define_period(dt_select, n_days=n_days, date_event=date_event)
     window_size = dt_event.shape[0]
+
+    # make sure all dep and indep are in dt/dt_event before gridding
+    dep_cols = list(itertools.compress(dep_cols, [x in dt.columns for x in dep_cols]))
+    indep_cols = list(
+        itertools.compress(indep_cols, [x in dt.columns for x in indep_cols])
+    )
+    indep_cols = list(
+        itertools.compress(indep_cols, [any(~pd.isna(dt_event[x])) for x in indep_cols])
+    )
 
     grid = rolling.make_grid(dt, dep_cols, indep_cols)
     grid = rolling.regression_grid(
