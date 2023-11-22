@@ -73,3 +73,17 @@ def pdf_table(
         "pandoc mdtable.md -V fontsize=14pt -o " + path_pdf,
         shell=True,
     )
+
+    try:  # conda pdfcrop
+        subprocess.check_call(
+            "pdfcrop.pl " + path_pdf + " " + path_pdf,
+            shell=True,
+        )
+    except:  # system pdfcrop
+        try:
+            subprocess.call(
+                "pdfcrop " + path_pdf + " " + path_pdf,
+                shell=True,
+            )
+        except:
+            pass

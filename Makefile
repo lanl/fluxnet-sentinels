@@ -47,7 +47,8 @@ figures/all.pdf: figures/__rolling_grid_be-lon.pdf figures/__map.pdf figures/__f
 	pdftk $(wildcard figures/__*.pdf) output $@
 	pdftk $@ $(wildcard tables/*.pdf) output temp.pdf
 	sleep 5
-	mv temp.pdf $@
+	cp temp.pdf $@
+	rm temp.pdf
 		
 
 # ---

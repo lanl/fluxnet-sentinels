@@ -22,9 +22,12 @@ dt["idep"] = "ta"
 dt = dt.drop_duplicates("site", keep="last")
 
 dt = dt[["site", "dep", "idep", "event_r2", "event_effect", "event_wind"]]
+dt["event_effect"] = round(dt["event_effect"], 2)
+dt["event_wind"] = round(dt["event_wind"], 2)
+
 utils.pdf_table(
     dt,
-    "test",
+    "",
     "tables/overview.pdf",
     ["site", "dep", "idep", "event_r2", "event_effect", "event_wind"],
 )

@@ -2,11 +2,10 @@
     Utility functions for driving rolling analyses
 """
 import os
+import sys
 import pyproj
 import janitor
-import tabulate
 import itertools
-import subprocess
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -14,6 +13,9 @@ import statsmodels.api as sm
 from datetime import timedelta
 import statsmodels.formula.api as smf
 from numpy_ext import rolling_apply as rolling_apply_ext
+
+sys.path.append(".")
+from src import utils
 
 
 def p_interact(x, y, timestamp, n_before, n_during, n_after):
@@ -397,49 +399,11 @@ def regression_grid(
     res = grid[grid["r2"] > 0.05].reset_index(drop=True)
     res = res[[x != "ppfd_in" for x in res["indep"]]].reset_index(drop=True)
 
-    mdtable = tabulate.tabulate(
+    utils.pdf_table(
         res,
-        headers=["Explanatory", "Regressor", "R2", r"Event Percentile"],
-        tablefmt="simple",
-        showindex=False,
+        site_id,
+        "figures/__rolling_grid_" + site_id + ".pdf",
+        ["Explanatory", "Regressor", "R2", r"Event Percentile"],
     )
-    with open("mdtable.md", "w") as f:
-        f.write(mdtable)
-
-    subprocess.call(
-        "echo ## " + site_id + "| cat - mdtable.md > temp && mv temp mdtable.md",
-        shell=True,
-    )
-    subprocess.call(
-        "echo \\pagenumbering{gobble}| cat - mdtable.md > temp && mv temp mdtable.md",
-        shell=True,
-    )
-    subprocess.call(
-        "pandoc mdtable.md -V fontsize=14pt -o figures/__rolling_grid_"
-        + site_id
-        + ".pdf",
-        shell=True,
-    )
-    try:  # conda pdfcrop
-        subprocess.check_call(
-            "pdfcrop.pl figures/__rolling_grid_"
-            + site_id
-            + ".pdf figures/__rolling_grid_"
-            + site_id
-            + ".pdf",
-            shell=True,
-        )
-    except:  # system pdfcrop
-        try:
-            subprocess.call(
-                "pdfcrop figures/__rolling_grid_"
-                + site_id
-                + ".pdf figures/__rolling_grid_"
-                + site_id
-                + ".pdf",
-                shell=True,
-            )
-        except:
-            pass
 
     return res
