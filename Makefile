@@ -62,6 +62,10 @@ figures/__map_fukushima.pdf: figures/fukushima.R data/ameriflux_pnw.csv
 	python $< --site_id BE-Vie
 
 # ---
+tables/overview.pdf: tables/overview.py
+	python $<
+
+# ---
 test:
 	python -m pytest
 
