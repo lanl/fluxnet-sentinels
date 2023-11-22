@@ -36,13 +36,14 @@ figures/__rolling_fleurus_bebra_co2vta_10_7_0.9.pdf: scripts/01_fit_rolling.py .
 figures/__rolling_fleurus_bevie_co2vta_10_7_0.9.pdf: scripts/01_fit_rolling.py ../../Data/Euroflux/BEVie.csv
 	python $< --site BE-Vie --date_event 2008-08-23 --path_in ../../Data/Euroflux/BEVie.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance 10 --n_days 7  --event_quantile_wind 0.7 --event_quantile_effect 0.9 --run_detailed
 
-figures/__interaction.pdf: figures/interaction.py
+figures/__interaction_belon.pdf: figures/interaction.py
 	python $<
  
 figures/all.pdf: figures/__rolling_grid_be-lon.pdf figures/__map.pdf figures/__footprint.pdf \
 	figures/__rolling_fleurus_bevie_co2vta_10_7_0.9.pdf \
 	figures/__rolling_fleurus_bebra_co2vta_10_7_0.9.pdf \
 	figures/__rolling_fleurus_belon_co2vta_10_7_0.9.pdf \
+	figures/__interaction_belon.pdf \
 	tables/overview.pdf
 	pdftk $(wildcard figures/__*.pdf) output $@
 	pdftk $@ $(wildcard tables/*.pdf) output temp.pdf
