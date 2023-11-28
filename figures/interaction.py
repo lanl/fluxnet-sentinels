@@ -91,6 +91,7 @@ legend_elements = [
     Line2D([0], [0], color=colors[2], lw=4, label="After"),
 ]
 ax1.legend(handles=legend_elements, loc="upper right")
+ax1.set_title("A.", pad=0, x=0.07, y=0.9)
 #
 gg2 = sns.histplot(
     x=pfdist["fdist"],
@@ -101,6 +102,7 @@ gg2 = sns.histplot(
 )
 gg2.axvline(fevent["fevent"].values[0], color="orange")
 ax2.set_xlabel("Effect size")
+ax2.set_title("C.", pad=0, x=0.07, y=0.9)
 #
 timestamps = [x for x in pfdist["timestamp"]]
 ts_start = timestamps[
@@ -108,6 +110,7 @@ ts_start = timestamps[
 ]
 dt_event_weak = rolling.define_period(dt_select, n_days=n_days, date_event=ts_start)
 gg3 = hue_regplot(data=dt_event_weak, x="ta", y="co2", hue="period", ax=ax3, ci=None)
+ax3.set_title("B.", pad=0, x=0.07, y=0.9)
 #
 # stats.percentileofscore(pfdist["fdist"], fevent["fevent"], nan_policy="omit") / 100
 gg4 = sns.histplot(
@@ -119,6 +122,7 @@ gg4 = sns.histplot(
 )
 gg4.axvline(np.nanmin(pfdist["fdist"]), color="orange")
 ax4.set_xlabel("Effect size")
+ax4.set_title("D.", pad=0, x=0.07, y=0.9)
 #
 plt.suptitle("BE-Lon\nlog(" + var_dep + ") ~ " + var_idep + " * period")
 plt.tight_layout()
