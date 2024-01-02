@@ -53,6 +53,7 @@ data/log_hyperparameter.csv: scripts/02_hyperparameter_experiment.py
 
 figures/__hyperparameter_experiment.pdf: figures/hyperparameter_experiment.py data/log_hyperparameter.csv
 	python $<
+	pdfcrop $@ $@
  
 figures/all.pdf: figures/__rolling_grid_be-lon.pdf figures/__map.pdf figures/__footprint.pdf \
 	figures/__rolling_fleurus_bevie_co2vta_10_7_0.9.pdf \
