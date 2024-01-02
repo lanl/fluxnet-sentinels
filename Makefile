@@ -90,3 +90,4 @@ clean:
 	-rm *.gpkg
 	-rm test*.gpkg
 	-rm test*.pdf
+	-rm figures/__rolling_fleurus_*_co2vta_10_7_0.9.pdf
