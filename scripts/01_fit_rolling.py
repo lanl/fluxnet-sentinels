@@ -51,6 +51,7 @@ from src import rolling
 @click.option("--overwrite", is_flag=True, default=False)
 @click.option("--no_false_positives", is_flag=True, default=False)
 @click.option("--noxticklabels", is_flag=True, default=False)
+@click.option("--noplotting", is_flag=True, default=False)
 def fit_rolling(
     site,
     date_event,
@@ -70,6 +71,7 @@ def fit_rolling(
     event_wind=None,
     no_false_positives=False,
     noxticklabels=False,
+    noplotting=False,
 ):
     # --- setup
     dep_cols = ["co2", "fc", "le", "h", "co"]
@@ -215,74 +217,75 @@ def fit_rolling(
         false_positive_rate = "NA"
 
     # --- plotting
-    plt.close()
-    g = sns.histplot(abs(np.log(pfdist["pdist"])))
-    g.axvline(abs(np.log(p_event)))
-    # plt.show()
-    print("figures/__" + varpair_code + site_code + "_hist.pdf")
-    plt.savefig("figures/__" + varpair_code + site_code + "_hist.pdf")
+    if not noplotting:
+        plt.close()
+        g = sns.histplot(abs(np.log(pfdist["pdist"])))
+        g.axvline(abs(np.log(p_event)))
+        # plt.show()
+        print("figures/__" + varpair_code + site_code + "_hist.pdf")
+        plt.savefig("figures/__" + varpair_code + site_code + "_hist.pdf")
 
-    plt.close()
-    plt.rc("font", size=14)
-    # find common x-axis date range
-    min(g_data["timestamp"].dropna())
-    # Timestamp('2004-01-01 07:00:00')
-    # Timestamp('2004-01-01 07:00:00')
-    # Timestamp('2004-04-09 10:00:00')
-    max(g_data["timestamp"].dropna())
-    # Timestamp('2013-12-30 18:30:00')
-    # Timestamp('2012-12-23 07:00:00')
-    # Timestamp('2013-12-30 15:00:00')
-    _, ax1 = plt.subplots(figsize=(9, 6))
-    g = sns.lineplot(data=g_data, x="timestamp", y="F", ax=ax1)
-    g.axvline(pd.to_datetime(date_event), color="yellow")
-    g.axhline(abs(np.log(p_event)), color="darkgreen")
-    # replace 360 below for non-Fleurus use with: `np.nanquantile(g_data["F"], [1]) + 10`
-    g.set_ylim(0, 360)
-    # below line specific to Fleurus
-    ax1.set_xlim([datetime(2004, 1, 1), datetime(2013, 12, 30)])
-    if noxticklabels:
-        ax1.set_xticklabels([])
-    ax1.set_ylabel("effect size (blue line, green line [event])")
-    ax1.text(pd.to_datetime(date_event), 3, "<-Event", color="red")
+        plt.close()
+        plt.rc("font", size=14)
+        # find common x-axis date range
+        min(g_data["timestamp"].dropna())
+        # Timestamp('2004-01-01 07:00:00')
+        # Timestamp('2004-01-01 07:00:00')
+        # Timestamp('2004-04-09 10:00:00')
+        max(g_data["timestamp"].dropna())
+        # Timestamp('2013-12-30 18:30:00')
+        # Timestamp('2012-12-23 07:00:00')
+        # Timestamp('2013-12-30 15:00:00')
+        _, ax1 = plt.subplots(figsize=(9, 6))
+        g = sns.lineplot(data=g_data, x="timestamp", y="F", ax=ax1)
+        g.axvline(pd.to_datetime(date_event), color="yellow")
+        g.axhline(abs(np.log(p_event)), color="darkgreen")
+        # replace 360 below for non-Fleurus use with: `np.nanquantile(g_data["F"], [1]) + 10`
+        g.set_ylim(0, 360)
+        # below line specific to Fleurus
+        ax1.set_xlim([datetime(2004, 1, 1), datetime(2013, 12, 30)])
+        if noxticklabels:
+            ax1.set_xticklabels([])
+        ax1.set_ylabel("effect size (blue line, green line [event])")
+        ax1.text(pd.to_datetime(date_event), 3, "<-Event", color="red")
 
-    ax2 = ax1.twinx()
-    g2 = sns.lineplot(
-        data=g_data, x="timestamp", y="wind_fraction", ax=ax2, color="black"
-    )
-    g2.set_ylim(-1, 1)
-    # below line specific to Fleurus
-    ax2.set_xlim([datetime(2004, 1, 1), datetime(2013, 12, 30)])
-    # g_data.iloc[int(event_index)]["p"]
-    if not no_false_positives:
-        [
-            g2.axvline(g_data[tt].iloc[i]["timestamp"], color="orange")
-            for i in range(g_data[tt].shape[0])
-        ]
-    # g_data[
-    #     (g_data["p"] > abs(np.log(p_event))).values and (g_data["test"] > 0.7).values
-    # ].shape
-    if noxticklabels:
-        ax2.set_xticklabels([])
-    ax2.set_ylabel("fraction wind towards (black line)")
-    plt.suptitle(
-        site
-        + "("
-        + ",".join(varpair)
-        + ")"
-        + r"$\alpha$"
-        + "="
-        + str(false_positive_rate),
-        y=0.85,
-        x=0.25,
-    )
-    ax1.set_xlabel("")
-    ax2.set_xlabel("")
-    # plt.show()
-    print(path_fig)
-    plt.savefig(path_fig)
+        ax2 = ax1.twinx()
+        g2 = sns.lineplot(
+            data=g_data, x="timestamp", y="wind_fraction", ax=ax2, color="black"
+        )
+        g2.set_ylim(-1, 1)
+        # below line specific to Fleurus
+        ax2.set_xlim([datetime(2004, 1, 1), datetime(2013, 12, 30)])
+        # g_data.iloc[int(event_index)]["p"]
+        if not no_false_positives:
+            [
+                g2.axvline(g_data[tt].iloc[i]["timestamp"], color="orange")
+                for i in range(g_data[tt].shape[0])
+            ]
+        # g_data[
+        #     (g_data["p"] > abs(np.log(p_event))).values and (g_data["test"] > 0.7).values
+        # ].shape
+        if noxticklabels:
+            ax2.set_xticklabels([])
+        ax2.set_ylabel("fraction wind towards (black line)")
+        plt.suptitle(
+            site
+            + "("
+            + ",".join(varpair)
+            + ")"
+            + r"$\alpha$"
+            + "="
+            + str(false_positive_rate),
+            y=0.85,
+            x=0.25,
+        )
+        ax1.set_xlabel("")
+        ax2.set_xlabel("")
+        # plt.show()
+        print(path_fig)
+        plt.savefig(path_fig)
 
-    # ---
+    # --- save logging info
     log_info = pd.DataFrame(
         {
             "date": str(datetime.now()),

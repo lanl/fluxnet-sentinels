@@ -7,3 +7,4 @@ n_days,10
 n_days,14
 event_quantile,0.5
 event_quantile,0.7
+event_quantile,0.9
