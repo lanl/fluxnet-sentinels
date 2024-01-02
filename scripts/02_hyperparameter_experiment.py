@@ -25,5 +25,5 @@ for i in range(res.shape[0]):
     subprocess.call(cmd, shell=True)
 
 log = pd.read_csv("data/log.csv", header=None)
-log_hyp = log.tail(hyp.shape[0])
+log_hyp = log.tail(res.shape[0])
 log_hyp.to_csv("data/log_hyperparameter.csv", header=False, index=False)
