@@ -47,6 +47,12 @@ figures/__rolling_fleurus_bebra_co2vta_10_7_0.9.pdf
 
 figures/__interaction_belon.pdf: figures/interaction.py
 	python $<
+
+data/log_hyperparameter.csv: scripts/02_hyperparameter_experiment.py
+	python $<
+
+figures/__hyperparameter_experiment.pdf: figures/hyperparameter_experiment.py data/log_hyperparameter.csv
+	python $<
  
 figures/all.pdf: figures/__rolling_grid_be-lon.pdf figures/__map.pdf figures/__footprint.pdf \
 	figures/__rolling_fleurus_bevie_co2vta_10_7_0.9.pdf \

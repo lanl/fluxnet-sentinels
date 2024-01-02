@@ -21,7 +21,7 @@ date_event = "2008-08-23"
 for i in range(res.shape[0]):
     # i = 0
     print(i)
-    cmd = f"python scripts/01_fit_rolling.py --site {site} --date_event {date_event} --path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance {int(res.iloc[i]['wind_tolerance'])} --n_days {int(res.iloc[i]['n_days'])} --event_quantile {res.iloc[i]['event_quantile']} --run_detailed --noplotting"
+    cmd = f"python scripts/01_fit_rolling.py --site {site} --date_event {date_event} --path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ --var_dep co2 --var_idep ta --bearing 235 --tolerance {int(res.iloc[i]['wind_tolerance'])} --n_days {int(res.iloc[i]['n_days'])} --event_quantile_effect {res.iloc[i]['event_quantile']}  --event_quantile_wind 0.7 --overwrite --run_detailed --noplotting"
     subprocess.call(cmd, shell=True)
 
 log = pd.read_csv("data/log.csv", header=None)
