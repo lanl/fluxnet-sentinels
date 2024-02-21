@@ -56,17 +56,20 @@ figures/__hyperparameter_experiment.pdf: figures/hyperparameter_experiment.py da
 	pdfcrop $@ $@
  
 figures/all.pdf: figures/__rolling_grid_be-lon.pdf figures/__map.pdf figures/__footprint.pdf \
-	figures/__rolling_fleurus_bevie_co2vta_10_7_0.9.pdf \
-	figures/__rolling_fleurus_bebra_co2vta_10_7_0.9.pdf \
-	figures/__rolling_fleurus_belon_co2vta_10_7_0.9.pdf \
-	figures/__interaction_belon.pdf \
-	tables/overview.pdf
+	figures/__rolling_fleurus.pdf figures/__interaction_belon.pdf tables/overview.pdf
 	pdftk $(wildcard figures/__*.pdf) output $@
 	pdftk $@ $(wildcard tables/*.pdf) output temp.pdf
 	sleep 2
 	cp temp.pdf $@
 	rm temp.pdf
-		
+
+data/grid_be-lon_7.csv data/grid_be-vie_7.csv data/grid_be-bra_7.csv &: figures/rolling_fig.py
+	python $<
+
+tables/grid_all.pdf: tables/grid_all.py data/grid_be-lon_7.csv data/grid_be-vie_7.csv data/grid_be-bra_7.csv
+	python $<
+
+figures/supplement.pdf: tables/grid_all.pdf
 
 # ---
 data/ameriflux_pnw.csv: scripts/00_get_ameriflux.R

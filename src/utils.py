@@ -87,3 +87,10 @@ def pdf_table(
             )
         except:
             pass
+
+
+def lower_to_mixed_case(x):
+    # x = "be-lon"
+    return "-".join(
+        [x.split("-", maxsplit=1)[0].upper(), x.split("-", maxsplit=1)[1].title()]
+    )
