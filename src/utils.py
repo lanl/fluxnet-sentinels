@@ -3,6 +3,8 @@ import tabulate
 import subprocess
 import pandas as pd
 
+tabulate.PRESERVE_WHITESPACE = True
+
 
 def amf_clean(dt_raw):
     """
@@ -38,13 +40,22 @@ def amf_clean(dt_raw):
 
 
 def pdf_table(
-    dt, title, path_pdf, headers=["Explanatory", "Regressor", "R2", r"Event Percentile"]
+    dt,
+    title,
+    path_pdf,
+    headers=["Explanatory", "Regressor", "R2", r"Event Percentile"],
+    maxcolwidths=None,
 ):
+    if maxcolwidths is None:
+        maxcolwidths = [None for _ in range(dt.shape[1])]
+
     mdtable = tabulate.tabulate(
         dt,
         headers=headers,
-        tablefmt="github",
+        tablefmt="grid",
+        maxcolwidths=maxcolwidths,
         showindex=False,
+        numalign="left",
     )
     with open("mdtable.md", "w") as f:
         f.write(mdtable)
@@ -70,7 +81,8 @@ def pdf_table(
     # )
 
     subprocess.call(
-        "pandoc mdtable.md -V fontsize=14pt -o " + path_pdf,
+        "pandoc --columns=10 mdtable.md -V fontsize=14pt -o " + path_pdf,
+        # + " --pdf-engine-opt=-shell-escape",
         shell=True,
     )
 
