@@ -9,12 +9,6 @@ figures/figures.pdf: figures/figures.Rmd
 	-mv figures2.pdf $@
 
 # ---
-figures/__rolling_heatmap.pdf: figures/rolling_fig.py
-	python $<
-
-figures/__rolling_grid_be-lon.pdf: figures/rolling_fig.py
-	python $<	
-
 figures/__map.pdf: figures/maps.R
 	Rscript $<
 

@@ -1,3 +1,5 @@
+"""This script is deprecated in favor of 01_fit_rolling and rolling.py"""
+
 import sys
 import janitor
 import tabulate
