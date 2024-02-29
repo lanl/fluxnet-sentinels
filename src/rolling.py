@@ -1,6 +1,7 @@
 """
     Utility functions for driving rolling analyses
 """
+
 import os
 import sys
 import pyproj
@@ -46,9 +47,9 @@ def p_interact(x, y, timestamp, n_before, n_during, n_after):
 def p_quantile(dt, dt_event, dep, indep, window_size=432):
     """
     1. Fit an interaction model for the event window.
-    2. Calculate a p-value for the model period interaction term (p_fl).
-    3. Roll over all possible windows calculating p-values as in step 2 (pdist_compilation).
-    4. Return p_fl and pdist_compilation
+    2. Calculate p and F values for the model period interaction term (p_fl, f_fl).
+    3. Roll over all possible windows calculating p and F values as in step 2 (p/fdist_compilation).
+    4. Return p/f_fl and p/fdist_compilation
     """
     # p_quantile(dt, dt_event, "co2", "ta") # ~ 0.14
     # p_quantile(dt, dt_event, "fc", "ws")
@@ -238,6 +239,7 @@ def grid_define_fquant(
     out_path="data/grid.csv",
     overwrite=False,
     window_size=432,
+    n_days=None,
 ):
     if not os.path.exists(out_path) or overwrite:
         print("Making: " + out_path)
@@ -261,6 +263,7 @@ def grid_define_fquant(
 
         grid["fquant"] = fquant
         grid = grid.sort_values("fquant")
+        grid["n_days"] = n_days
         grid.to_csv(out_path, index=False)
         return grid
 
@@ -393,6 +396,7 @@ def regression_grid(
         "data/grid_" + site_id + "_" + str(n_days) + ".csv",
         overwrite,
         window_size,
+        n_days,
     )
 
     grid = pd.read_csv("data/grid_" + site_id + "_" + str(n_days) + ".csv")

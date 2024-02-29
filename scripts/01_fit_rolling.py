@@ -1,6 +1,7 @@
 """
     Fitting a rolling interaction model first of all pairs then of a specified variable pair
 """
+
 # tolerance: the spread around the specified bearing indicating what counts as "towards"
 # n_days: the number of days to count as included in the event
 # event_quantile: how extreme within the event window do we count as an abnormal event?

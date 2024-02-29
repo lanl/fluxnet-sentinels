@@ -12,6 +12,10 @@ dt["site"] = utils.lower_to_mixed_case(flist[i].split("_")[1])
 dt = dt[dt["r2"] > 0].sort_values("r2", ascending=False)
 dt["fquant"] = dt["fquant"] * 100
 
+# NOTE
+# values here are different than the overview table because here they're relative to the POR
+# in the overview table they're limited to only during the event
+
 utils.pdf_table(
     dt,
     "",
