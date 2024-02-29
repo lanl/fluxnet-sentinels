@@ -63,12 +63,6 @@ figures/all.pdf: figures/__rolling_grid_be-lon.pdf figures/__map.pdf figures/__f
 	cp temp.pdf $@
 	rm temp.pdf
 
-data/grid_be-lon_7.csv data/grid_be-vie_7.csv data/grid_be-bra_7.csv &: figures/rolling_fig.py
-	python $<
-
-tables/grid_all.pdf: tables/grid_all.py data/grid_be-lon_7.csv data/grid_be-vie_7.csv data/grid_be-bra_7.csv
-	python $<
-
 figures/supplement.pdf: tables/grid_all.pdf
 
 # ---
@@ -89,6 +83,16 @@ figures/__map_fukushima.pdf: figures/fukushima.R data/ameriflux_pnw.csv
 
 # ---
 tables/overview.pdf: tables/overview.py
+	python $<
+
+# 01_fit_rolling -> rolling.regression_grid -> rolling.grid_define_fquant -> grid csv
+data/grid_be-lon_7.csv: figures/__rolling_fleurus_belon_co2vta_10_7_0.9.pdf
+
+data/grid_be-vie_7.csv: figures/__rolling_fleurus_bevie_co2vta_10_7_0.9.pdf
+
+data/grid_be-bra_7.csv: figures/__rolling_fleurus_bebra_co2vta_10_7_0.9.pdf
+
+tables/grid_all.pdf: tables/grid_all.py data/grid_be-lon_7.csv data/grid_be-vie_7.csv data/grid_be-bra_7.csv
 	python $<
 
 # ---
