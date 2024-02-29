@@ -26,11 +26,15 @@ make all
 
 ```shell
 ## "effect size"
-# p-value
-# quantile of p-value relative to other windows
-# abs(np.log(p-value))
+# interaction term F-value
+# quantile of F-value relative to other windows
 
-# TODO: makes much more sense to have it be a coefficient value?
+# raw comparison in the initial variable pair screening step:
+# stats.percentileofscore(fdist_compilation, f_fl, nan_policy="omit") / 100
+
+# in the event detection flagging step:
+# np.quantile(<fdist during event>, [event_quantile_effect]) -> event_effect
+# other events flagged if f >= event_effect
 ```
 
 ```shell
