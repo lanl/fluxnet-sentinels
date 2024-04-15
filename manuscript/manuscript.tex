@@ -1,0 +1,130 @@
+i\documentclass{article}
+
+\usepackage{arxiv}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{microtype}      % microtypography
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{doi}
+\usepackage{listings}
+\usepackage{lineno}
+\usepackage{setspace}
+
+\linenumbers
+
+\title{Eddy covariance towers as sentinels of abnormal radioactive material releases}
+
+%\date{September 9, 1985}	% Here you can change the date presented in the paper title
+\date{} 					% Or removing it
+
+\author{
+	\href{https://orcid.org/0000-0002-5924-2464}{\includegraphics[scale=0.06]{orcid.pdf}\hspace{1mm}Jemma Stachelek},
+	\href{https://orcid.org/0000}{\includegraphics[scale=0.06]{orcid.pdf}\hspace{1mm}
+	 Second Author},
+	\href{https://orcid.org/0000}{\includegraphics[scale=0.06]{orcid.pdf}\hspace{1mm}
+	 Third Author} \\
+	Earth and Environmental Sciences\\
+	Los Alamos National Laboratory\\
+	Los Alamos, NM, USA, 87544 \\
+	\texttt{jsta@lanl.gov} \\
+}
+
+% Uncomment to remove the date
+%\date{}
+
+% Uncomment to override  the `A preprint' in the header
+\renewcommand{\headeright}{\href{https://doi.org/}{DOI: 10.000/XXXXX}}
+\renewcommand{\undertitle}{This is a draft of a Manuscript in preparation for publication \href{https://doi.org/10.1000/XXXXX}{DOI: 10.1000/XXXXX}}
+\renewcommand{\shorttitle}{Eddy covariance towers and abnormal releases}
+
+%%% Add PDF metadata to help others organize their library
+%%% Once the PDF is generated, you can check the metadata with
+%%% $ pdfinfo template.pdf
+\hypersetup{
+pdftitle={Eddy covariance towers as sentinels of abnormal radioactive material releases},
+pdfsubject={stat.AP},
+pdfauthor={Jemma Stachelek}
+}
+
+\begin{document}
+\maketitle
+\doublespacing
+
+\section*{Abstract}	
+    Ensuring accurate detection and attribution of abnormal releases of radioactive material is critical for ensuring human health and safety. Most commonly, such detection is accomplished via active monitoring approaches involving the collection of physical samples. This is labor intensive and limits the temporal and spatial resolution of any detected events to a relatively coarse level. As an alternative, we developed a passive monitoring approach using eddy flux tower data records to identify signals from a known abnormal release and quantify the extent to which that signal also occurs at other times in the data record. We tested our approach relative to a known release in Belgium nominally occurring on August 23, 2008. With this approach, we identified several potential heretofore unidentified abnormal releases. We found that the occurrence of these releases was consistent with wind direction from the known release site to a given flux tower. We conclude that although eddy flux tower data records are a potentially rich target for these types of data mining efforts, geographic sparsity in tower locations as well as noisiness of the data streams may limit their usefulness to targeted constituents in relatively limited geographic regions.
+
+\section{Introduction}
+Detecting abnormal releases of radioactive material (hereafter simply “abnormal releases”) is important as a means of ensuring human health and industrial safety. The detection of such releases is typically accomplished using active approaches that require site-specific trace gas measurements \citep{carriganTraceGasEmissions1996} sometimes as a part of international monitoring networks (e.g., Sangiorgi et al. 2020). A potential shortcoming of these active monitoring approaches is that they require collection of physical samples (particulates, gasses, and other signal carriers) to retrospectively determine the nature of the release and the events that may have led up to it. Such active monitoring is thus labor intensive and limits the temporal and spatial resolution of any detected events to a relatively coarse level. 
+
+A potential alternative to active monitoring is passive monitoring (e.g., seismic monitoring for underground nuclear explosions, UNEs, Li et al. 2023). Although existing passive monitoring approaches are already critical components of abnormal release detection and tracking programs, diversification-of-approach may increase the programs' sensitivity and comprehensiveness. With a greater diversity of approaches, monitoring programs may be able to detect a wider array of constituents with differing characteristics. In the present study, we developed a novel passive monitoring approach to supplement existing programs that involves  the use of eddy flux tower data records to capture the signal from “known'' abnormal releases. We then use this signal to investigate the extent to which it also occurs at other times in the data record. We focused on eddy flux towers as they are a potential source of abnormal release “signatures,” are globally distributed, have been in near continuous operations for several decades, and can be relatively cheaply and easily deployed in locations of interest. Therefore, they constitute a rich target for data mining approaches aimed at identifying signatures resulting from direct interference of radioactive material with target measurements and/or the indirect signal of vegetation responses to the deposition of radioactive material.
+
+Our use of flux tower records for signal detection stands in contrast to their typical use for direct carbon balance accounting. Whereas carbon balance accounting activities deal directly in the units of the measured data for computing quantities like net ecosystem exchange (Baldocchi et al. 2018), our use treats each variable as a potential indirect signal of radioactive material deposition irrespective of its physical properties (e.g., mass, volume, etc). In this way, we are not directly measuring radioactive deposition but rather leveraging the fact that existing ecosystem monitoring records reflect vegetation photosynthesis rates and general stress condition of site vegetation. We specifically focused on short-term vegetation stress responses (on the order of days to weeks) to potential deposition of radioactive material rather than chronic long-term signals (on the order of years to decades). First, we tested the ability of various data mining techniques to recover the signal from the closest tower (approximately 18 km away) to a known release coming from a site in Belgium (hereafter called the known release location or the “facility”) nominally occurring on August 23, 2008. The release originated from waste tanks into the atmosphere at the Institut des Radioelements (IRE) and lasted for several days totaling 50 GBq 131I. Grass samples collected in the vicinity of the facility found radioactivity levels of 5000 Bq/kg (Carle et al. 2010). We used the signal identified during the known release to identify additional potential abnormal releases occurring at other times in the data record and at other nearby eddy flux towers. 
+
+
+\section{Methods}
+
+\subsection{Data Description}
+
+We gathered measurements from eddy covariance platforms (i.e., “towers”) located in Belgium, which are part of the ICOS (Integrated Carbon Observation System) network available through the European Fluxes Database (http://www.europe-fluxdata.eu/). Only three sites in proximity to the known release location had sufficient long-term data for our anticipated data mining efforts (BE-Lon, BE-Bra, and BE-Vie sites, Figure 1). Apart from standard content formatting (e.g., timestamps, dropping empty columns, etc.), we processed each data file by 1) excluding nighttime measurements based on photosynthetic photon flux density (PPFD) or net solar radiation (netrad) and 2) defining an “event period” based on the publicly known date of the abnormal release. We focused on the following potential data streams in the eddy covariance tower records where the following were treated as dependent “response” variables: carbon dioxide, carbon dioxide flux (fc), latent heat (le), and sensible heat flux (h). Conversely, the following were treated as independent explanatory variables: wind speed, precipitation, atmospheric pressure, relative humidity, photosynthetic photon flux density, air temperature, and net radiation. We also used wind direction data from the eddy flux towers to determine when or if any released material might plausibly reach a particular location. Each of these variables were typically recorded by the flux tower instrumentation at a 30 minute interval barring any gaps due to missing data.
+
+\subsection{Modeling approach}
+
+Our analysis screened pairwise relationships between the aforementioned independent and dependent variables starting using a linear regression fit between each pair for the entire period of record. We excluded variable pairs from further analysis if the overall coefficient of determination (R2) was less than 0.1. We determined from visual inspection that many of the rejected variable pairs appeared to have a nonlinear relationship. We then fit an interaction model of the following form where Y represents a continuous response (e.g., CO2, latent heat, etc.), X is an independent variable (e.g., air temperature, humidity, etc.), and W is a categorical variable representing the “period” of observation (i.e., during, before, or after, the event):
+
+% Y = 0+ 1X1 + B2W2+ 3X1W2
+
+We fit this interaction model for a “window” of time encompassing the known release event and for every other possible window in the period-of-record. We treated the overall length of the window as an adjustable hyperparameter because we lacked information on exactly how long an abnormal material release might take to reach the footprint of the eddy covariance tower. We also lacked information on how long deposited material might take to induce a vegetation response. In the default base case, we set the window length (n\_days) as 7 days but we ran hyperparameter experiments to determine the effect of setting it to longer lengths of 10 and 14 days. We compared the “effect size” of the interaction term (B3) during the event-encompassing window against all other windows in a “rolling” analysis. Therefore, the overall analysis compares the interaction term of the window of the known event (August 23, 2008) against a window centered on every other observation. We “flagged” specific windows that had an effect size at least as large as that of the known event and with wind conditions at least as “towards” the flux tower as the event as “event detections”. We report the frequency of these event detections as “false positives”.
+
+To accomplish this flagging of event detections (i.e., false positives), we defined several adjustable hyperparameters to deal with uncertainty surrounding atmospheric transport and the timing of any vegetation responses to material deposition. The first hyperparameter we defined, wind\_tolerance, reflects the range around the bearing from the facility to the tower location which counts as towards the tower. In the base case, we set wind\_tolerance to 10 degrees but we explored setting it to smaller values down to 5 degrees and larger values up to 20 degrees. The second hyperparameter we defined, event\_quantile\_effect, is an attempt to deal with the fact that we don't know the travel time of any materials to be deposited via an abnormal release or what if any delays exist between deposition and vegetation response. Rather than selecting the maximum value of B3 during a given window or simply the value at the exact time of the event, we set the value of event\_quantile\_effect to correspond with a specific quantile of all B3 values during the event window. In the base default case, this was set at 0.9 but we explored values as low as 0.5. All statistical analyses were carried out using the statsmodels Python package (Seabold and Perktold, 2009). Our processing scripts are openly available at [doi link], we refer readers to the original providers for data access.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=9cm]{../figures/__map}
+	\caption{Map of the three closest Fluxnet tower sites to the Fleurus release location. Note that BE-Lon and BE-Vie are of a similar easterly direction to the site whereas BE-Bra is of an entirely different northerly direction.}
+	\label{fig:study_site}
+\end{figure}
+
+\section{Results}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=11cm]{../figures/__interaction_belon}
+	\caption{Interaction plots at the BE-Lon site between air temperature (ta) and CO2 (co2) for the period of the known abnormal release (A) and an arbitrary non-release period (B). Also shown is the distribution of all interaction effect sizes (gray) compared with the effect size of the time period shown in the corresponding left panels (orange, C, D).}
+	\label{fig:interaction}
+\end{figure}
+
+
+\begin{figure}
+	\centering
+	\includegraphics[width=8cm]{../figures/__rolling_fleurus}
+	\caption{Time series plots of rolling event detection analysis for the CO2 and air temperature (ta) variable pair. Panel labels indicate the name of the site, the variable pair (in parentheses), and the false positive rate (a). Event detection lines (orange), interaction effect size (blue), and event effect size (green) correspond to the left vertical axis. Fraction that the wind direction was towards the particular tower (black) corresponds to the right vertical axis.}
+	\label{fig:rolling}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=12cm]{../figures/__hyperparameter_experiment}
+	\caption{Sensitivity of false event detection to different hyperparameter values.}
+	\label{fig:hyperparameter}
+\end{figure}
+
+\section{Discussion}
+
+\section{Data Availability Statement}
+
+All data and code associated with this manuscript will be made available by the time of publication (or earlier pending the conclusion of US Department of Energy approvals) with a Zenodo DOI at: \href{https://doi.org}{https://doi.org}
+
+\section{Acknowledgements}
+
+This are Acknowledgements
+
+\bibliographystyle{jsta}
+\bibliography{fluxnet}
+
+\end{document}
