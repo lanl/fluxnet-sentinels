@@ -10,6 +10,8 @@ from matplotlib.lines import Line2D
 sys.path.append(".")
 from src import rolling
 
+plt.rcParams["text.usetex"] = True
+
 
 def hue_regplot(data, x, y, hue, palette=None, **kwargs):
     """
@@ -91,6 +93,7 @@ legend_elements = [
     Line2D([0], [0], color=colors[2], lw=4, label="After"),
 ]
 ax1.legend(handles=legend_elements, loc="upper right")
+ax1.set_ylabel("$CO_2$ (ppm)")
 ax1.set_title("A.", pad=0, x=0.07, y=0.9)
 #
 gg2 = sns.histplot(
@@ -110,6 +113,7 @@ ts_start = timestamps[
 ]
 dt_event_weak = rolling.define_period(dt_select, n_days=n_days, date_event=ts_start)
 gg3 = hue_regplot(data=dt_event_weak, x="ta", y="co2", hue="period", ax=ax3, ci=None)
+ax1.set_ylabel("$CO_2$ (ppm)")
 ax3.set_title("B.", pad=0, x=0.07, y=0.9)
 #
 # stats.percentileofscore(pfdist["fdist"], fevent["fevent"], nan_policy="omit") / 100
