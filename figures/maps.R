@@ -54,7 +54,8 @@ gg_euro_overview <- ggmap(gg_map) +
   geom_text(
     data = m1_data, aes(x = X, y = Y, label = site_code),
     vjust = 0,
-    hjust = 0
+    hjust = 0,
+    size = 6
   )
 # gg_euro_overview
 
@@ -62,10 +63,10 @@ dt_sub <- dplyr::filter(m1_data, site_code == "BE-Lon")
 gg_euro_belon <- get_gg_sub(dt_sub)
 
 dt_sub <- dplyr::filter(m1_data, site_code == "BE-Vie")
-gg_euro_bevie <- get_gg_sub(dt_sub)
+gg_euro_bevie <- get_gg_sub(dt_sub, label_color = "white")
 
 dt_sub <- dplyr::filter(m1_data, site_code == "BE-Bra")
-gg_euro_bebra <- get_gg_sub(dt_sub)
+gg_euro_bebra <- get_gg_sub(dt_sub, label_color = "white")
 
 gg <- cowplot::plot_grid(gg_euro_overview, gg_euro_bebra, gg_euro_belon, gg_euro_bevie)
 ggsave("figures/__map.pdf", gg)

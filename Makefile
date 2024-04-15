@@ -36,7 +36,7 @@ figures/__rolling_fleurus_bevie_co2vta_10_7_0.9.pdf: scripts/01_fit_rolling.py .
 figures/__rolling_fleurus.pdf: figures/__rolling_fleurus_belon_co2vta_10_7_0.9.pdf \
 figures/__rolling_fleurus_bevie_co2vta_10_7_0.9.pdf \
 figures/__rolling_fleurus_bebra_co2vta_10_7_0.9.pdf
-	pdfjam $^ --nup 1x3 --outfile $@
+	pdfjam --no-tidy $^ --nup 1x3 --outfile $@
 	pdfcrop $@ $@
 
 figures/__interaction_belon.pdf: figures/interaction.py
@@ -92,7 +92,7 @@ tables/grid_all.pdf: tables/grid_all.py data/grid_be-lon_7.csv data/grid_be-vie_
 # ---
 manuscript: manuscript/manuscript.pdf
 
-manuscript/manuscript.pdf: manuscript/manuscript.tex
+manuscript/manuscript.pdf: manuscript/manuscript.tex figures/all.pdf
 	cd manuscript && pdflatex manuscript.tex
 	cd manuscript && bibtex manuscript
 	cd manuscript && bibtex manuscript
