@@ -107,13 +107,20 @@ gg2.axvline(fevent["fevent"].values[0], color="orange")
 ax2.set_xlabel("Effect size")
 ax2.set_title("C.", pad=0, x=0.07, y=0.9)
 #
-timestamps = [x for x in pfdist["timestamp"]]
-ts_start = timestamps[
-    int(np.where([x == np.nanmin(pfdist["fdist"]) for x in pfdist["fdist"]])[0][0])
-]
+
+# limit ts_start to the same month as date_event
+pfdist["month"] = [x.month for x in pd.to_datetime(pfdist["timestamp"])]
+# avoid 2009 because of missing data
+pfdist["year"] = [x.year for x in pd.to_datetime(pfdist["timestamp"])]
+pfdist_temp = pfdist[pfdist["year"] != 2009]
+pfdist_temp = pfdist_temp[pfdist_temp["year"] != 2008]
+pfdist_temp = pfdist_temp.sort_values("fdist", ascending=True)
+pfdist_temp = pfdist_temp[pfdist_temp["month"] == pd.to_datetime(date_event).month]
+ts_start = pfdist_temp["timestamp"].iloc[[0]].values[0]
+
 dt_event_weak = rolling.define_period(dt_select, n_days=n_days, date_event=ts_start)
 gg3 = hue_regplot(data=dt_event_weak, x="ta", y="co2", hue="period", ax=ax3, ci=None)
-ax1.set_ylabel("$CO_2$ (ppm)")
+ax3.set_ylabel("$CO_2$ (ppm)")
 ax3.set_title("B.", pad=0, x=0.07, y=0.9)
 #
 # stats.percentileofscore(pfdist["fdist"], fevent["fevent"], nan_policy="omit") / 100
