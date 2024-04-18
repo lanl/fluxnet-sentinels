@@ -37,7 +37,8 @@ amf_clean <- function(fpath) {
   base1
 }
 
-get_gg_sub <- function(dt_sub, buffer_x = 0.02, buffer_y = 0.02, label_color = "black") {
+get_gg_sub <- function(dt_sub, buffer_x = 0.02, buffer_y = 0.02, label_color = "black",
+    vjust = 0, hjust = 0) {
   bbox_sub <- c(left   = dt_sub$X - buffer_x,
     bottom = dt_sub$Y - buffer_y,
     right  = dt_sub$X + buffer_x,
@@ -54,8 +55,8 @@ get_gg_sub <- function(dt_sub, buffer_x = 0.02, buffer_y = 0.02, label_color = "
       fill = "red",
       alpha = .8) +
     geom_text(aes(x = X, y = Y, label = site_code), data = dt_sub,
-      vjust = 0,
-      hjust = 0,
+      vjust = vjust,
+      hjust = hjust,
       size = 6,
       color = label_color)
   res

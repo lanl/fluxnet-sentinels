@@ -47,14 +47,12 @@ gg_map <- get_map(location = bbox,
 gg_euro_overview <- ggmap(gg_map) +
   geom_point(
     data = m1_data, aes(x = X, y = Y),
-    vjust = 0,
-    hjust = 0,
     color = I("red")
   ) +
   geom_text(
     data = m1_data, aes(x = X, y = Y, label = site_code),
-    vjust = 0,
-    hjust = 0,
+    vjust = -0.1,
+    hjust = 0.3,
     size = 6
   )
 # gg_euro_overview
