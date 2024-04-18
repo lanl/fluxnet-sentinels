@@ -19,6 +19,10 @@ dt = dt.drop(["date", "site"], axis=1)
 dt = dt[["false_positive_rate", "wind_tolerance", "n_days", "event_quantile_effect"]]
 dt = dt.melt(id_vars="false_positive_rate")
 
-sns.set(font_scale=1.5)
-sns.lmplot(x="value", y="false_positive_rate", col="variable", sharex=False, data=dt)
+sns.set_theme(font_scale=1.5, style="ticks", palette=["black"])
+ax = sns.lmplot(
+    x="value", y="false_positive_rate", col="variable", sharex=False, data=dt
+)
+ax.set_xlabels("")
+ax.set_ylabels("False event detection")
 plt.savefig("figures/__hyperparameter_experiment.pdf")

@@ -50,7 +50,8 @@ figures/__hyperparameter_experiment.pdf: figures/hyperparameter_experiment.py da
 	pdfcrop $@ $@
  
 figures/all.pdf: figures/__rolling_grid_be-lon.pdf figures/__map.pdf figures/__footprint.pdf \
-	figures/__rolling_fleurus.pdf figures/__interaction_belon.pdf tables/overview.pdf
+	figures/__rolling_fleurus.pdf figures/__interaction_belon.pdf tables/overview.pdf \
+	figures/__hyperparameter_experiment.pdf
 	pdftk $(wildcard figures/__*.pdf) output $@
 	pdftk $@ $(wildcard tables/*.pdf) output temp.pdf
 	sleep 2
