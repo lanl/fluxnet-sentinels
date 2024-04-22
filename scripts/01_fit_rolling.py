@@ -278,7 +278,7 @@ def fit_rolling(
             + "="
             + str(false_positive_rate),
             y=0.85,
-            x=0.25,
+            x=0.27,
         )
         ax1.set_xlabel("")
         ax2.set_xlabel("")
