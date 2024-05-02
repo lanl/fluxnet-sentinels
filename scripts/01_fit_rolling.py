@@ -237,26 +237,33 @@ def fit_rolling(
         # Timestamp('2013-12-30 18:30:00')
         # Timestamp('2012-12-23 07:00:00')
         # Timestamp('2013-12-30 15:00:00')
+
+        # g_data["timestamp"] = g_data["timestamp"].replace({np.nan: None})
+
         _, ax1 = plt.subplots(figsize=(9, 6))
         g = sns.lineplot(data=g_data, x="timestamp", y="F", ax=ax1)
         g.axvline(pd.to_datetime(date_event), color="yellow")
-        g.axhline(abs(np.log(p_event)), color="darkgreen")
+        g.axhline(abs(np.log(p_event)), color="black", ls="--")
         # replace 360 below for non-Fleurus use with: `np.nanquantile(g_data["F"], [1]) + 10`
         g.set_ylim(0, 360)
         # below line specific to Fleurus
-        ax1.set_xlim([datetime(2004, 1, 1), datetime(2013, 12, 30)])
+        ax1.set_xlim([datetime(2004, 1, 1), datetime(2013, 2, 1)])
         if noxticklabels:
-            ax1.set_xticklabels([])
-        ax1.set_ylabel("effect size (blue line, green line [event])")
-        ax1.text(pd.to_datetime(date_event), 3, "<-Event", color="red")
+            plt.xticks(color="white")
+            # ax1.set_xticklabels([])
+            print(None)
+        ax1.set_ylabel("effect size (blue line, dashed black line [event])")
+        ax1.text(pd.to_datetime(date_event), 15, "<-Event", color="black")
 
         ax2 = ax1.twinx()
         g2 = sns.lineplot(
             data=g_data, x="timestamp", y="wind_fraction", ax=ax2, color="black"
         )
         g2.set_ylim(-1, 1)
+        g2.set_yticks([0, 0.2, 0.4])
+
         # below line specific to Fleurus
-        ax2.set_xlim([datetime(2004, 1, 1), datetime(2013, 12, 30)])
+        ax2.set_xlim([datetime(2004, 1, 1), datetime(2013, 2, 1)])
         # g_data.iloc[int(event_index)]["p"]
         if not no_false_positives:
             [
@@ -267,7 +274,9 @@ def fit_rolling(
         #     (g_data["p"] > abs(np.log(p_event))).values and (g_data["test"] > 0.7).values
         # ].shape
         if noxticklabels:
-            ax2.set_xticklabels([])
+            # ax2.set_xticklabels([])
+            # ax2.xaxis.label.set_color("white")
+            plt.xticks(color="white")
         ax2.set_ylabel("fraction wind towards (black line)")
         plt.suptitle(
             site
