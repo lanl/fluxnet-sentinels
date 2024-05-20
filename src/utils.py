@@ -56,7 +56,8 @@ def pdf_table(
             tablefmt="grid",
             # maxcolwidths=maxcolwidths,
             showindex=False,
-            numalign="left",
+            numalign="right",
+            # colalign="center",
         )
         with open("mdtable.md", "w") as f:
             f.write(mdtable)

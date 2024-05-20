@@ -51,14 +51,14 @@ utils.pdf_table(
     dt,
     "",
     "tables/overview.pdf",
-    [
+    headers=[
         "Site",
-        "R2",
+        "$$R^2$$",
         "Effect",
-        "Wind(%)",
+        "Wind(t%)",
         "Days(n)",
         "Wind(tol)",
         "Effect(q)",
     ],
-    [18, 8, 8, 8, 8, 8, 8],
+    # max_colwidths=[18, 8, 8, 8, 8, 8, 8],
 )
