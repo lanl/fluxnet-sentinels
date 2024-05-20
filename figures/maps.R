@@ -5,7 +5,7 @@ coords_ire <- sf::st_as_sf(
   data.frame(lat = 50.45055, lon = 4.5350415),
   coords = c("lon", "lat"), crs = 4326
 )
-coords_ire$site_code <- "Fleurus"
+coords_ire$site_code <- "IRE"
 if (!file.exists("data/fleurus.gpkg")) {
   sf::st_write(coords_ire, "data/fleurus.gpkg", append = FALSE)
 }
@@ -30,7 +30,7 @@ m1_data <- cbind(m1_data, st_coordinates(m1_data))
 m1_data <- sf::st_drop_geometry(dplyr::select(m1_data, X, Y, site_code))
 m1_data <- dplyr::filter(
   m1_data,
-  site_code %in% c("BE-Lon", "BE-Vie", "BE-Bra", "Fleurus")
+  site_code %in% c("BE-Lon", "BE-Vie", "BE-Bra", "IRE")
 )
 
 print(m1_data)
