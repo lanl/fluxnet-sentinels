@@ -17,7 +17,8 @@ dt_sites <- read.csv(
   # dplyr::mutate_all(na_if, "") %>%
   st_as_sf(coords = c("site_longitude", "site_latitude"), crs = 4326)
 
-dt_sites$dist <- unlist(list(unlist(st_distance(coords_ire, dt_sites)))) / 1609.34
+dt_sites$dist <- unlist(list(unlist(
+  st_distance(coords_ire, dt_sites)))) / 1609.34 # m to miles
 dt_sites_close <- dt_sites[dt_sites$dist < 100, ] %>%
   dplyr::arrange(dist)
 sf::st_write(dt_sites_close, "dt_sites_close.gpkg", append = FALSE)
@@ -27,11 +28,14 @@ sf::st_write(dt_sites_close, "dt_sites_close.gpkg", append = FALSE)
 
 m1_data <- dplyr::bind_rows(dt_sites_close, coords_ire)
 m1_data <- cbind(m1_data, st_coordinates(m1_data))
-m1_data <- sf::st_drop_geometry(dplyr::select(m1_data, X, Y, site_code))
 m1_data <- dplyr::filter(
   m1_data,
   site_code %in% c("BE-Lon", "BE-Vie", "BE-Bra", "IRE")
 )
+m1_data <- dplyr::mutate(m1_data, dist = dist * 1.60934)  # mi to km
+m1_data <- sf::st_drop_geometry(
+  dplyr::select(m1_data, X, Y, site_code, dist))
+
 
 print(m1_data)
 buffer_x <- 0.5
