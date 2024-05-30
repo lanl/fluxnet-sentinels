@@ -204,6 +204,8 @@ def define_period(dt_select, date_event="2008-08-23", n_days=10):
     dt_select = dt_select.copy()
     dt_select["period"] = None
 
+    # during is always 2 days
+    # before and after are +/- 1 days +/- n_days
     dt_select.loc[
         (dt_select["timestamp_end"] < pd.to_datetime(date_event) - timedelta(days=1))
         & (
