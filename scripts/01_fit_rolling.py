@@ -243,7 +243,8 @@ def fit_rolling(
         _, ax1 = plt.subplots(figsize=(9, 6))
         g = sns.lineplot(data=g_data, x="timestamp", y="F", ax=ax1)
         g.axvline(pd.to_datetime(date_event), color="yellow")
-        g.axhline(abs(np.log(p_event)), color="black", ls="--")
+        # TODO: write a line for f_event below not p_event
+        g.axhline(event_effect, color="black", ls="--")
         # replace 360 below for non-Fleurus use with: `np.nanquantile(g_data["F"], [1]) + 10`
         g.set_ylim(0, 360)
         # below line specific to Fleurus
