@@ -35,7 +35,8 @@ get_sites <- function(lat, lon, site_tag, distance_threshold = 100) {
   m1_data
 }
 
-generate_overview <- function(sites, site_codes) {
+generate_overview <- function(sites, site_codes, buffer_x = 0.5, buffer_y = 0.2,
+    nudge_x = 0.3, nudge_y = -0.1, label_color = "black") {
   # site_codes <- c("BE-Lon", "BE-Vie", "BE-Bra", "IRE")
   # label_colors = c("black", "white", "white")
 
@@ -45,8 +46,7 @@ generate_overview <- function(sites, site_codes) {
     dplyr::select(m1_data, X, Y, site_code, dist))
 
   print(m1_data)
-  buffer_x <- 0.5
-  buffer_y <- 0.2
+  print(buffer_x)
   bbox <- c(left   = min(m1_data$X) - buffer_x,
     bottom = min(m1_data$Y) - buffer_y,
     right  = max(m1_data$X) + buffer_x,
@@ -62,9 +62,10 @@ generate_overview <- function(sites, site_codes) {
     ) +
     geom_text(
       data = m1_data, aes(x = X, y = Y, label = site_code),
-      vjust = -0.1,
-      hjust = 0.3,
-      size = 6
+      vjust = nudge_y,
+      hjust = nudge_x,
+      size = 6,
+      color = label_color
     )
   list(gg_overview = gg_overview, m1_data = m1_data)
 }
@@ -83,11 +84,12 @@ dt_sub <- dplyr::filter(m1_data, site_code == "BE-Bra")
 gg_euro_bebra <- get_gg_sub(dt_sub, label_color = "white")
 
 gg <- cowplot::plot_grid(gg_overview, gg_euro_bebra, gg_euro_belon, gg_euro_bevie)
-ggsave("figures/__map.pdf", gg)
+ggsave("figures/__map_fleurus.pdf", gg)
 
 # --- fukushima
-sites <- get_sites(37.423056, 141.033056, "fukushima", 190)
-overview <- generate_overview(sites, c("JP-FHK", "fukushima"))
+sites <- get_sites(37.423056, 141.033056, "Fukushima", 190)
+overview <- generate_overview(sites, c("JP-FHK", "Fukushima"),
+  nudge_x = 0.6, label_color = "red", buffer_x = 0.7)
 gg_overview <- overview$gg_overview
 m1_data <- overview$m1_data
 
@@ -95,4 +97,16 @@ dt_sub <- dplyr::filter(m1_data, site_code == "JP-FHK")
 gg_jp_fhk <- get_gg_sub(dt_sub, label_color = "white")
 
 gg <- cowplot::plot_grid(gg_overview, gg_jp_fhk)
-ggsave("figures/test.pdf", gg)
+ggsave("figures/__map_fukushima.pdf", gg)
+
+# ---
+sites <- get_sites(45.8205, -121.9519, "US-Wrc", 190)
+overview <- generate_overview(sites, c("US-Wrc"), buffer_x = 3, buffer_y = 2.5)
+gg_overview <- overview$gg_overview
+m1_data <- overview$m1_data
+
+dt_sub <- dplyr::filter(m1_data, site_code == "US-Wrc" & !is.na(dist))
+gg_us_wrc <- get_gg_sub(dt_sub, label_color = "white")
+
+gg <- cowplot::plot_grid(gg_overview, gg_us_wrc)
+ggsave("figures/__map_wrc.pdf", gg)
