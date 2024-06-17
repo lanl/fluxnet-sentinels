@@ -314,10 +314,17 @@ def within_bearing(wd, within_bearing_args={"bearing": 20, "tolerance": 10}):
         if pd.isna(x):
             return False
 
-        if lower < upper:
-            return (x <= upper) and (x >= lower)
-        else:
-            return (x <= upper) or (x >= lower)
+        if isinstance(x, str):
+            print(x)
+            return False
+
+        try:
+            if lower < upper:
+                return (x <= upper) and (x >= lower)
+            else:
+                return (x <= upper) or (x >= lower)
+        except:
+            breakpoint()  # debug error
 
     is_within = [_compute(x, upper, lower) for x in wd]
     res = round(sum(is_within) / len(is_within), 3)

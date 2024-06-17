@@ -27,6 +27,7 @@ import pandas as pd
 import seaborn as sns
 from datetime import datetime
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
 
 sys.path.append(".")
@@ -53,6 +54,9 @@ from src import rolling
 @click.option("--no_false_positives", is_flag=True, default=False)
 @click.option("--noxticklabels", is_flag=True, default=False)
 @click.option("--noplotting", is_flag=True, default=False)
+@click.option("--panel_ylim", type=int, default=360)
+@click.option("--panel_start_year", type=int, default=2004)
+@click.option("--panel_end_year", type=int, default=2013)
 def fit_rolling(
     site,
     date_event,
@@ -73,6 +77,9 @@ def fit_rolling(
     no_false_positives=False,
     noxticklabels=False,
     noplotting=False,
+    panel_ylim=360,
+    panel_start_year=2004,
+    panel_end_year=2013,
 ):
     # --- setup
     dep_cols = ["co2", "fc", "le", "h", "co"]
@@ -243,12 +250,10 @@ def fit_rolling(
         _, ax1 = plt.subplots(figsize=(9, 6))
         g = sns.lineplot(data=g_data, x="timestamp", y="F", ax=ax1)
         g.axvline(pd.to_datetime(date_event), color="yellow")
-        # TODO: write a line for f_event below not p_event
         g.axhline(event_effect, color="black", ls="--")
-        # replace 360 below for non-Fleurus use with: `np.nanquantile(g_data["F"], [1]) + 10`
-        g.set_ylim(0, 360)
-        # below line specific to Fleurus
-        ax1.set_xlim([datetime(2004, 1, 1), datetime(2013, 2, 1)])
+        g.set_ylim(0, panel_ylim)
+        ax1.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+        ax1.set_xlim([datetime(panel_start_year, 1, 1), datetime(panel_end_year, 2, 1)])
         if noxticklabels:
             plt.xticks(color="white")
             # ax1.set_xticklabels([])
@@ -263,8 +268,7 @@ def fit_rolling(
         g2.set_ylim(-1, 1)
         g2.set_yticks([0, 0.2, 0.4])
 
-        # below line specific to Fleurus
-        ax2.set_xlim([datetime(2004, 1, 1), datetime(2013, 2, 1)])
+        ax2.set_xlim([datetime(panel_start_year, 1, 1), datetime(panel_end_year, 2, 1)])
         # g_data.iloc[int(event_index)]["p"]
         if not no_false_positives:
             [
