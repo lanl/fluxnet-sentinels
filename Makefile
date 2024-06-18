@@ -29,13 +29,13 @@ figures/__rolling_fukushima_jpfhk_levrh_10_7_0.9.pdf: scripts/01_fit_rolling.py 
 	python $< --site JP-FHK --date_event 2011-03-11 \
 		--path_in ../../Data/Asiaflux/FHK.csv --path_out figures/__rolling_fukushima_ \
 		--var_dep le --var_idep rh \
-		--bearing 225 --tolerance 10 --n_days 7 --event_quantile_wind 0.7 --event_quantile_effect 0.9 --run_detailed --overwrite --panel_start_year 2010 --panel_end_year 2013 --panel_ylim 60 --uses_letters
+		--bearing 225 --tolerance 45 --n_days 7 --event_quantile_wind 0.7 --event_quantile_effect 0.9 --run_detailed --overwrite --panel_start_year 2010 --panel_end_year 2013 --panel_ylim 60 --uses_letters
 
 figures/__rolling_fukushima_uswrc_levrh_10_7_0.9.pdf: scripts/01_fit_rolling.py ../../Data/Ameriflux/US-Wrc.csv
 	python $< --site US-Wrc --date_event 2011-03-11 \
 		--path_in ../../Data/Ameriflux/US-Wrc.csv --path_out figures/__rolling_fukushima_ \
 		--var_dep le --var_idep rh \
-		--bearing 285 --tolerance 10 --n_days 7 --event_quantile_wind 0.7 --event_quantile_effect 0.9 --run_detailed --overwrite --panel_start_year 2010 --panel_end_year 2013 --panel_ylim 180
+		--bearing 285 --tolerance 45 --n_days 7 --event_quantile_wind 0.7 --event_quantile_effect 0.9 --run_detailed --overwrite --panel_start_year 2010 --panel_end_year 2013 --panel_ylim 60
 
 figures/__rolling_fleurus_belon_co2vta_10_7_0.9.pdf: scripts/01_fit_rolling.py ../../Data/Euroflux/BELon.csv
 	python $< --site BE-Lon --date_event 2008-08-23 \
