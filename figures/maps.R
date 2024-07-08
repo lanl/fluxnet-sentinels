@@ -1,40 +1,6 @@
 library(ggmap) # install_github("stadiamaps/ggmap")
 source("scripts/99_utils.R")
 
-get_sites <- function(lat, lon, site_tag, distance_threshold = 100) {
-  coords <- sf::st_as_sf(
-    data.frame(lat = lat, lon = lon),
-    coords = c("lon", "lat"), crs = 4326
-  )
-  coords$site_code <- site_tag
-
-  out_file <- paste0("data/", site_tag, ".gpkg")
-  if (!file.exists(out_file)) {
-    sf::st_write(coords, out_file, append = FALSE)
-  }
-
-  dt_sites <- read.csv(
-    system.file("extdata", "Site_metadata.csv", package = "FluxnetLSM")
-  ) %>%
-    clean_names() %>%
-    # dplyr::mutate_all(na_if, "") %>%
-    st_as_sf(coords = c("site_longitude", "site_latitude"), crs = 4326)
-
-  dt_sites$dist <- unlist(list(unlist(
-    st_distance(coords, dt_sites)))) / 1609.34 # m to miles
-  dt_sites_close <- dt_sites[dt_sites$dist < distance_threshold, ] %>%
-    dplyr::arrange(dist)
-  sf::st_write(dt_sites_close,
-    paste0("dt_sites_close", site_tag, ".gpkg"), append = FALSE)
-
-  # head(dplyr::select(dt_sites_close, site_code, dist))
-  # st_coordinates(dt_sites_close[1,])
-
-  m1_data <- dplyr::bind_rows(dt_sites_close, coords)
-  m1_data <- cbind(m1_data, st_coordinates(m1_data))
-  m1_data
-}
-
 generate_overview <- function(sites, site_codes, buffer_x = 0.5, buffer_y = 0.2,
     nudge_x = 0.3, nudge_y = -0.1, label_color = "black") {
   # site_codes <- c("BE-Lon", "BE-Vie", "BE-Bra", "IRE")
