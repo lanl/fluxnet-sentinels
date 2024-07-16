@@ -2,6 +2,7 @@ source("scripts/99_utils.R")
 
 site <- amf_site_info()
 
+# --- West Coast US
 site_filtered <- site %>%
   clean_names() %>%
   dplyr::filter(data_start < 2011, data_end > 2012) %>%
@@ -57,3 +58,6 @@ write.csv(res_out, "data/ameriflux_pnw.csv", row.names = FALSE)
 # library(ggplot2)
 # ggplot(data = base1) +
 # geom_point(aes(x = timestamp, y = co2, color = year))
+
+# --- Australia
+get_sites(-33.867778, 151.21, "test")
