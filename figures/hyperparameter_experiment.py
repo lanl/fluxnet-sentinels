@@ -21,7 +21,13 @@ dt = dt.melt(id_vars="false_positive_rate")
 
 sns.set_theme(font_scale=1.5, style="ticks", palette=["black"])
 ax = sns.lmplot(
-    x="value", y="false_positive_rate", col="variable", sharex=False, data=dt
+    x="value",
+    y="false_positive_rate",
+    col="variable",
+    sharex=False,
+    data=dt,
+    x_jitter=0.01,
+    y_jitter=0.01,
 )
 ax.set_xlabels("")
 ax.set_ylabels("Event detection rate")
