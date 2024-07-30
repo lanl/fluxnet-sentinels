@@ -28,7 +28,7 @@ figures/__footprint.pdf: figures/footprint.py
 ../../Data/Ameriflux/US-Wrc.csv: scripts/00_get_ameriflux.R
 	Rscript $<
 
- ../../Data/ozflux/dargo.csv: scripts/00_get_ozflux.R
+ ../../Data/ozflux/mulga.csv: scripts/00_get_ozflux.R
 	Rscript $<
 
 figures/__rolling_fukushima_jpfhk_levrh_10_7_0.9.pdf: scripts/01_fit_rolling.py ../../Data/Asiaflux/FHK.csv
