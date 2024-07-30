@@ -60,4 +60,9 @@ write.csv(res_out, "data/ameriflux_pnw.csv", row.names = FALSE)
 # geom_point(aes(x = timestamp, y = co2, color = year))
 
 # --- Australia
-get_sites(-33.867778, 151.21, "test")
+# dt <- get_sites(-33.867778, 151.21, "test")
+
+# --- Brazil
+test <- site[substring(site$SITE_ID, 0, 1) == "B", ]
+test <- test[test$DATA_POLICY == "CCBY4.0", ]
+# Brazil data doesn't span the required period :(

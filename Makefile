@@ -25,6 +25,12 @@ figures/__footprint.pdf: figures/footprint.py
 ../../Data/Asiaflux/FHK.csv: scripts/00_get_japanflux.py
 	python $<
 
+../../Data/Ameriflux/US-Wrc.csv: scripts/00_get_ameriflux.R
+	Rscript $<
+
+ ../../Data/ozflux/dargo.csv: scripts/00_get_ozflux.R
+	Rscript $<
+
 figures/__rolling_fukushima_jpfhk_levrh_10_7_0.9.pdf: scripts/01_fit_rolling.py ../../Data/Asiaflux/FHK.csv
 	python $< --site JP-FHK --date_event 2011-03-11 \
 		--path_in ../../Data/Asiaflux/FHK.csv --path_out figures/__rolling_fukushima_ \

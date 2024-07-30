@@ -13,6 +13,7 @@ eddypro-metadata_be-lon.md
 figures/*.db
 .smbdelete*
 *.pptx
+*.nc
 
 manuscript/*.log
 manuscript/*.aux
