@@ -43,6 +43,12 @@ figures/__rolling_fukushima_uswrc_levrh_10_7_0.9.pdf: scripts/01_fit_rolling.py 
 		--var_dep le --var_idep rh \
 		--bearing 285 --tolerance 45 --n_days 7 --event_quantile_wind 0.7 --event_quantile_effect 0.9 --run_detailed --overwrite --panel_start_year 2010 --panel_end_year 2013 --panel_ylim 60
 
+figures/__rolling_fukushima_mulga_levrh_10_7_0.9.pdf: scripts/01_fit_rolling.py ../../Data/ozflux/mulga.csv
+	python $< --site mulga --date_event 2011-03-11 \
+		--path_in ../../Data/ozflux/mulga.csv --path_out figures/__rolling_fukushima_ \
+		--var_dep le --var_idep rh \
+		--bearing 355 --tolerance 45 --n_days 7 --event_quantile_wind 0.7 --event_quantile_effect 0.9 --run_detailed --overwrite --panel_start_year 2010 --panel_end_year 2013 --panel_ylim 60
+
 figures/__rolling_fleurus_belon_co2vta_10_7_0.9.pdf: scripts/01_fit_rolling.py ../../Data/Euroflux/BELon.csv
 	python $< --site BE-Lon --date_event 2008-08-23 \
 		--path_in ../../Data/Euroflux/BELon.csv --path_out figures/__rolling_fleurus_ \
