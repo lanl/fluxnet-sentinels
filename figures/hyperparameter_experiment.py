@@ -2,6 +2,13 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+
+def set_labels(fig, i, xlab):
+    a1 = fig.axes[i]
+    a1.set_title("")
+    a1.set_xlabel(xlab)
+
+
 dt = pd.read_csv("data/log_hyperparameter.csv", header=None)
 colnames = [
     "date",
@@ -26,9 +33,13 @@ ax = sns.lmplot(
     col="variable",
     sharex=False,
     data=dt,
-    x_jitter=0.01,
-    y_jitter=0.01,
+    y_jitter=0.003,
 )
-ax.set_xlabels("")
+
+fig = ax.fig
+xlabs = ["Wind tolerance", "Days (n)", "Effect Quantile"]
+[set_labels(fig, i, xlabs[i]) for i in range(len(fig.axes))]
+
+# ax.set_xlabels("")
 ax.set_ylabels("Event detection rate")
 plt.savefig("figures/__hyperparameter_experiment.pdf")
