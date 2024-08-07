@@ -52,7 +52,7 @@ from src import rolling
 @click.option("--run_detailed", is_flag=True, default=False)
 @click.option("--overwrite", is_flag=True, default=False)
 @click.option("--no_false_positives", is_flag=True, default=False)
-@click.option("--noxticklabels", is_flag=True, default=False)
+@click.option("--noyticklabels", is_flag=True, default=False)
 @click.option("--noplotting", is_flag=True, default=False)
 @click.option("--panel_ylim", type=int, default=360)
 @click.option("--panel_start_year", type=int, default=2004)
@@ -75,7 +75,7 @@ def fit_rolling(
     event_effect=None,
     event_wind=None,
     no_false_positives=False,
-    noxticklabels=False,
+    noyticklabels=False,
     noplotting=False,
     panel_ylim=360,
     panel_start_year=2004,
@@ -234,7 +234,7 @@ def fit_rolling(
         plt.savefig("figures/__" + varpair_code + site_code + "_hist.pdf")
 
         plt.close()
-        plt.rc("font", size=14)
+        plt.rc("font", size=16)
         # find common x-axis date range
         min(g_data["timestamp"].dropna())
         # Timestamp('2004-01-01 07:00:00')
@@ -247,30 +247,44 @@ def fit_rolling(
 
         # g_data["timestamp"] = g_data["timestamp"].replace({np.nan: None})
 
-        _, ax1 = plt.subplots(figsize=(9, 6))
+        _, axs = plt.subplots(figsize=(9, 6), nrows=2)
+        ax1 = axs[0]
+        ax2 = axs[1]
+
         g = sns.lineplot(data=g_data, x="timestamp", y="F", ax=ax1)
         g.axvline(pd.to_datetime(date_event), color="yellow")
         g.axhline(event_effect, color="black", ls="--")
         g.set_ylim(0, panel_ylim)
-        ax1.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+        # ax1.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
         ax1.set_xlim([datetime(panel_start_year, 1, 1), datetime(panel_end_year, 2, 1)])
-        if noxticklabels:
-            plt.xticks(color="white")
-            # ax1.set_xticklabels([])
-            print(None)
-        ax1.set_ylabel("effect size (blue line, dashed black line [event])")
-        ax1.text(pd.to_datetime(date_event), 15, "<-Event", color="black")
+        if noyticklabels:
+            plt.yticks(color="white")
+            ax1.set_yticklabels([])
+            ax1.yaxis.label.set_color("white")
 
-        ax2 = ax1.twinx()
+        ax1.set_xticklabels([])
+        ax1.set_ylabel("effect size")
+        ax1.text(
+            pd.to_datetime(date_event),
+            panel_ylim - (panel_ylim / 6),
+            "<-Event",
+            color="black",
+        )
+
+        # ax2 = ax1.twinx()
         g2 = sns.lineplot(
             data=g_data, x="timestamp", y="wind_fraction", ax=ax2, color="black"
         )
-        g2.set_ylim(-1, 1)
+        g2.set_ylim(0, 0.5)
         g2.set_yticks([0, 0.2, 0.4])
 
         ax2.set_xlim([datetime(panel_start_year, 1, 1), datetime(panel_end_year, 2, 1)])
         # g_data.iloc[int(event_index)]["p"]
         if not no_false_positives:
+            [
+                g.axvline(g_data[tt].iloc[i]["timestamp"], color="orange")
+                for i in range(g_data[tt].shape[0])
+            ]
             [
                 g2.axvline(g_data[tt].iloc[i]["timestamp"], color="orange")
                 for i in range(g_data[tt].shape[0])
@@ -278,26 +292,29 @@ def fit_rolling(
         # g_data[
         #     (g_data["p"] > abs(np.log(p_event))).values and (g_data["test"] > 0.7).values
         # ].shape
-        if noxticklabels:
-            # ax2.set_xticklabels([])
-            # ax2.xaxis.label.set_color("white")
-            plt.xticks(color="white")
-        ax2.set_ylabel("fraction wind towards (black line)")
+        if noyticklabels:
+            ax2.set_yticklabels([])
+            ax2.yaxis.label.set_color("white")
+            plt.yticks(color="white")
+        ax2.set_ylabel("fraction wind towards")
+        ax2.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
         plt.suptitle(
-            site
-            + "("
-            + ",".join(varpair)
-            + ")"
-            + r"$\alpha$"
-            + "="
-            + str(false_positive_rate),
-            y=0.85,
-            x=0.27,
+            site,
+            # + "("
+            # + ",".join(varpair)
+            # + ")"
+            # + r"$\alpha$"
+            # + "="
+            # + str(false_positive_rate),
+            y=0.87,
+            x=0.175,
         )
         ax1.set_xlabel("")
         ax2.set_xlabel("")
         # plt.show()
         print(path_fig)
+        plt.subplots_adjust(hspace=0.1)
+        # plt.subplots_adjust(bottom=0, right=0.02, left=0, top=0.02)
         plt.savefig(path_fig)
 
     # --- save logging info
