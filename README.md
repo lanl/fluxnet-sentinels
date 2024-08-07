@@ -19,6 +19,7 @@ mamba env create -f environment.yml
 ### Usage
 
 ```shell
+mamba activate fluxnet
 make all
 ```
 
