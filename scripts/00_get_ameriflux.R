@@ -1,18 +1,5 @@
 source("scripts/99_utils.R")
 
-site <- amf_site_info()
-
-# --- West Coast US
-site_filtered <- site %>%
-  clean_names() %>%
-  dplyr::filter(data_start < 2011, data_end > 2012) %>%
-  dplyr::filter(location_lat > 42, location_lat < 48.9,
-    location_long < -116.9, location_long > -124.5) %>%
-  dplyr::filter(data_policy == "CCBY4.0") %>%
-  dplyr::filter(data_start < 2002)
-
-head(site_filtered)
-
 check_site <- function(site_id) {
   # site_id <- "US-Uaf"
   print(site_id)
@@ -38,6 +25,10 @@ check_site <- function(site_id) {
   outpath <- paste0("../../data/ameriflux/", site_id, ".csv")
   write.csv(base1, outpath, row.names = FALSE)
 
+  # library(ggplot2)
+  # ggplot(data = base1) +
+  # geom_point(aes(x = timestamp, y = co2, color = year))
+
   res <- base1 %>%
     dplyr::filter(year == 2011, month == 3) %>%
     dplyr::filter(!is.na(fc)) %>%
@@ -47,6 +38,18 @@ check_site <- function(site_id) {
   data.frame(covers_fukushima = res, path = outpath)
 }
 
+site <- amf_site_info()
+
+# --- West Coast US
+site_filtered <- site %>%
+  clean_names() %>%
+  dplyr::filter(data_start < 2011, data_end > 2012) %>%
+  dplyr::filter(location_lat > 42, location_lat < 48.9,
+    location_long < -116.9, location_long > -124.5) %>%
+  dplyr::filter(data_policy == "CCBY4.0") %>%
+  dplyr::filter(data_start < 2002)
+
+head(site_filtered)
 res <- lapply(site_filtered$site_id, check_site)
 
 covers_fukushima <- as.logical(unlist(lapply(res, function(x) x[1])))
@@ -54,10 +57,6 @@ res_out <- site_filtered[covers_fukushima, ]
 res_out$path <- as.character(unlist(lapply(res, function(x) x[2])))[covers_fukushima]
 
 write.csv(res_out, "data/ameriflux_pnw.csv", row.names = FALSE)
-
-# library(ggplot2)
-# ggplot(data = base1) +
-# geom_point(aes(x = timestamp, y = co2, color = year))
 
 # --- Australia
 # dt <- get_sites(-33.867778, 151.21, "test")
