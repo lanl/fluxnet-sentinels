@@ -247,7 +247,7 @@ def fit_rolling(
 
         # g_data["timestamp"] = g_data["timestamp"].replace({np.nan: None})
 
-        _, axs = plt.subplots(figsize=(9, 6), nrows=2)
+        _, axs = plt.subplots(figsize=(4, 6), nrows=2)
         ax1 = axs[0]
         ax2 = axs[1]
 
@@ -297,7 +297,9 @@ def fit_rolling(
             ax2.yaxis.label.set_color("white")
             plt.yticks(color="white")
         ax2.set_ylabel("fraction wind towards")
-        ax2.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+        ax2.xaxis.set_major_locator(mdates.YearLocator())
+        # ax2.tick_params(axis="x", labelrotation=90)
+        ax2.xaxis.set_major_formatter(mdates.DateFormatter("%y"))
         plt.suptitle(
             site,
             # + "("
@@ -307,7 +309,7 @@ def fit_rolling(
             # + "="
             # + str(false_positive_rate),
             y=0.87,
-            x=0.18,
+            x=0.25,
         )
         ax1.set_xlabel("")
         ax2.set_xlabel("")
