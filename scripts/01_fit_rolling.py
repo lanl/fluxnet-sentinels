@@ -275,8 +275,8 @@ def fit_rolling(
         g2 = sns.lineplot(
             data=g_data, x="timestamp", y="wind_fraction", ax=ax2, color="black"
         )
-        g2.set_ylim(0, 0.5)
-        g2.set_yticks([0, 0.2, 0.4])
+        g2.set_ylim(0, 1)
+        g2.set_yticks([0, 0.2, 0.4, 0.6, 0.8])
 
         ax2.set_xlim([datetime(panel_start_year, 1, 1), datetime(panel_end_year, 2, 1)])
         # g_data.iloc[int(event_index)]["p"]
@@ -307,7 +307,7 @@ def fit_rolling(
             # + "="
             # + str(false_positive_rate),
             y=0.87,
-            x=0.175,
+            x=0.18,
         )
         ax1.set_xlabel("")
         ax2.set_xlabel("")

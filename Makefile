@@ -37,13 +37,19 @@ figures/__rolling_fukushima_jpfhk_levrh_10_7_0.9.pdf: scripts/01_fit_rolling.py 
 		--var_dep le --var_idep rh \
 		--bearing 225 --tolerance 45 --n_days 7 --event_quantile_wind 0.7 --event_quantile_effect 0.9 --run_detailed --overwrite --panel_start_year 2010 --panel_end_year 2013 --panel_ylim 60 --uses_letters
 
-figures/__rolling_fukushima_uswrc_levrh_10_7_0.9.pdf: scripts/01_fit_rolling.py ../../Data/Ameriflux/US-Wrc.csv
+figures/__rolling_fukushima_uswrc_levrh_45_7_0.9.pdf: scripts/01_fit_rolling.py ../../Data/Ameriflux/US-Wrc.csv
 	python $< --site US-Wrc --date_event 2011-03-11 \
 		--path_in ../../Data/Ameriflux/US-Wrc.csv --path_out figures/__rolling_fukushima_ \
 		--var_dep le --var_idep rh \
 		--bearing 285 --tolerance 45 --n_days 7 --event_quantile_wind 0.7 --event_quantile_effect 0.9 --run_detailed --overwrite --panel_start_year 2010 --panel_end_year 2013 --panel_ylim 60
 
-figures/__rolling_fukushima_mulga_levrh_10_7_0.9.pdf: scripts/01_fit_rolling.py ../../Data/ozflux/mulga.csv
+figures/__rolling_fukushima_usgle_levrh_45_7_0.9.pdf: scripts/01_fit_rolling.py ../../Data/Ameriflux/US-GLE.csv
+	python $< --site US-GLE --date_event 2011-03-11 \
+		--path_in ../../Data/Ameriflux/US-GLE.csv --path_out figures/__rolling_fukushima_ \
+		--var_dep le --var_idep rh \
+		--bearing 285 --tolerance 45 --n_days 7 --event_quantile_wind 0.7 --event_quantile_effect 0.9 --run_detailed --overwrite --panel_start_year 2010 --panel_end_year 2013 --panel_ylim 60
+
+figures/__rolling_fukushima_mulga_levrh_45_7_0.9.pdf: scripts/01_fit_rolling.py ../../Data/ozflux/mulga.csv
 	python $< --site mulga --date_event 2011-03-11 \
 		--path_in ../../Data/ozflux/mulga.csv --path_out figures/__rolling_fukushima_ \
 		--var_dep le --var_idep rh \

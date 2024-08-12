@@ -50,18 +50,26 @@ site_filtered <- site %>%
   dplyr::filter(data_start < 2002)
 
 head(site_filtered)
-res <- lapply(site_filtered$site_id, check_site)
+if (!file.exists("../../Data/Ameriflux/US-Wrc.csv")) {
+  res <- lapply(site_filtered$site_id, check_site)
 
-covers_fukushima <- as.logical(unlist(lapply(res, function(x) x[1])))
-res_out <- site_filtered[covers_fukushima, ]
-res_out$path <- as.character(unlist(lapply(res, function(x) x[2])))[covers_fukushima]
+  covers_fukushima <- as.logical(unlist(lapply(res, function(x) x[1])))
+  res_out <- site_filtered[covers_fukushima, ]
+  res_out$path <- as.character(unlist(lapply(res, function(x) x[2])))[covers_fukushima]
 
-write.csv(res_out, "data/ameriflux_pnw.csv", row.names = FALSE)
+  write.csv(res_out, "data/ameriflux_pnw.csv", row.names = FALSE)
+}
+
+# --- Interior US
+if (!file.exists("../../Data/Ameriflux/US-GLE.csv")) {
+  dt <- get_sites(41.298056, -106.1375, "test")
+  res <- check_site("US-GLE")
+}
 
 # --- Australia
 # dt <- get_sites(-33.867778, 151.21, "test")
 
 # --- Brazil
-test <- site[substring(site$SITE_ID, 0, 1) == "B", ]
-test <- test[test$DATA_POLICY == "CCBY4.0", ]
+# test <- site[substring(site$SITE_ID, 0, 1) == "B", ]
+# test <- test[test$DATA_POLICY == "CCBY4.0", ]
 # Brazil data doesn't span the required period :(
