@@ -58,6 +58,8 @@ from src import rolling
 @click.option("--panel_start_year", type=int, default=2004)
 @click.option("--panel_end_year", type=int, default=2013)
 @click.option("--wind_ylim", type=float, default=1.0)
+@click.option("--mask_start", type=str, default=None)
+@click.option("--mask_end", type=str, default=None)
 def fit_rolling(
     site,
     date_event,
@@ -82,6 +84,8 @@ def fit_rolling(
     panel_start_year=2004,
     panel_end_year=2013,
     wind_ylim=1,
+    mask_start="2009-01-01",
+    mask_end="2010-01-01",
 ):
     # --- setup
     dep_cols = ["co2", "fc", "le", "h", "co"]
@@ -203,6 +207,28 @@ def fit_rolling(
         }
     )
     g_data["timestamp"] = pd.to_datetime(g_data["timestamp"])
+    # fill-in missing timestamps
+    nonnat_ts = g_data["timestamp"][~np.isnat(g_data["timestamp"].values)]
+    full_ts = pd.to_datetime(
+        np.arange(
+            min(nonnat_ts),
+            max(nonnat_ts),
+            np.timedelta64(30, "m"),
+            dtype="datetime64[m]",
+        )
+    )
+    missing_ts = list(set(full_ts) - set(g_data["timestamp"]))
+    g_data_missing_ts = pd.DataFrame(
+        {
+            "timestamp": missing_ts,
+            "index": pd.NA,
+            "p": pd.NA,
+            "wind_fraction": pd.NA,
+            "F": pd.NA,
+        }
+    )
+    g_data = pd.concat([g_data, g_data_missing_ts], ignore_index=True)
+
     if event_wind is None:
         event_wind = np.quantile(
             [
@@ -286,6 +312,40 @@ def fit_rolling(
 
         ax2.set_xlim([datetime(panel_start_year, 1, 1), datetime(panel_end_year, 2, 1)])
         # g_data.iloc[int(event_index)]["p"]
+
+        # mask out missing data with white bars
+        if mask_start is not None and mask_end is not None:
+            # mask_start = pd.to_datetime("2009-02-01")
+            # mask_end = pd.to_datetime("2009-12-01")
+            missing_mask = [
+                x and y
+                for x, y in zip(
+                    g_data["timestamp"] > mask_start, g_data["timestamp"] < mask_end
+                )
+            ]
+            # missing_mask = [
+            #     x and y and w and p
+            #     for x, y, w, p in zip(
+            #         pd.isna(g_data["F"]),
+            #         pd.isna(g_data["wind_fraction"]),
+            #         ~np.isnat(g_data["timestamp"]),
+            #         [
+            #             abs(round(x, 0)) >= 3
+            #             for x in np.random.normal(0, 1, g_data.shape[0])
+            #         ],
+            #     )
+            # ]
+            # g_data.iloc[np.where(missing_mask)].sort_values("timestamp")
+            # sum(missing_mask)
+            [
+                g.axvline(g_data[missing_mask].iloc[i]["timestamp"], color="white")
+                for i in range(g_data[missing_mask].shape[0])
+            ]
+            [
+                g2.axvline(g_data[missing_mask].iloc[i]["timestamp"], color="white")
+                for i in range(g_data[missing_mask].shape[0])
+            ]
+
         if not no_false_positives:
             [
                 g.axvline(g_data[tt].iloc[i]["timestamp"], color="orange")
