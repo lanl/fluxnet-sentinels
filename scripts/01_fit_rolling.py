@@ -57,6 +57,7 @@ from src import rolling
 @click.option("--panel_ylim", type=int, default=360)
 @click.option("--panel_start_year", type=int, default=2004)
 @click.option("--panel_end_year", type=int, default=2013)
+@click.option("--wind_ylim", type=float, default=1.0)
 def fit_rolling(
     site,
     date_event,
@@ -80,6 +81,7 @@ def fit_rolling(
     panel_ylim=360,
     panel_start_year=2004,
     panel_end_year=2013,
+    wind_ylim=1,
 ):
     # --- setup
     dep_cols = ["co2", "fc", "le", "h", "co"]
@@ -275,8 +277,12 @@ def fit_rolling(
         g2 = sns.lineplot(
             data=g_data, x="timestamp", y="wind_fraction", ax=ax2, color="black"
         )
-        g2.set_ylim(0, 1)
-        g2.set_yticks([0, 0.2, 0.4, 0.6, 0.8])
+        g2.set_ylim(0, wind_ylim)
+        y_tick_range = [0, 0.2, 0.4, 0.6, 0.8]
+        y_tick_range = list(
+            itertools.compress(y_tick_range, [x <= wind_ylim for x in y_tick_range])
+        )
+        g2.set_yticks(y_tick_range)
 
         ax2.set_xlim([datetime(panel_start_year, 1, 1), datetime(panel_end_year, 2, 1)])
         # g_data.iloc[int(event_index)]["p"]
@@ -317,7 +323,7 @@ def fit_rolling(
         print(path_fig)
         plt.subplots_adjust(hspace=0.1)
         # plt.subplots_adjust(bottom=0, right=0.02, left=0, top=0.02)
-        plt.savefig(path_fig)
+        plt.savefig(path_fig, bbox_inches="tight")
 
     # --- save logging info
     log_info = pd.DataFrame(
