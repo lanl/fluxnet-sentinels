@@ -52,7 +52,7 @@ gg_euro_bebra <- get_gg_sub(dt_sub, label_color = "white")
 gg <- cowplot::plot_grid(gg_overview, gg_euro_bebra, gg_euro_belon, gg_euro_bevie)
 ggsave("figures/__map_fleurus.pdf", gg)
 
-# --- fukushima
+# --- jp-fhk
 sites <- get_sites(37.423056, 141.033056, "Fukushima", 190)
 overview <- generate_overview(sites, c("JP-FHK", "Fukushima"),
   nudge_x = 0.6, label_color = "red", buffer_x = 0.7)
@@ -63,9 +63,9 @@ dt_sub <- dplyr::filter(m1_data, site_code == "JP-FHK")
 gg_jp_fhk <- get_gg_sub(dt_sub, label_color = "white")
 
 gg <- cowplot::plot_grid(gg_overview, gg_jp_fhk)
-ggsave("figures/__map_fukushima.pdf", gg)
+ggsave("figures/__map_fhk.pdf", gg)
 
-# ---
+# --- us-wrc
 sites <- get_sites(45.8205, -121.9519, "US-Wrc", 190)
 overview <- generate_overview(sites, c("US-Wrc"), buffer_x = 3, buffer_y = 2.5)
 gg_overview <- overview$gg_overview
@@ -76,3 +76,46 @@ gg_us_wrc <- get_gg_sub(dt_sub, label_color = "white")
 
 gg <- cowplot::plot_grid(gg_overview, gg_us_wrc)
 ggsave("figures/__map_wrc.pdf", gg)
+
+# -- us-gle
+sites <- get_sites(41.3665, -106.2399, "US-Gle", 190)
+overview <- generate_overview(sites, c("US-Gle"), buffer_x = 3, buffer_y = 2.5)
+gg_overview <- overview$gg_overview
+m1_data <- overview$m1_data
+
+dt_sub <- dplyr::filter(m1_data, site_code == "US-Gle" & is.na(dist))
+gg_us_gle <- get_gg_sub(dt_sub, label_color = "white")
+
+gg <- cowplot::plot_grid(gg_overview, gg_us_gle)
+ggsave("figures/__map_gle.pdf", gg)
+
+# -- oz-mul
+sites <- get_sites(-22.2828, 133.2493, "OZ-Mul", 190)
+overview <- generate_overview(sites, c("OZ-Mul"), buffer_x = 3, buffer_y = 2.5)
+gg_overview <- overview$gg_overview
+m1_data <- overview$m1_data
+
+dt_sub <- dplyr::filter(m1_data, site_code == "OZ-Mul" & is.na(dist))
+gg_oz_mul <- get_gg_sub(dt_sub, label_color = "white")
+
+gg <- cowplot::plot_grid(gg_overview, gg_oz_mul)
+ggsave("figures/__map_mul.pdf", gg)
+
+# --- fukushima
+crsrobin <- "+proj=robin +lon_0=-180 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
+
+dt_fuku_df <- data.frame(
+  site_code = c("Fukushima", "US-Wrc", "US-Gle", "OZ-Mul"),
+  lat = c(37.423056, 45.8205, 41.3665, -22.2828),
+  lon = c(141.033056, -121.9519, -106.2399, 133.2493))
+dt_fuku <- st_transform(st_as_sf(dt_fuku_df, coords = c("lon", "lat"), crs = 4326), crs = crsrobin)
+dt_fuku_df <- cbind(dt_fuku_df, st_coordinates(dt_fuku))
+
+world <- ne_countries(scale = "medium", returnclass = "sf")
+gg <- ggplot(data = st_transform(st_break_antimeridian(world, lon_0 = 180), crs = crsrobin)) +
+  geom_sf() +
+  geom_sf(data = dt_fuku) +
+  geom_text(data = dt_fuku_df, aes(x = X, y = Y, label = site_code),
+    color = "darkblue", fontface = "bold", check_overlap = FALSE) +
+  theme_bw()
+ggsave("test.pdf", gg)
