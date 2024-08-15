@@ -1,6 +1,6 @@
 .PHONY: test clean manuscript
 
-all: figures/all.pdf
+all: figures/all.pdf manuscript
 
 # ---
 figures/figures.pdf: figures/figures.Rmd
@@ -132,7 +132,7 @@ tables/grid_all.pdf: tables/grid_all.py data/grid_be-lon_7.csv data/grid_be-vie_
 # ---
 manuscript: manuscript/manuscript.pdf
 
-manuscript/manuscript.pdf: manuscript/manuscript.tex figures/all.pdf
+manuscript/manuscript.pdf: manuscript/manuscript.tex figures/all.pdf manuscript/fluxnet.bib
 	cd manuscript && pdflatex manuscript.tex
 	cd manuscript && bibtex manuscript
 	cd manuscript && bibtex manuscript
