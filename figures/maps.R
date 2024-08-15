@@ -102,6 +102,7 @@ gg <- cowplot::plot_grid(gg_overview, gg_oz_mul)
 ggsave("figures/__map_mul.pdf", gg)
 
 # --- fukushima
+# https://r-spatial.org/r/2018/10/25/ggplot2-sf.html
 crsrobin <- "+proj=robin +lon_0=-180 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
 
 dt_fuku_df <- data.frame(
@@ -111,11 +112,15 @@ dt_fuku_df <- data.frame(
 dt_fuku <- st_transform(st_as_sf(dt_fuku_df, coords = c("lon", "lat"), crs = 4326), crs = crsrobin)
 dt_fuku_df <- cbind(dt_fuku_df, st_coordinates(dt_fuku))
 
+library(rnaturalearth)
 world <- ne_countries(scale = "medium", returnclass = "sf")
-gg <- ggplot(data = st_transform(st_break_antimeridian(world, lon_0 = 180), crs = crsrobin)) +
+gg_overview <- ggplot(data = st_transform(st_break_antimeridian(world, lon_0 = 180), crs = crsrobin)) +
   geom_sf() +
   geom_sf(data = dt_fuku) +
-  geom_text(data = dt_fuku_df, aes(x = X, y = Y, label = site_code),
+  geom_text(data = dt_fuku_df, aes(x = X, y = Y * 1.06, label = site_code),
     color = "darkblue", fontface = "bold", check_overlap = FALSE) +
-  theme_bw()
-ggsave("test.pdf", gg)
+  coord_sf(xlim = c(-4320952 * 1.3, 6376465  * 1.2), ylim = c(-2383193 * 1.3, 4891261 * 1.3), expand = FALSE) +
+  theme_bw() +
+  theme(axis.title = element_blank())
+gg <- cowplot::plot_grid(gg_overview, gg_us_wrc, gg_oz_mul, gg_us_gle)
+ggsave("figures/__map_fukushima.pdf", gg)

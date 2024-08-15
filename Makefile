@@ -9,14 +9,13 @@ figures/figures.pdf: figures/figures.Rmd
 	-mv figures2.pdf $@
 
 # ---
-figures/__map_fleurus.pdf figures/__map_fukushima.pdf figures/__map_wrc.pdf: figures/maps.R
+figures/__map_fleurus.pdf figures/__map_fukushima.pdf: figures/maps.R
 	Rscript $<
 	pdfcrop figures/__map_fleurus.pdf figures/__map_fleurus.pdf
 	pdfcrop figures/__map_fukushima.pdf figures/__map_fukushima.pdf
-	pdfcrop figures/__map_wrc.pdf figures/__map_wrc.pdf
 
-figures/__map.pdf: figures/__map_fleurus.pdf figures/__map_fukushima.pdf figures/__map_wrc.pdf
-	pdfjam --no-tidy $^ --nup 1x1 --outfile $@
+figures/__map.pdf: figures/__map_fleurus.pdf figures/__map_fukushima.pdf
+	pdfjam --no-tidy $^ --nup 2x1 --outfile $@
 	pdfcrop $@ $@
 
 figures/__footprint.pdf: figures/footprint.py
