@@ -137,7 +137,7 @@ gg4.axvline(np.nanmin(pfdist["fdist"]), color="orange")
 ax4.set_xlabel("Effect size")
 ax4.set_title("D.", pad=0, x=0.07, y=0.9)
 #
-plt.suptitle("BE-Lon\nlog(" + var_dep + ") ~ " + var_idep + " * period")
+# plt.suptitle("BE-Lon\nlog(" + var_dep + ") ~ " + var_idep + " * period")
 plt.tight_layout()
 # plt.show()
 plt.savefig("figures/__interaction_belon.pdf", bbox_inches="tight", pad_inches=0.1)
