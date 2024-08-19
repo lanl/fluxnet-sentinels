@@ -1,6 +1,14 @@
-## Fluxnet signatures
+## Eddy covariance towers as sentinels of abnormal radioactive material releases
+
+[![Paper DOI](https://img.shields.io/badge/Paper-DOI-blue.svg)](https://doi.org) [![Code DOI](https://img.shields.io/badge/Code-DOI-blue.svg)](https://doi.org) [![Data DOI](https://img.shields.io/badge/Data-DOI-blue.svg)](https://doi.org)
+
+Code for the publication:
+
+> Stachelek J., Vachel A. Kraklow, E. Christi Thompson, L. Turin Dickman, Emily Casleton, Sanna Sevanto, Ann Junghans. _In-prep_. Eddy covariance towers as sentinels of abnormal radioactive material releases.
 
 ### Products
+
+[manuscript/manuscript.pdf](manuscript/manuscript.pdf)
 
 [figures/all.pdf](figures/all.pdf)
 
