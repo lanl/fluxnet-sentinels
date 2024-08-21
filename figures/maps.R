@@ -49,7 +49,8 @@ gg_euro_bevie <- get_gg_sub(dt_sub, label_color = "white")
 dt_sub <- dplyr::filter(m1_data, site_code == "BE-Bra")
 gg_euro_bebra <- get_gg_sub(dt_sub, label_color = "white")
 
-gg <- cowplot::plot_grid(gg_overview, gg_euro_bebra, gg_euro_belon, gg_euro_bevie)
+gg <- cowplot::plot_grid(gg_overview, gg_euro_bebra, gg_euro_belon, gg_euro_bevie) +
+  cowplot::panel_border(color = "black", size = 1.5)
 ggsave("figures/__map_fleurus.pdf", gg)
 
 # --- jp-fhk
@@ -116,16 +117,34 @@ dt_fuku_df <- cbind(dt_fuku_df, st_coordinates(dt_fuku))
 
 library(rnaturalearth)
 world <- ne_countries(scale = "medium", returnclass = "sf")
+xmin <- -4320952
+xmax <- 6376465
+ymin <- -2383193 * 1.12
+ymax <- 4891261 * 1.12
+arrow_y <- ((xmin + xmax) / 2) + abs(ymin - ymax) * 0.32
+arrow_x_end <- ((xmin + xmax) / 2) + abs(xmin - xmax) * 0.16
 gg_overview <- ggplot(
   data = st_transform(st_break_antimeridian(world, lon_0 = 180), crs = crsrobin)) +
   geom_sf() +
-  geom_sf(data = dt_fuku) +
+  geom_sf(data = dt_fuku, color = "red") +
   geom_text(data = dt_fuku_df, aes(x = X, y = Y * 1.06, label = site_code),
-    color = "darkblue", fontface = "bold", check_overlap = FALSE) +
+    check_overlap = FALSE) +
   coord_sf(
-    xlim = c(-4320952 * 1.3, 6376465  * 1.2),
-    ylim = c(-2383193 * 1.3, 4891261 * 1.3), expand = FALSE) +
-  theme_bw() +
-  theme(axis.title = element_blank())
-gg <- cowplot::plot_grid(gg_overview, gg_us_wrc, gg_oz_mul, gg_us_gle)
+    xlim = c(xmin * 1.2, xmax  * 1.1),
+    ylim = c(ymin * 1.3, ymax * 1.3), expand = TRUE) +
+  annotate("text", x = (2 + arrow_x_end) / 2, y = arrow_y - abs(ymin - ymax) * 0.1,
+    label = "Plume direction", size = 5) +
+  geom_segment(lineend = "butt", linejoin = "mitre", linewidth = 1.5,
+    arrow = arrow(length = unit(0.2, "inches")),
+    aes(x = 2, y = arrow_y,
+      xend = arrow_x_end, yend = arrow_y)) +
+  theme_minimal() +
+  xlab("lon") + ylab("lat") +
+  theme(
+    # axis.title = element_blank(),
+    axis.ticks = element_line(color = "black"))
+ggsave("test.pdf", gg_overview)
+
+gg <- cowplot::plot_grid(gg_overview, gg_us_wrc, gg_oz_mul, gg_us_gle) +
+  cowplot::panel_border(color = "black", size = 1.5)
 ggsave("figures/__map_fukushima.pdf", gg)
