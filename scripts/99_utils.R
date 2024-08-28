@@ -48,6 +48,17 @@ get_gg_sub <- function(dt_sub, buffer_x = 0.02, buffer_y = 0.02, label_color = "
   gg_map <- get_googlemap(center = c(lon = dt_sub$X, lat = dt_sub$Y),
     maptype  = "satellite",
     zoom     = 16)
+
+  # https://stackoverflow.com/a/20580465
+  bb <- attr(gg_map, "bb")
+  sbar <- data.frame(lon.start = c(bb$ll.lon + 0.1 * (bb$ur.lon - bb$ll.lon)),
+    lon.end = c(bb$ll.lon + 0.25 * (bb$ur.lon - bb$ll.lon)),
+    lat.start = c(bb$ll.lat + 0.1 * (bb$ur.lat - bb$ll.lat)),
+    lat.end = c(bb$ll.lat + 0.1 * (bb$ur.lat - bb$ll.lat)))
+  sbar$distance <- dist_haversine(long = c(sbar$lon.start, sbar$lon.end),
+    lat = c(sbar$lat.start, sbar$lat.end))
+  ptspermm <- 2.83464567  # need this because geom_text uses mm, and themes use pts. Urgh.
+
   res <- ggmap(gg_map) +
     geom_point(aes(x = X, y = Y),
       data = dt_sub,
@@ -58,6 +69,25 @@ get_gg_sub <- function(dt_sub, buffer_x = 0.02, buffer_y = 0.02, label_color = "
       vjust = vjust,
       hjust = hjust,
       size = 6,
+      color = label_color) +
+    geom_segment(data = sbar,
+      aes(x = lon.start,
+        xend = lon.end,
+        y = lat.start,
+        yend = lat.end),
+      arrow = arrow(angle = 90, length = unit(0.1, "cm"),
+        ends = "both", type = "open"),
+      color = label_color) +
+    geom_text(data = sbar,
+      aes(x = (lon.start + lon.end) / 2,
+        y = lat.start + 0.025 * (bb$ur.lat - bb$ll.lat),
+        label = paste(format(distance,
+          digits = 4,
+          nsmall = 2),
+        "km")),
+      hjust = 0.5,
+      vjust = 0,
+      size = 8 / ptspermm,
       color = label_color)
   res
 }
@@ -94,4 +124,19 @@ get_sites <- function(lat, lon, site_tag, distance_threshold = 100) {
   m1_data <- dplyr::bind_rows(dt_sites_close, coords)
   m1_data <- cbind(m1_data, st_coordinates(m1_data))
   m1_data
+}
+
+dist_haversine <- function(long, lat) {
+
+  long <- long * pi / 180
+  lat <- lat * pi / 180
+  dlong <- (long[2] - long[1])
+  dlat  <- (lat[2] - lat[1])
+
+  # Haversine formula:
+  R <- 6371
+  a <- sin(dlat / 2) * sin(dlat / 2) + cos(lat[1]) * cos(lat[2]) * sin(dlong / 2) * sin(dlong / 2)
+  c <- 2 * atan2(sqrt(a), sqrt(1 - a))
+  d <- R * c
+  return(d) # in km
 }

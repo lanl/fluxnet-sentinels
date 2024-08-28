@@ -1,4 +1,6 @@
+options(debug = TRUE)
 library(ggmap) # install_github("stadiamaps/ggmap")
+library(ggspatial)
 source("scripts/99_utils.R")
 
 generate_overview <- function(sites, site_codes, buffer_x = 0.5, buffer_y = 0.2,
@@ -21,6 +23,17 @@ generate_overview <- function(sites, site_codes, buffer_x = 0.5, buffer_y = 0.2,
 
   gg_map <- get_map(location = bbox,
     maptype  = "stamen_toner_background")
+
+  # https://stackoverflow.com/a/20580465
+  bb <- attr(gg_map, "bb")
+  sbar <- data.frame(lon.start = c(bb$ll.lon + 0.1 * (bb$ur.lon - bb$ll.lon)),
+    lon.end = c(bb$ll.lon + 0.25 * (bb$ur.lon - bb$ll.lon)),
+    lat.start = c(bb$ll.lat + 0.1 * (bb$ur.lat - bb$ll.lat)),
+    lat.end = c(bb$ll.lat + 0.1 * (bb$ur.lat - bb$ll.lat)))
+  sbar$distance <- dist_haversine(long = c(sbar$lon.start, sbar$lon.end),
+    lat = c(sbar$lat.start, sbar$lat.end))
+  ptspermm <- 2.83464567  # need this because geom_text uses mm, and themes use pts. Urgh.
+
   gg_overview <- ggmap(gg_map) +
     geom_point(
       data = m1_data, aes(x = X, y = Y),
@@ -32,7 +45,26 @@ generate_overview <- function(sites, site_codes, buffer_x = 0.5, buffer_y = 0.2,
       hjust = nudge_x,
       size = 6,
       color = label_color
-    )
+    ) +
+    geom_segment(data = sbar,
+      aes(x = lon.start,
+        xend = lon.end,
+        y = lat.start,
+        yend = lat.end),
+      arrow = arrow(angle = 90, length = unit(0.1, "cm"),
+        ends = "both", type = "open"),
+      color = label_color) +
+    geom_text(data = sbar,
+      aes(x = (lon.start + lon.end) / 2,
+        y = lat.start + 0.025 * (bb$ur.lat - bb$ll.lat),
+        label = paste(format(distance,
+          digits = 4,
+          nsmall = 2),
+        "km")),
+      hjust = 0.5,
+      vjust = 0,
+      size = 8 / ptspermm,
+      color = label_color)
   list(gg_overview = gg_overview, m1_data = m1_data)
 }
 
@@ -40,6 +72,7 @@ generate_overview <- function(sites, site_codes, buffer_x = 0.5, buffer_y = 0.2,
 sites <- get_sites(50.45055, 4.5350415, "fleurus")
 overview <- generate_overview(sites, c("BE-Lon", "BE-Vie", "BE-Bra", "IRE"))
 gg_overview <- overview$gg_overview
+# ggsave("test.pdf", gg_overview)
 m1_data <- overview$m1_data
 
 dt_sub <- dplyr::filter(m1_data, site_code == "BE-Lon")
