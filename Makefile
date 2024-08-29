@@ -100,7 +100,8 @@ figures/all.pdf: figures/__rolling_grid_be-lon.pdf figures/__map.pdf figures/__f
 	cp temp.pdf $@
 	rm temp.pdf
 
-figures/supplement.pdf: tables/grid_all.pdf
+manuscript/supplement.pdf: manuscript/supplement.tex tables/grid_all.pdf
+	cd manuscript && pdflatex supplement.tex
 
 # ---
 data/ameriflux_pnw.csv: scripts/00_get_ameriflux.R
@@ -132,7 +133,7 @@ tables/grid_all.pdf: tables/grid_all.py data/grid_be-lon_7.csv data/grid_be-vie_
 # ---
 manuscript: manuscript/manuscript.pdf
 
-manuscript/manuscript.pdf: manuscript/manuscript.tex figures/all.pdf manuscript/fluxnet.bib
+manuscript/manuscript.pdf: manuscript/manuscript.tex figures/all.pdf manuscript/fluxnet.bib  manuscript/supplement.pdf
 	cd manuscript && pdflatex manuscript.tex
 	cd manuscript && bibtex manuscript
 	cd manuscript && bibtex manuscript

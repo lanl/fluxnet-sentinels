@@ -1,0 +1,23 @@
+\documentclass{article}
+
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{inputenc}
+\usepackage{geometry}
+\usepackage{subfig}
+
+\usepackage{ragged2e}  % for '\RaggedRight' macro
+\usepackage{calc}      % for '\widthof' macro
+\newcolumntype{P}[1]{>{\RaggedRight\hspace{0pt}}p{#1}}
+\newcolumntype{L}{>{\RaggedRight}X}
+
+\begin{document}
+
+\noindent Table S1: All possible pairwise combinations of dependent and independent variables for the IRE case study (n=51). $R^2$ is the coefficient of determination of a linear model fit to the two covariates for the period of the abnormal release event (corresponding to 'during' in Fig. 2). Effect is the event effect size of the interaction term 'during' the known release period matching the quantile of the distribution as specified by event quantile effect hyperparameter.
+
+\input{table_s1}
+
+\end{document}
