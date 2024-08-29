@@ -69,7 +69,7 @@ generate_overview <- function(sites, site_codes, buffer_x = 0.5, buffer_y = 0.2,
 }
 
 # --- ire
-sites <- get_sites(50.45055, 4.5350415, "fleurus")
+sites <- get_sites(50.45055, 4.5350415, "IRE")
 overview <- generate_overview(sites, c("BE-Lon", "BE-Vie", "BE-Bra", "IRE"))
 gg_overview <- overview$gg_overview
 # ggsave("test.pdf", gg_overview)

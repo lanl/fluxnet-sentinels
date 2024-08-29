@@ -280,7 +280,6 @@ def fit_rolling(
         ax2 = axs[1]
 
         g = sns.lineplot(data=g_data, x="timestamp", y="F", ax=ax1)
-        g.axvline(pd.to_datetime(date_event), color="yellow")
         g.axhline(event_effect, color="black", ls="--")
         g.set_ylim(0, panel_ylim)
         # ax1.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
@@ -358,6 +357,10 @@ def fit_rolling(
         # g_data[
         #     (g_data["p"] > abs(np.log(p_event))).values and (g_data["test"] > 0.7).values
         # ].shape
+
+        g.axvline(pd.to_datetime(date_event), color="yellow")
+        g2.axvline(pd.to_datetime(date_event), color="yellow")
+
         if noyticklabels:
             ax2.set_yticklabels([])
             ax2.yaxis.label.set_color("white")
@@ -378,7 +381,7 @@ def fit_rolling(
             x=0.25,
         )
         ax1.set_xlabel("")
-        ax2.set_xlabel("")
+        ax2.set_xlabel("Year")
         # plt.show()
         print(path_fig)
         plt.subplots_adjust(hspace=0.1)
