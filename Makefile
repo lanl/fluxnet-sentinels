@@ -1,8 +1,11 @@
-.PHONY: test clean manuscript
+.PHONY: test clean manuscript figures
 
-all: figures/all.pdf manuscript
+all: manuscript
 
 # ---
+figures: figures/all.pdf
+	cp figures/__map.pdf figures/__interaction_belon.pdf figures/__rolling_fleurus.pdf figures/__hyperparameter_experiment.pdf figures/__rolling_fukushima.pdf manuscript
+
 figures/figures.pdf: figures/figures.Rmd
 	Rscript -e 'rmarkdown::render("$<")'
 	-pdftk $@ cat 2-end output figures2.pdf
@@ -131,7 +134,7 @@ tables/grid_all.pdf: tables/grid_all.py data/grid_be-lon_7.csv data/grid_be-vie_
 	python $<
 
 # ---
-manuscript: manuscript/manuscript.pdf
+manuscript: manuscript/manuscript.pdf figures
 
 manuscript/manuscript.pdf: manuscript/manuscript.tex figures/all.pdf manuscript/fluxnet.bib  manuscript/supplement.pdf
 	cd manuscript && pdflatex manuscript.tex
@@ -143,9 +146,11 @@ manuscript/manuscript.pdf: manuscript/manuscript.tex figures/all.pdf manuscript/
 test:
 	python -m pytest
 
-clean:
-	-rm figures/all.pdf
+clean:	
 	-rm *.gpkg
 	-rm test*.gpkg
-	-rm test*.pdf
-	-rm figures/__rolling_fleurus_*_co2vta_10_7_0.9.pdf
+	-rm test*.pdf	
+
+latex_source.zip: manuscript
+	ls manuscript/*{.tex,.bbl,.bib,.cls,.sty,.bst,orcid.pdf} | zip -j -@ $@
+	zip -j figures.zip manuscript/__map.pdf manuscript/__interaction_belon.pdf manuscript/__rolling_fleurus.pdf manuscript/__hyperparameter_experiment.pdf manuscript/__rolling_fukushima.pdf
