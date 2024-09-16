@@ -5,6 +5,7 @@ all: manuscript
 # ---
 figures: figures/all.pdf
 	cp figures/__map.pdf figures/__interaction_belon.pdf figures/__rolling_fleurus.pdf figures/__hyperparameter_experiment.pdf figures/__rolling_fukushima.pdf manuscript
+	cp figures/__map.png figures/__interaction_belon.png figures/__rolling_fleurus.png figures/__hyperparameter_experiment.png figures/__rolling_fukushima.png manuscript
 
 figures/figures.pdf: figures/figures.Rmd
 	Rscript -e 'rmarkdown::render("$<")'
@@ -153,4 +154,6 @@ clean:
 
 latex_source.zip: manuscript
 	ls manuscript/*{.tex,.bbl,.bib,.cls,.sty,.bst,orcid.pdf} | zip -j -@ $@
-	zip -j figures.zip manuscript/__map.pdf manuscript/__interaction_belon.pdf manuscript/__rolling_fleurus.pdf manuscript/__hyperparameter_experiment.pdf manuscript/__rolling_fukushima.pdf
+	zip -j figures.zip \
+		manuscript/__map.pdf manuscript/__interaction_belon.pdf manuscript/__rolling_fleurus.pdf manuscript/__hyperparameter_experiment.pdf manuscript/__rolling_fukushima.pdf \
+		manuscript/__map.png manuscript/__interaction_belon.png manuscript/__rolling_fleurus.png manuscript/__hyperparameter_experiment.png manuscript/__rolling_fukushima.png
