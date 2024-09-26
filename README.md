@@ -1,6 +1,6 @@
 ## Eddy covariance towers as sentinels of abnormal radioactive material releases
 
-[![Paper DOI](https://img.shields.io/badge/Paper-DOI-blue.svg)](https://doi.org) [![Code DOI](https://img.shields.io/badge/Code-DOI-blue.svg)](https://doi.org)
+[![Paper DOI](https://img.shields.io/badge/Paper-DOI-blue.svg)](https://doi.org) [![Code DOI](https://img.shields.io/badge/Code-10.5281/zenodo.13845254-blue.svg)](https://doi.org/10.5281/zenodo.13845254)
 
 Code for the publication:
 
