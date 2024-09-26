@@ -10,8 +10,6 @@ Code for the publication:
 
 [manuscript/manuscript.pdf](manuscript/manuscript.pdf)
 
-[figures/all.pdf](figures/all.pdf)
-
 ### Setup
 
 ```R
