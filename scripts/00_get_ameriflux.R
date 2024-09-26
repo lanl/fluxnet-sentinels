@@ -10,8 +10,8 @@ check_site <- function(site_id) {
   dir.create("../../data/ameriflux", showWarnings = FALSE)
   if (length(grep(site_id, fpaths)) == 0) {
     fpath <- amf_download_base(
-      user_id = "jstaaa",
-      user_email = "jsta@lanl.gov",
+      # user_id = "",
+      # user_email = "",
       site_id = site_id,
       data_policy = "CCBY4.0",
       agree_policy = TRUE,
