@@ -15,6 +15,8 @@ figures/*.db
 *.pptx
 *.nc
 manuscript/reviewer_comments*
+manuscript/diff*
+manuscript/save*
 
 manuscript/*.log
 manuscript/*.aux
