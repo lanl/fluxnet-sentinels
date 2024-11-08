@@ -159,6 +159,9 @@ diff.pdf: manuscript/manuscript.tex
 	cd manuscript && latexdiff -t CTRADITIONAL save_manuscript.tex manuscript.tex > diff.tex --flatten --append-safecmd=doi --allow-spaces --disable-citation-markup
 	cd manuscript && latexdiff save_manuscript.bbl manuscript.bbl > diff.bbl --flatten --append-safecmd=doi --allow-spaces --disable-citation-markup
 	cd manuscript && pdflatex diff.tex
+	# cd manuscript && bibtex diff
+	# cd manuscript && bibtex diff
+	cd manuscript && pdflatex diff.tex
 
 latex_source.zip: manuscript
 	ls manuscript/*{.tex,.bbl,.bib,.cls,.sty,.bst,orcid.pdf} | zip -j -@ $@
