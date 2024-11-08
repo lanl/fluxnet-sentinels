@@ -152,6 +152,13 @@ clean:
 	-rm test*.gpkg
 	-rm test*.pdf	
 
+reviewer_comments.pdf: manuscript/reviewer_comments.md
+	cd manuscript && pandoc reviewer_comments.md -H quote_setup.tex -o $@
+
+diff.pdf: manuscript.tex
+	latexdiff -t CTRADITIONAL save_manuscript.tex $< > diff.tex
+	pdflatex diff.tex
+
 latex_source.zip: manuscript
 	ls manuscript/*{.tex,.bbl,.bib,.cls,.sty,.bst,orcid.pdf} | zip -j -@ $@
 	zip -j figures.zip \

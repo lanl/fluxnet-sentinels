@@ -14,6 +14,7 @@ figures/*.db
 .smbdelete*
 *.pptx
 *.nc
+manuscript/reviewer_comments*
 
 manuscript/*.log
 manuscript/*.aux
