@@ -22,6 +22,7 @@ def process_grid(i):
 # values here are different than the overview table because here they're relative to the POR
 # in the overview table they're limited to only during the event
 
+# # IRE case study
 flist = ["data/grid_be-lon_7.csv", "data/grid_be-vie_7.csv", "data/grid_be-bra_7.csv"]
 grid_list = [process_grid(i) for i in range(len(flist))]
 
@@ -29,6 +30,19 @@ utils.pdf_table(
     list(itertools.chain(*grid_list)),
     "",
     "tables/grid_all.pdf",
+    ["Dep", "Indep", "R2", "Effect", "Site"],
+    render_only=False,
+)
+
+# # Fukushima case study
+
+flist = ["data/grid_oz-mul_7.csv", "data/grid_us-gle_7.csv", "data/grid_us-wrc_7.csv"]
+grid_list = [process_grid(i) for i in range(len(flist))]
+
+utils.pdf_table(
+    list(itertools.chain(*grid_list)),
+    "",
+    "tables/grid_all_fukushima.pdf",
     ["Dep", "Indep", "R2", "Effect", "Site"],
     render_only=False,
 )

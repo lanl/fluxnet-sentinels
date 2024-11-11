@@ -100,6 +100,14 @@ def pdf_table(
             shell=True,
         )
 
+    if path_pdf == "tables/grid_all_fukushima.pdf":
+        subprocess.call(
+            "pandoc --columns=10 mdtable.md -V fontsize=14pt -o "
+            + "manuscript/table_s1_fukushima.tex",
+            # + " --pdf-engine-opt=-shell-escape",
+            shell=True,
+        )
+
     try:  # conda pdfcrop
         subprocess.check_call(
             "pdfcrop.pl " + path_pdf + " " + path_pdf,

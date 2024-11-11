@@ -134,6 +134,8 @@ data/grid_be-bra_7.csv: figures/__rolling_fleurus_bebra_co2vta_10_7_0.9.pdf
 tables/grid_all.pdf: tables/grid_all.py data/grid_be-lon_7.csv data/grid_be-vie_7.csv data/grid_be-bra_7.csv
 	python $<
 
+data/grid_us-wrc_7.csv: figures/__rolling_fukushima_uswrc_levrh_45_7_0.9.pdf
+
 # ---
 manuscript: manuscript/manuscript.pdf figures
 
