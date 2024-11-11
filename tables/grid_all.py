@@ -13,6 +13,11 @@ def process_grid(i):
     dt["site"] = utils.lower_to_mixed_case(flist[i].split("_")[1])
     dt = dt[dt["r2"] > 0].sort_values("r2", ascending=False)
     dt["fquant"] = dt["fquant"] * 100
+
+    dt_names = [x for x in dt.columns]
+    if "n_days" in dt_names:
+        dt = dt[list(itertools.compress(dt_names, [x != "n_days" for x in dt_names]))]
+
     dt = dt.values.tolist()
     # dt = dt + [SEPARATING_LINE]
     return dt
