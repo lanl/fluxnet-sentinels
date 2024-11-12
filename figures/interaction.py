@@ -29,7 +29,12 @@ def hue_regplot(data, x, y, hue, palette=None, **kwargs):
     for key in levels:
         regplots.append(
             sns.regplot(
-                x=x, y=y, data=data[data[hue] == key], color=palette[key], **kwargs
+                x=x,
+                y=y,
+                data=data[data[hue] == key],
+                color=palette[key],
+                marker="$\circ$",
+                **kwargs
             )
         )
 
