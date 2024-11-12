@@ -5,8 +5,9 @@ all: manuscript
 # ---
 figures: figures/all.pdf
 	cp figures/__map.pdf figures/__interaction_belon.pdf \
-	figures/__interaction_uswrc.pdf figures/__rolling_fleurus.pdf \
-	figures/__hyperparameter_experiment.pdf figures/__rolling_fukushima.pdf manuscript
+	figures/__interaction_uswrc.pdf figures/__interaction_bebra.pdf \
+	figures/__interaction_bevie.pdf \
+	figures/__rolling_fleurus.pdf figures/__hyperparameter_experiment.pdf figures/__rolling_fukushima.pdf manuscript
 	cp figures/__map.png figures/__interaction_belon.png \
 	figures/__interaction_uswrc.png figures/__rolling_fleurus.png \
 	figures/__hyperparameter_experiment.png figures/__rolling_fukushima.png manuscript
@@ -108,7 +109,7 @@ figures/all.pdf: figures/__rolling_grid_be-lon.pdf figures/__map.pdf figures/__f
 	cp temp.pdf $@
 	rm temp.pdf
 
-manuscript/supplement.pdf: manuscript/supplement.tex tables/grid_all.pdf
+manuscript/supplement.pdf: manuscript/supplement.tex tables/grid_all.pdf figures/interaction.py
 	cd manuscript && pdflatex supplement.tex
 
 # ---

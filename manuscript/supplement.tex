@@ -15,6 +15,8 @@
 \newcolumntype{P}[1]{>{\RaggedRight\hspace{0pt}}p{#1}}
 \newcolumntype{L}{>{\RaggedRight}X}
 
+\pagenumbering{gobble}
+
 \begin{document}
 \title{Supplmentary material to: "Eddy covariance towers as sentinels of abnormal radioactive material releases"}
 \date{}
@@ -25,21 +27,39 @@
 \renewcommand{\thefigure}{S\@arabic\c@figure}
 \makeatother
 
-\begin{figure}
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=11cm]{__interaction_uswrc}
-	\caption{Interaction plots at the US-Wrc site between latent heat and relative humidity for the period of the known abnormal release (A) and an arbitrary non-release period (B). Also shown is the distribution of all interaction effect sizes (gray) compared with the effect size of the time period shown in the corresponding left panels (orange, C, D).}
-	\label{fig:interaction_fukushima}
+	\caption{Interaction plots at the BE-Bra site between air temperature ($C^{\circ}$) and $CO_2$ (ppm)for the period of the known abnormal release (A) and an arbitrary non-release period (B). Also shown is the distribution of all interaction effect sizes (gray) compared with the effect size of the time period shown in the corresponding left panels (orange, C, D).}
+	\label{fig:interaction_bebra}
 \end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=11cm]{__interaction_bevie}
+	\caption{Interaction plots at the BE-Vie site between air temperature ($C^{\circ}$) and $CO_2$ (ppm) for the period of the known abnormal release (A) and an arbitrary non-release period (B). Also shown is the distribution of all interaction effect sizes (gray) compared with the effect size of the time period shown in the corresponding left panels (orange, C, D).}
+	\label{fig:interaction_bevie}
+\end{figure}
+
+% \begin{figure}[H]
+% 	\centering
+% 	\includegraphics[width=11cm]{__interaction_uswrc}
+% 	\caption{Interaction plots at the US-Wrc site between latent heat and relative humidity for the period of the known abnormal release (A) and an arbitrary non-release period (B). Also shown is the distribution of all interaction effect sizes (gray) compared with the effect size of the time period shown in the corresponding left panels (orange, C, D).}
+% 	\label{fig:interaction_fukushima}
+% \end{figure}
+
+\newpage
 
 \noindent Table S0: Variable definitions for Tables S1 and S2.
 \input{table_s0}
 
-\noindent Table S1: All possible pairwise combinations of dependent and independent variables for the IRE case study (n=51). $R^2$ is the coefficient of determination of a linear model fit to the two covariates for the period of the abnormal release event (corresponding to 'during' in Fig. 2). Effect is the event effect size of the interaction term 'during' the known release period matching the quantile of the distribution as specified by event quantile effect hyperparameter.
+\noindent Table S1: All possible pairwise combinations of dependent and independent variables for the IRE case study (n=51). $R^2$ is the coefficient of determination of a linear model fit to the two covariates for the entirety of the period of record (not specific to any window in Fig. 2). Effect is the event effect size of the interaction term 'during' the known release period matching the 100\% quantile of the distribution.
 
 \input{table_s1}
 
-\noindent Table S2: All possible pairwise combinations of dependent and independent variables for the Fukushima case study (n=51). $R^2$ is the coefficient of determination of a linear model fit to the two covariates for the period of the abnormal release event (corresponding to 'during' in Fig. 2). Effect is the event effect size of the interaction term 'during' the known release period matching the quantile of the distribution as specified by event quantile effect hyperparameter.
+\noindent Table S2: All possible pairwise combinations of dependent and independent variables for the Fukushima case study (n=51) for screening of candidate variable pairs. $R^2$ is the coefficient of determination of a linear model fit to the two covariates for the entirety of the period of record (not specific to any window in Fig. 2). Effect is the event effect size of the interaction term 'during' the known release period matching the 100\% quantile of the distribution.
+
+
 
 \input{table_s1_fukushima}
 
