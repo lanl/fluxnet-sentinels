@@ -159,8 +159,8 @@ clean:
 	-rm test*.gpkg
 	-rm test*.pdf	
 
-reviewer_comments.pdf: manuscript/reviewer_comments.md
-	cd manuscript && pandoc reviewer_comments.md -H quote_setup.tex -o $@
+manuscript/reviewer_comments.pdf: manuscript/reviewer_comments.md
+	cd manuscript && pandoc -V geometry:margin=1in -H quote_setup.tex -o reviewer_comments.pdf reviewer_comments.md
 
 manuscript/diff.pdf: manuscript/manuscript.tex
 	cd manuscript && latexdiff -t CTRADITIONAL save_manuscript.tex manuscript.tex > diff.tex --flatten --append-safecmd=doi --allow-spaces --disable-citation-markup
