@@ -16,8 +16,23 @@
 \newcolumntype{L}{>{\RaggedRight}X}
 
 \begin{document}
+\title{Supplmentary material to: "Eddy covariance towers as sentinels of abnormal radioactive material releases"}
+\date{}
+\maketitle
 
-\noindent Table S0: Variable definitions
+
+\makeatletter 
+\renewcommand{\thefigure}{S\@arabic\c@figure}
+\makeatother
+
+\begin{figure}
+	\centering
+	\includegraphics[width=11cm]{__interaction_uswrc}
+	\caption{Interaction plots at the US-Wrc site between latent heat and relative humidity for the period of the known abnormal release (A) and an arbitrary non-release period (B). Also shown is the distribution of all interaction effect sizes (gray) compared with the effect size of the time period shown in the corresponding left panels (orange, C, D).}
+	\label{fig:interaction_fukushima}
+\end{figure}
+
+\noindent Table S0: Variable definitions for Tables S1 and S2.
 \input{table_s0}
 
 \noindent Table S1: All possible pairwise combinations of dependent and independent variables for the IRE case study (n=51). $R^2$ is the coefficient of determination of a linear model fit to the two covariates for the period of the abnormal release event (corresponding to 'during' in Fig. 2). Effect is the event effect size of the interaction term 'during' the known release period matching the quantile of the distribution as specified by event quantile effect hyperparameter.

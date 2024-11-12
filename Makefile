@@ -4,8 +4,12 @@ all: manuscript
 
 # ---
 figures: figures/all.pdf
-	cp figures/__map.pdf figures/__interaction_belon.pdf figures/__rolling_fleurus.pdf figures/__hyperparameter_experiment.pdf figures/__rolling_fukushima.pdf manuscript
-	cp figures/__map.png figures/__interaction_belon.png figures/__rolling_fleurus.png figures/__hyperparameter_experiment.png figures/__rolling_fukushima.png manuscript
+	cp figures/__map.pdf figures/__interaction_belon.pdf \
+	figures/__interaction_uswrc.pdf figures/__rolling_fleurus.pdf \
+	figures/__hyperparameter_experiment.pdf figures/__rolling_fukushima.pdf manuscript
+	cp figures/__map.png figures/__interaction_belon.png \
+	figures/__interaction_uswrc.png figures/__rolling_fleurus.png \
+	figures/__hyperparameter_experiment.png figures/__rolling_fukushima.png manuscript
 
 figures/figures.pdf: figures/figures.Rmd
 	Rscript -e 'rmarkdown::render("$<")'
@@ -137,7 +141,7 @@ tables/grid_all.pdf: tables/grid_all.py data/grid_be-lon_7.csv data/grid_be-vie_
 data/grid_us-wrc_7.csv: figures/__rolling_fukushima_uswrc_levrh_45_7_0.9.pdf
 
 # ---
-manuscript: manuscript/manuscript.pdf figures
+manuscript: figures manuscript/manuscript.pdf
 
 manuscript/manuscript.pdf: manuscript/manuscript.tex figures/all.pdf manuscript/fluxnet.bib  manuscript/supplement.pdf
 	cd manuscript && pdflatex manuscript.tex
