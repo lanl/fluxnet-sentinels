@@ -142,7 +142,7 @@ tables/grid_all.pdf: tables/grid_all.py data/grid_be-lon_7.csv data/grid_be-vie_
 data/grid_us-wrc_7.csv: figures/__rolling_fukushima_uswrc_levrh_45_7_0.9.pdf
 
 # ---
-manuscript: figures manuscript/manuscript.pdf
+manuscript: figures manuscript/manuscript.pdf manuscript/diff.pdf
 
 manuscript/manuscript.pdf: manuscript/manuscript.tex figures/all.pdf manuscript/fluxnet.bib  manuscript/supplement.pdf
 	cd manuscript && pdflatex manuscript.tex
@@ -162,7 +162,7 @@ clean:
 reviewer_comments.pdf: manuscript/reviewer_comments.md
 	cd manuscript && pandoc reviewer_comments.md -H quote_setup.tex -o $@
 
-diff.pdf: manuscript/manuscript.tex
+manuscript/diff.pdf: manuscript/manuscript.tex
 	cd manuscript && latexdiff -t CTRADITIONAL save_manuscript.tex manuscript.tex > diff.tex --flatten --append-safecmd=doi --allow-spaces --disable-citation-markup
 	cd manuscript && latexdiff save_manuscript.bbl manuscript.bbl > diff.bbl --flatten --append-safecmd=doi --allow-spaces --disable-citation-markup
 	cd manuscript && pdflatex diff.tex

@@ -80,7 +80,7 @@ def interaction_plot(
         ax=ax2,
     )
     gg2.axvline(fevent["fevent"].values[0], color="orange")
-    gg2.set_xlim(0, 150)
+    gg2.set_xlim(-2, 150)
     ax2.set_xlabel("Effect size")
     ax2.set_title("C.", pad=0, x=0.07, y=0.9)
     #
@@ -101,7 +101,7 @@ def interaction_plot(
         ax=ax4,
     )
     gg4.axvline(np.nanmin(pfdist["fdist"]), color="orange")
-    gg4.set_xlim(0, 150)
+    gg4.set_xlim(-2, 150)
     ax4.set_xlabel("Effect size")
     ax4.set_title("D.", pad=0, x=0.07, y=0.9)
     #
