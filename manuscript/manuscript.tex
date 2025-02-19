@@ -25,32 +25,38 @@
 \date{} 					% Or removing it
 
 \author{
+	% 1
 	\href{https://orcid.org/0000-0002-5924-2464}{\includegraphics[scale=0.06]{orcid.pdf}\hspace{1mm}Corresponding Author: Jemma Stachelek$^1$} \\
 	$^1$ High Performance Computing Division\\
 	Los Alamos National Laboratory\\
 	Los Alamos, NM, USA, 87544 \\
 	\texttt{jsta@lanl.gov} \\
 	\And
-	Vachel A. Kraklow$^2$ \\
-	$^2$ Earth and Environmental Sciences Division\\
-	Los Alamos National Laboratory\\
-	Los Alamos, NM, USA, 87544 \\
-	\And
-	Elizabeth Christi Thompson$^3$ \\
-	$^3$ Computer, Computational, and Statistical Sciences Division\\
-	Los Alamos National Laboratory\\
-	Los Alamos, NM, USA, 87544 \\
-	\And
+	% 4
 	\textbf{Lee Turin Dickman}$^2$ \\
 	$^2$ Earth and Environmental Sciences Division\\
 	Los Alamos National Laboratory\\
-	Los Alamos, NM, USA, 87544 \\
+	Los Alamos, NM, USA, 87544 \\	
 	\And
+	% 2
+	Vachel A. Kraklow$^2$ \\
+	$^2$ Earth and Environmental Sciences Division\\
+	Los Alamos National Laboratory\\
+	Los Alamos, NM, USA, 87544 \\	
+	\And
+	% 5
 	\textbf{Emily Casleton}$^3$ \\
 	$^3$ Computer, Computational, and Statistical Sciences Division\\
 	Los Alamos National Laboratory\\
-	Los Alamos, NM, USA, 87544 \\
+	Los Alamos, NM, USA, 87544 \\	
 	\And
+	% 3
+	Elizabeth Christi Thompson$^3$ \\
+	$^3$ Computer, Computational, and Statistical Sciences Division\\
+	Los Alamos National Laboratory\\
+	Los Alamos, NM, USA, 87544 \\	
+	\And
+	% 6
 	\textbf{Sanna Sevanto}$^2$ \\
 	$^2$ Earth and Environmental Sciences Division\\
 	Los Alamos National Laboratory\\
@@ -156,7 +162,7 @@ For the Fukushima case study, our objective was to test the sensitivity of our a
 \begin{figure}
 	\centering
 	\includegraphics[width=11cm]{__interaction_belon}
-	\caption{Interaction plots at the BE-Lon site between air temperature ($C^{\circ}$) and $CO_2$ (ppm) for the period of the known abnormal release (A) and an arbitrary non-release period (B). Also shown is the distribution of all interaction effect sizes (gray) compared with the effect size of the time period shown in the corresponding left panels (orange, C, D).}
+	\caption{Interaction plots at the BE-Lon site between air temperature ($^{\circ}C$) and $CO_2$ (ppm) for the period of the known abnormal release (A) and an arbitrary non-release period (B). Also shown is the distribution of all interaction effect sizes (gray) compared with the effect size of the time period shown in the corresponding left panels (orange, C, D).}
 	\label{fig:interaction}
 \end{figure}
 
@@ -164,7 +170,7 @@ For the Fukushima case study, our objective was to test the sensitivity of our a
 \begin{figure}
 	\centering
 	\includegraphics[width=16cm]{__rolling_fleurus}
-	\caption{Time series plots (2004-2013) of rolling event detection analysis at the IRE site for the $CO_2$ and air temperature ($C^{\circ}$) variable pair. Event detection lines (orange), interaction effect size (blue), and event effect size (dashed black line) are shown in the top panels. The fraction of time that the wind direction was towards the particular tower (solid black) are shown in the corresponding bottom panels.}
+	\caption{Time series plots (2004-2013) of rolling event detection analysis at the IRE site for the $CO_2$ and air temperature ($^{\circ}C$) variable pair. Event detection lines (orange), interaction effect size (blue), and event effect size (dashed black line) are shown in the top panels. The fraction of time that the wind direction was towards the particular tower (solid black) are shown in the corresponding bottom panels.}
 	\label{fig:rolling}
 \end{figure}
 
@@ -189,7 +195,7 @@ More generally, we show that flux tower records have value for this type of data
 
 Another contributor to the success of our approach was our ability to compare event detections at  close towers in prevailing wind directions against more distant towers (refer to Figure 1), increasing our confidence that we were seeing a true signal and not spurious noise. The relatively dense networks of flux towers with long data records leveraged in both locations also aided these case studies. This level of flux tower density may be found in the United States, Western/Central Europe, Japan, and Australia, which have high densities of flux towers, but not throughout the rest of the world \citep{baldocchi2001fluxnet,pastorello2020fluxnet2015}. As a result, this may impose geographical limits on our approach, although installation and maintenance of new flux towers in locations of interest may be cost effective compared to other monitoring approaches. Another attribute that likely aided our investigations was the fact that all three of the flux towers we examined were located in similar agricultural and forested ecosystem types for the IRE and Fukushima case studies respectively. Although investigating whether or not flux tower combinations with differing ecosystems would yield similar results is beyond the scope of the present study, we suspect that the data records among towers in disparate ecosystem types could differ too drastically to be of comparative use. For example, \citet{pastorello2020fluxnet2015} show that towers in the crop ecosystem type, of which all three sites used in this study belong, have a relatively narrow distribution of fluxes (i.e., gross primary production, GPP) compared to towers in the grassland or evergreen broadleaf forest types. One reason for this narrow spread in crop ecosystems may be the relative homogeneity of flux tower footprints in crop ecosystems, which typically extend to within 1000m of the tower depending on atmospheric conditions \citep[e.g., wind speed and direction,][]{chuRepresentativenessEddyCovarianceFlux2021}. Given that towers in other ecosystem types with a more heterogeneous flux tower footprint have a wider distribution of fluxes \citep[e.g.][]{pastorello2020fluxnet2015}, we suspect that having all the towers in the IRE case study located in a homogenous ecosystem type was helpful in reducing the spikiness and spread of the data. 
 
-The biggest improvements to our approach would likely come from coupling our data mining procedure with rigorous air pollutant dispersion modeling \cite[e.g.,][]{meszarosPredictabilityDispersionFukushimaderived2016}. This would eliminate the need for indirect estimation of material transport via uncertainty analyses and instead use simulation results to analytically determine the likely arrival and duration of material deposition. Further improvements could be made by incorporating knowledge about the composition of materials being deposited \citep{international2006iaea, meszarosPredictabilityDispersionFukushimaderived2016} and/or the interactions between material exposure and other environmental stressors \citep{mousseauPlantsLightIonizing2020}, which likely affects the severity and timing of ecosystem responses and by extension the fluxes being measured by a given tower. Such information may help disentangle potential interference of atmospheric contaminants with infrared measurement of $CO_2$ from declines in photosynthetic $CO_2$ uptake of contaminated vegetation given our observation that during and after the known abnormal release, the slopes of the relationships between $CO_2$ and air temperature become less negative than before the event, with lower than expected $CO_2$ at low air temperature. Although the chemical makeup of possible atmospheric contaminants is unknown, interference by iodine itself is unlikely to affect measurements of $CO_2$ given that the absorption spectra of iodine peaks at much shorter wavelengths around 10-7 m \citep{haynes2016crc} compared to that of $CO_2$ which peaks around 1700-2100 10-9 m (LICOR Biosciences Inc., Lincoln, NE).
+The biggest improvements to our approach would likely come from coupling our data mining procedure with rigorous air pollutant dispersion modeling \cite[e.g.,][]{meszarosPredictabilityDispersionFukushimaderived2016}. This would eliminate the need for indirect estimation of material transport via uncertainty analyses and instead use simulation results to analytically determine the likely arrival and duration of material deposition. Further improvements could be made by incorporating knowledge about the composition of materials being deposited \citep{international2006iaea, meszarosPredictabilityDispersionFukushimaderived2016} and/or the interactions between material exposure and other environmental stressors \citep{mousseauPlantsLightIonizing2020}, which likely affects the severity and timing of ecosystem responses and by extension the fluxes being measured by a given tower. Such information may help disentangle potential interference of atmospheric contaminants with infrared measurement of $CO_2$ from declines in photosynthetic $CO_2$ uptake of contaminated vegetation given our observation that during and after the known abnormal release, the slopes of the relationships between $CO_2$ and air temperature become less negative than before the event, with lower than expected $CO_2$ at low air temperature. Although the chemical makeup of possible atmospheric contaminants is unknown, interference by iodine itself is unlikely to affect measurements of $CO_2$ given that the absorption spectra of iodine peaks at much shorter wavelengths around $10^{-7}$ m \citep{haynes2016crc} compared to that of $CO_2$ which peaks around 1700-2100 $10^{-9}$ m (LICOR Biosciences Inc., Lincoln, NE).
 
 The fact that we were able to identify known releases (along with potential unidentified abnormal events) in the data records from both a large event (i.e. Fukushima) as well as a smaller event despite not having a detailed radiological or atmospheric transport model is a strength of our approach. Furthermore, our approach is not limited to a radiological context, any abnormal event that affects the plant community and is reflected in flux tower data is a potential target. Because our approach is light-weight and resistant to systematic errors in the observational record, it has broad applicability beyond specific constituents and ecosystem types to identify a wide variety of limited-duration impacts to the plant community within flux tower footprints to ensure human health and industrial safety.
 
