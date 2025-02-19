@@ -2,11 +2,11 @@
 
 [![Paper DOI](https://img.shields.io/badge/Paper-DOI-blue.svg)](https://doi.org) [![Code DOI](https://img.shields.io/badge/Code-10.5281/zenodo.13845254-blue.svg)](https://doi.org/10.5281/zenodo.13845254)
 
-> Computing bivariate contrasts and time-series anomaly detection.
+> Computing bivariate contrasts and time-series anomalies for event detection and flagging.
 
 Code for the publication:
 
-> Stachelek J., Vachel A. Kraklow, E. Christi Thompson, L. Turin Dickman, Emily Casleton, Sanna Sevanto, Ann Junghans. _In-prep_. Eddy covariance towers as sentinels of abnormal radioactive material releases.
+> Stachelek J., Vachel A. Kraklow, E. Christi Thompson, L. Turin Dickman, Emily Casleton, Sanna Sevanto, Ann Junghans. _Accepted_. Eddy covariance towers as sentinels of abnormal radioactive material releases.
 
 ### Products
 
