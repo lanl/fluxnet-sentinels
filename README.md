@@ -1,12 +1,12 @@
 ## Eddy covariance towers as sentinels of abnormal radioactive material releases
 
-[![Paper DOI](https://img.shields.io/badge/Paper-DOI-blue.svg)](https://doi.org) [![Code DOI](https://img.shields.io/badge/Code-10.5281/zenodo.13845254-blue.svg)](https://doi.org/10.5281/zenodo.13845254)
+[![Paper DOI](https://img.shields.io/badge/Paper-10.1007/s11356-025-36171-3-blue.svg)](https://doi.org/10.1007/s11356-025-36171-3) [![Code DOI](https://img.shields.io/badge/Code-10.5281/zenodo.13845254-blue.svg)](https://doi.org/10.5281/zenodo.13845254)
 
 > Computing bivariate contrasts and time-series anomalies for event detection and flagging.
 
 Code for the publication:
 
-> Stachelek J., Vachel A. Kraklow, E. Christi Thompson, L. Turin Dickman, Emily Casleton, Sanna Sevanto, Ann Junghans. _Accepted_. Eddy covariance towers as sentinels of abnormal radioactive material releases.
+> Stachelek J., Vachel A. Kraklow, E. Christi Thompson, L. Turin Dickman, Emily Casleton, Sanna Sevanto, Ann Junghans. 2025. Eddy covariance towers as sentinels of abnormal radioactive material releases. 10.1007/s11356-025-36171-3
 
 ### Products
 
